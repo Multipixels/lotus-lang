@@ -1,0 +1,77 @@
+// These are comments
+
+// DATATYPES
+
+// Boolean types
+boolean someTruthValue = false;
+boolean anotherTruthValue = true;
+
+// Numerical types
+integer someInteger = 1;
+float someFloat = 1f;
+float anotherFloat = 2.5f;
+
+// Characters
+character theLetterA = 'a';
+
+// Collections
+collection<integer> myCollection = [2, 1, 6, 3, 8];
+dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
+
+myCollection[2] // => gives back 6
+
+// String
+string myString = "hello";
+collection<char> sameString = ['h', 'e', 'l', 'l', 'o'];
+
+// FUNCTIONS
+
+int myFunction(integer a, boolean b) 
+{
+    char c = 'd';
+    return c;
+}
+
+// CONTROL STRUCTURES
+
+if(someTruthValue) 
+{
+    // some code that executes if someTruthValue evaluates to true
+}
+else if(anotherTruthValue) 
+{
+    // some code that executes if anotherTruthValue evaluates to true
+} 
+else 
+{
+    // some code that executes if someTruthValue evaluates to false
+}
+
+while(anotherTruthValue)
+{
+    // repeat some code until anotherTruthValue evaluates to false
+}
+
+do {
+    // run this code first, and check condition. repeat until someTruthValue is checked and evaluates to false
+} while (someTruthValue)
+
+for(int i = 0; i < 10; i++) {
+    // run code until condition (second statement) fails
+}
+
+iterate(var : myCollection) {
+    // iterates over every value in myCollection, setting var to that value
+}
+
+// BUILT-IN FUNCTIONS
+log("Hello World!"); // Logs input into the console
+length(myCollection); // Returns the length of a collection (# of characters in string, # of elements in collection, # of keys in dictionary)
+
+a == b; // EQ
+a != b; // NEQ
+a < b; a > b; a <= b; a >= b; // LT, GT, LTEQ, GTEQ
+!a // NOT
+a && b // AND
+a || b // OR
+a |X| b // XOR 
