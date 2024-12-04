@@ -74,11 +74,18 @@ namespace token
 		{"iterate", ITERATE},
 	};
 
-	typedef struct Token 
+	class Token 
 	{
-		TokenType tokenType;
-		std::string Literal;
-	} Token;
+	private:
+		TokenType m_tokenType;
+		std::string m_literal;
+	public:
+		Token(TokenType tokenType, std::string *m_literal)
+		{
+			m_tokenType = tokenType;
+			m_literal->assign(*m_literal);
+		}
+	};
 
 	TokenType LookupIdentifier(std::string *identifier);
 }

@@ -1,6 +1,7 @@
 #include "token.h"
 
-namespace token {
+namespace token 
+{
 
 	TokenType LookupIdentifier(std::string* identifier)
 	{
