@@ -6,6 +6,13 @@ namespace lexer
 {
 	class Lexer
 	{
+	public:
+		Lexer(std::string* input);
+
+		// Returns the token we are currently on.
+		// Increments position to next token.
+		token::Token nextToken();
+
 	private:
 		std::string* m_input;
 		char m_currentChar;
@@ -34,11 +41,5 @@ namespace lexer
 		// Returns the character in 'm_nextPosition' without progressing through the input string.
 		char peekChar();
 
-	public:
-		Lexer(std::string* input);
-
-		// Returns the token we are currently on.
-		// Increments position to next token.
-		token::Token nextToken();
 	};
 }

@@ -18,11 +18,11 @@ TEST(LexerTest, LexNextToken)
     TokenLiteralPair tests[] =
     {
         TokenLiteralPair(token::PLUS, "+"),
-        TokenLiteralPair(token::EQ, "="),
+        TokenLiteralPair(token::ASSIGN, "="),
         TokenLiteralPair(token::MINUS, "-"),
         TokenLiteralPair(token::SEMICOLON, ";"),
         TokenLiteralPair(token::PLUS, "+"),
-        TokenLiteralPair(token::EQ, "="),
+        TokenLiteralPair(token::ASSIGN, "="),
         TokenLiteralPair(token::MINUS, "-"),
         TokenLiteralPair(token::SEMICOLON, ";"),
         TokenLiteralPair(token::END_OF_FILE, ""),

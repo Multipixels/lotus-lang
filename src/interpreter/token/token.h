@@ -127,11 +127,8 @@ namespace token
 		TokenType m_type;
 		std::string m_literal;
 
-		Token(TokenType tokenType, std::string *m_literal)
-		{
-			m_type = tokenType;
-			m_literal->assign(*m_literal);
-		}
+		Token();
+		Token(TokenType tokenType, std::string m_literal);
 	};
 
 	TokenType LookupIdentifier(std::string *identifier);
