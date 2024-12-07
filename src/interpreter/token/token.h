@@ -20,11 +20,12 @@ namespace token
 		AMPERSAND,
 		PIPE,
 
+		AND,
+		OR,
+
 		EQ,
 		NEQ,
-		LT,
 		LEQ,
-		GT,
 		GEQ,
 
 		// Delimiters
@@ -38,6 +39,8 @@ namespace token
 		RBRACE,
 		LBRACKET,
 		RBRACKET,
+		LCHEVRON,
+		RCHEVRON,
 
 		// Keywords
 		INTEGER_TYPE,
@@ -51,12 +54,15 @@ namespace token
 		ELSE,
 		DO,
 		WHILE,
+		FOR,
 		ITERATE,
+		RETURN,
 
 		// Literals
 		TRUE_LITERAL,
 		FALSE_LITERAL,
 		INTEGER_LITERAL,
+		FLOAT_LITERAL,
 		CHARACTER_LITERAL,
 		STRING_LITERAL,
 
@@ -75,11 +81,11 @@ namespace token
 		{BANG, "BANG"}, 
 		{AMPERSAND, "AMPERSAND"},
 		{PIPE, "PIPE"},
+		{AND, "AND"},
+		{OR, "OR"},
 		{EQ, "EQ"},
 		{NEQ, "NEQ"}, 
-		{LT, "LT"}, 
 		{LEQ, "LEQ"},
-		{GT, "GT"}, 
 		{GEQ, "GEQ"},
 		{COMMA, "COMMA"},
 		{COLON, "COLON"},
@@ -90,6 +96,8 @@ namespace token
 		{RBRACE, "RBRACE"},
 		{LBRACKET, "LBRACKET"},
 		{RBRACKET, "RBRACKET"},
+		{LCHEVRON, "LCHEVRON"},
+		{RCHEVRON, "RCHEVRON"},
 		{INTEGER_TYPE, "INTEGER_TYPE"},
 		{BOOLEAN_TYPE, "BOOLEAN_TYPE"},
 		{FLOAT_TYPE, "FLOAT_TYPE"},
@@ -101,24 +109,36 @@ namespace token
 		{ELSE, "ELSE"},
 		{DO, "DO"}, 
 		{WHILE, "WHILE"}, 
+		{FOR, "FOR"},
 		{ITERATE, "ITERATE"}, 
+		{RETURN, "RETURN"},
 		{TRUE_LITERAL, "TRUE_LITERAL"}, 
 		{FALSE_LITERAL, "FALSE_LITERAL"},
-		{INTEGER_LITERAL, "INTEGER_LITERAL"}, 
+		{INTEGER_LITERAL, "INTEGER_LITERAL"},
+		{FLOAT_LITERAL, "FLOAT_LITERAL"},
 		{CHARACTER_LITERAL, "CHARACTER_LITERAL"},
 		{STRING_LITERAL, "STRING_LITERAL"},
 		{IDENTIFIER, "IDENTIFIER"},
 	};
 
 	const std::map<std::string, TokenType> keywordToTokenType =
-	{
-		{"true", TRUE_LITERAL},
-		{"false", FALSE_LITERAL},
+	{ 
+		{"integer", INTEGER_TYPE},
+		{"boolean", BOOLEAN_TYPE},
+		{"float", FLOAT_TYPE},
+		{"character", CHARACTER_TYPE},
+		{"collection", COLLECTION_TYPE},
+		{"dictionary", DICTIONARY_TYPE},
+		{"string", STRING_TYPE},
 		{"if", IF},
 		{"else", ELSE},
 		{"do", DO},
 		{"while", WHILE},
+		{"for", FOR},
 		{"iterate", ITERATE},
+		{"return", RETURN},
+		{"true", TRUE_LITERAL},
+		{"false", FALSE_LITERAL},
 	};
 
 	class Token 

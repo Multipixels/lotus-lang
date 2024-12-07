@@ -18,7 +18,7 @@ character theLetterA = 'a';
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
 
-myCollection[2] // => gives back 6
+myCollection[2]; // => gives back 6
 
 // String
 string myString = "hello";
@@ -26,7 +26,7 @@ collection<char> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 // FUNCTIONS
 
-int myFunction(integer a, boolean b) 
+integer myFunction(integer a, boolean b) 
 {
     char c = 'd';
     return c;
@@ -54,9 +54,9 @@ while(anotherTruthValue)
 
 do {
     // run this code first, and check condition. repeat until someTruthValue is checked and evaluates to false
-} while (someTruthValue)
+} while (someTruthValue);
 
-for(int i = 0; i < 10; i++) {
+for(integer i = 0; i < 10; i = i + 1) {
     // run code until condition (second statement) fails
 }
 
@@ -74,4 +74,3 @@ a < b; a > b; a <= b; a >= b; // LT, GT, LTEQ, GTEQ
 !a // NOT
 a && b // AND
 a || b // OR
-a |X| b // XOR 

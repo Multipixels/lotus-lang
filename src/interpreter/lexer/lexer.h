@@ -26,14 +26,17 @@ namespace lexer
 		// Skips through whitespace characters, like tabs, spaces, and newlines.
 		void eatWhiteSpace();
 
-		// Reads integer value.
-		int readNumber();
+		// Reads numeric value and returns Token.
+		token::Token readNumber();
 
 		// Reads an identifier and saves it into the address provided.
 		void readIdentifier(std::string* output);
 
 		// Reads a string and saves it into the address provided.
 		void readString(std::string* output);
+
+		// Reads a character literal and saves it into the address provided.
+		void readCharacter(std::string* output);
 
 		bool isLetter(char character);
 		bool isDigit(char character);
