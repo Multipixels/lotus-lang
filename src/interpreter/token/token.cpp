@@ -2,7 +2,6 @@
 
 namespace token 
 {
-
 	TokenType LookupIdentifier(std::string* identifier)
 	{
 		if (keywordToTokenType.count(*identifier) > 0) 

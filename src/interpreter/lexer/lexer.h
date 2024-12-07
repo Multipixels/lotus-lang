@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../token/token.h"
+#include "token.h"
 
 namespace lexer 
 {

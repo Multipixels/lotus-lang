@@ -21,7 +21,7 @@ namespace token
 		PIPE,
 
 		EQ,
-		NOT_EQ,
+		NEQ,
 		LT,
 		LEQ,
 		GT,
@@ -63,6 +63,53 @@ namespace token
 		IDENTIFIER,
 	};
 
+	const std::map<TokenType, std::string> tokenTypeToString =
+	{
+		{ILLEGAL, "ILLEGAL"},
+		{END_OF_FILE, "END_OF_FILE"},
+		{ASSIGN, "EQUALS"},
+		{PLUS, "PLUS"},
+		{MINUS, "MINUS"},
+		{ASTERIK, "ASTERIK"},
+		{SLASH, "SLASH"}, 
+		{BANG, "BANG"}, 
+		{AMPERSAND, "AMPERSAND"},
+		{PIPE, "PIPE"},
+		{EQ, "EQ"},
+		{NEQ, "NEQ"}, 
+		{LT, "LT"}, 
+		{LEQ, "LEQ"},
+		{GT, "GT"}, 
+		{GEQ, "GEQ"},
+		{COMMA, "COMMA"},
+		{COLON, "COLON"},
+		{SEMICOLON, "SEMICOLON"},
+		{LPARENTHESIS, "LPARENTHESIS"},
+		{RPARENTHESIS, "RPARENTHESIS"},
+		{LBRACE, "LBRACE"},
+		{RBRACE, "RBRACE"},
+		{LBRACKET, "LBRACKET"},
+		{RBRACKET, "RBRACKET"},
+		{INTEGER_TYPE, "INTEGER_TYPE"},
+		{BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+		{FLOAT_TYPE, "FLOAT_TYPE"},
+		{CHARACTER_TYPE, "CHARACTER_TYPE"},
+		{COLLECTION_TYPE, "COLLECTION_TYPE"},
+		{DICTIONARY_TYPE, "DICTIONARY_TYPE"},
+		{STRING_TYPE, "STRING_TYPE"},
+		{IF, "IF"},
+		{ELSE, "ELSE"},
+		{DO, "DO"}, 
+		{WHILE, "WHILE"}, 
+		{ITERATE, "ITERATE"}, 
+		{TRUE_LITERAL, "TRUE_LITERAL"}, 
+		{FALSE_LITERAL, "FALSE_LITERAL"},
+		{INTEGER_LITERAL, "INTEGER_LITERAL"}, 
+		{CHARACTER_LITERAL, "CHARACTER_LITERAL"},
+		{STRING_LITERAL, "STRING_LITERAL"},
+		{IDENTIFIER, "IDENTIFIER"},
+	};
+
 	const std::map<std::string, TokenType> keywordToTokenType =
 	{
 		{"true", TRUE_LITERAL},
@@ -76,13 +123,13 @@ namespace token
 
 	class Token 
 	{
-	private:
-		TokenType m_tokenType;
-		std::string m_literal;
 	public:
+		TokenType m_type;
+		std::string m_literal;
+
 		Token(TokenType tokenType, std::string *m_literal)
 		{
-			m_tokenType = tokenType;
+			m_type = tokenType;
 			m_literal->assign(*m_literal);
 		}
 	};
