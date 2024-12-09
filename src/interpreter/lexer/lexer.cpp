@@ -251,6 +251,8 @@ namespace lexer
 		int startPosition = m_currentPosition;
 		bool seenDecimal = false;
 		bool seenF = false;
+		bool seenFirstDigit = false;
+		bool seenSecondDigit = false;
 
 		// Keep reading characters as long as they're valid numerical values (digits, ., and 'f' for floats)
 		while ((isDigit(peekChar()) || peekChar() == '.' || peekChar() == 'f') && peekChar() != '\0')
@@ -258,12 +260,22 @@ namespace lexer
 			if (isDigit(peekChar()))
 			{
 				readChar();
+				if (seenDecimal) // We have seen a decimal
+				{
+					seenSecondDigit = true;
+				}
 			}
 			else if (peekChar() == '.')
 			{
 				readChar();
 				if (seenDecimal) // We've already seen a decimal
 				{
+					readChar();
+					while ((isDigit(peekChar()) || peekChar() == '.' || peekChar() == 'f') && peekChar() != '\0')
+					{
+						readChar();
+					}
+
 					return token::Token(token::ILLEGAL, "ILLEGAL");
 				}
 				else
@@ -289,19 +301,19 @@ namespace lexer
 			}
 		}
 
-		if (seenDecimal && !seenF) // Found a decimal but did not find an 'f'.
-		{
-			return token::Token(token::ILLEGAL, "ILLEGAL");
-		}
-		else if (!seenF)
+		if (!seenDecimal && !seenF) // No decimal, no 'f'
 		{
 			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
 			return token::Token(token::INTEGER_LITERAL, number_literal);
 		}
-		else
+		else if(seenF && (!seenDecimal || (seenDecimal && seenSecondDigit))) // Seen 'f' and seen decimal digits or see 'f' with no dot
 		{
 			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
 			return token::Token(token::FLOAT_LITERAL, number_literal);
+		} 
+		else
+		{
+			return token::Token(token::ILLEGAL, "ILLEGAL");
 		}
 		
 	}

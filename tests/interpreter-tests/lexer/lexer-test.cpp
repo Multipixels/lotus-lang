@@ -324,3 +324,54 @@ a || b;
             << "Test #" << i << '\n';
     }
 }
+
+
+
+TEST(LexerTest, NumericalValues)
+{
+    std::string inputCode =
+        R"(
+-- Valid
+1
+12345
+2.0f
+3.232321f
+123.456789f
+
+-- Invalid
+1.0
+1.f
+1.0.0.0
+1.0f101
+1.0f01f01
+1.0f01.01
+)";
+
+    TokenLiteralPair tests[] =
+    {
+        TokenLiteralPair(token::INTEGER_LITERAL, "1"),
+        TokenLiteralPair(token::INTEGER_LITERAL, "12345"),
+        TokenLiteralPair(token::FLOAT_LITERAL, "2.0f"),
+        TokenLiteralPair(token::FLOAT_LITERAL, "3.232321f"),
+        TokenLiteralPair(token::FLOAT_LITERAL, "123.456789f"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::END_OF_FILE, ""),
+    };
+
+    lexer::Lexer lexer(&inputCode);
+
+    for (int i = 0; i < sizeof(tests) / sizeof(TokenLiteralPair); i++)
+    {
+        token::Token token = lexer.nextToken();
+
+        EXPECT_EQ(token::tokenTypeToString.at(token.m_type), token::tokenTypeToString.at(tests[i].first))
+            << "Test #" << i << '\n';
+        EXPECT_EQ(token.m_literal, tests[i].second)
+            << "Test #" << i << '\n';
+    }
+}
