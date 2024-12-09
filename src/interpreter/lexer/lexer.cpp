@@ -2,6 +2,7 @@
 #include <ctype.h>
 
 #include "lexer.h"
+#include <iostream>
 
 namespace lexer 
 {
@@ -19,8 +20,27 @@ namespace lexer
 	{
 		token::Token token;
 
-		eatWhiteSpace();
+		// Remove whitespace and comments so we don't tokenize them
 
+		eatWhiteSpace();
+		while (true)
+		{
+			if (m_currentChar == '-' && peekChar() == '-')
+			{
+				eatSingleComment();
+			}
+			else if (m_currentChar == '-' && peekChar() == '*')
+			{
+				eatMultiComment();
+			}
+			else 
+			{
+				break;
+			}
+			eatWhiteSpace();
+		}
+
+		// Generate token based on current (and possibly next) char
 		switch(m_currentChar)
 		{
 		case '=':
@@ -153,6 +173,7 @@ namespace lexer
 			break;
 		default:
 		{
+			// Generate a number or identifier
 			if (isDigit(m_currentChar))
 			{
 				token = readNumber();
@@ -201,9 +222,28 @@ namespace lexer
 	void Lexer::eatWhiteSpace() 
 	{
 		while (m_currentChar == ' ' || m_currentChar == '\t' || m_currentChar == '\n' || m_currentChar == '\r')
+		{ 
+			readChar();
+		}
+	}
+
+	void Lexer::eatSingleComment()
+	{
+		while (m_currentChar != '\n' && m_currentChar != '\0')
 		{
 			readChar();
 		}
+		readChar();
+	}
+
+	void Lexer::eatMultiComment()
+	{
+		while (!(m_currentChar == '*' && peekChar() == '-') && m_currentChar != '\0')
+		{
+			readChar();
+		}
+		readChar();
+		readChar();
 	}
 
 	token::Token Lexer::readNumber() 
@@ -212,6 +252,7 @@ namespace lexer
 		bool seenDecimal = false;
 		bool seenF = false;
 
+		// Keep reading characters as long as they're valid numerical values (digits, ., and 'f' for floats)
 		while ((isDigit(peekChar()) || peekChar() == '.' || peekChar() == 'f') && peekChar() != '\0')
 		{
 			if (isDigit(peekChar()))
@@ -221,7 +262,7 @@ namespace lexer
 			else if (peekChar() == '.')
 			{
 				readChar();
-				if (seenDecimal)
+				if (seenDecimal) // We've already seen a decimal
 				{
 					return token::Token(token::ILLEGAL, "ILLEGAL");
 				}
@@ -241,14 +282,14 @@ namespace lexer
 					readChar();
 				}
 
-				if (invalidValue)
+				if (invalidValue) // We've seen an 'f' already, found unexpected digits, '.', or 'f'.
 				{
 					return token::Token(token::ILLEGAL, "ILLEGAL");
 				}
 			}
 		}
 
-		if (seenDecimal && !seenF)
+		if (seenDecimal && !seenF) // Found a decimal but did not find an 'f'.
 		{
 			return token::Token(token::ILLEGAL, "ILLEGAL");
 		}

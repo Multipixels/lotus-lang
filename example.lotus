@@ -1,76 +1,74 @@
-// These are comments
+-- These are comments
+-- Double dashes create a single-line comment
 
-// DATATYPES
+-* These 
+                    are
+    multi
+            line
+    comments
+*-
 
-// Boolean types
-boolean someTruthValue = false;
+-- Atomic data types
+boolean someTruthValue -* this is an inner comment *- = false;
 boolean anotherTruthValue = true;
-
-// Numerical types
 integer someInteger = 1;
 float someFloat = 1f;
 float anotherFloat = 2.5f;
-
-// Characters
 character theLetterA = 'a';
 
-// Collections
+-- Collections and dictionaries
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
-
-myCollection[2]; // => gives back 6
-
-// String
+myCollection[2];
 string myString = "hello";
-collection<char> sameString = ['h', 'e', 'l', 'l', 'o'];
+collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
-// FUNCTIONS
-
+-- Functions
 integer myFunction(integer a, boolean b) 
 {
-    char c = 'd';
+    integer c = 23;
     return c;
 }
 
-// CONTROL STRUCTURES
-
+-- Control structures
 if(someTruthValue) 
 {
-    // some code that executes if someTruthValue evaluates to true
+
 }
 else if(anotherTruthValue) 
 {
-    // some code that executes if anotherTruthValue evaluates to true
+
 } 
 else 
 {
-    // some code that executes if someTruthValue evaluates to false
+
 }
 
-while(anotherTruthValue)
+while (anotherTruthValue)
 {
-    // repeat some code until anotherTruthValue evaluates to false
+
 }
 
 do {
-    // run this code first, and check condition. repeat until someTruthValue is checked and evaluates to false
+
 } while (someTruthValue);
 
-for(integer i = 0; i < 10; i = i + 1) {
-    // run code until condition (second statement) fails
+for (integer i = 0; i < 10; i = i + 1) {
+
 }
 
 iterate(var : myCollection) {
-    // iterates over every value in myCollection, setting var to that value
+
 }
 
-// BUILT-IN FUNCTIONS
-log("Hello World!"); // Logs input into the console
-length(myCollection); // Returns the length of a collection (# of characters in string, # of elements in collection, # of keys in dictionary)
+-- Built in functions
+log("Hello World!"); 
+length(myCollection);
 
-a == b; // EQ
-a != b; // NEQ
-a < b; a > b; a <= b; a >= b; // LT, GT, LTEQ, GTEQ
-!a // NOT
-a && b // AND
-a || b // OR
+-- Operators
+a == b;
+a != b;
+a < b; a > b; a <= b; a >= b;
+!a;
+a && b;
+a || b;

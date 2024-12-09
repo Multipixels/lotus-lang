@@ -26,6 +26,12 @@ namespace lexer
 		// Skips through whitespace characters, like tabs, spaces, and newlines.
 		void eatWhiteSpace();
 
+		// Skips through single comment (until new line)
+		void eatSingleComment();
+
+		// Skips through a multi-lined comment
+		void eatMultiComment();
+
 		// Reads numeric value and returns Token.
 		token::Token readNumber();
 

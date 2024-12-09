@@ -12,24 +12,39 @@ TEST(LexerTest, LexNextToken)
 {
     std::string inputCode = 
     R"(
-boolean someTruthValue = false;
+-- These are comments
+-- Double dashes create a single-line comment
+
+-* These 
+                    are
+    multi
+            line
+    comments
+*-
+
+-- Atomic data types
+boolean someTruthValue -* this is an inner comment *- = false;
 boolean anotherTruthValue = true;
 integer someInteger = 1;
 float someFloat = 1f;
 float anotherFloat = 2.5f;
 character theLetterA = 'a';
+
+-- Collections and dictionaries
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
 myCollection[2];
 string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
+-- Functions
 integer myFunction(integer a, boolean b) 
 {
     integer c = 23;
     return c;
 }
 
+-- Control structures
 if(someTruthValue) 
 {
 
@@ -60,9 +75,11 @@ iterate(var : myCollection) {
 
 }
 
+-- Built in functions
 log("Hello World!"); 
 length(myCollection);
 
+-- Operators
 a == b;
 a != b;
 a < b; a > b; a <= b; a >= b;
