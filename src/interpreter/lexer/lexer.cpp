@@ -7,12 +7,11 @@
 namespace lexer 
 {
 	Lexer::Lexer(std::string* input)
+		: m_input(input),
+		m_currentChar('\0'),
+		m_currentPosition(-1),
+		m_nextPosition(0)
 	{
-		m_input = input;
-		m_currentChar = '\0';
-		m_currentPosition = -1;
-		m_nextPosition = 0;
-
 		readChar();
 	}
 
