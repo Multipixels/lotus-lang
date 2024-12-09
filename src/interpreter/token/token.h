@@ -8,6 +8,7 @@ namespace token
 	enum TokenType
 	{
 		ILLEGAL,	// Unexpected character
+		ILLEGAL_NUMERIC, // Unable to lex numeric value
 		END_OF_FILE,
 
 		// Operators
@@ -72,6 +73,7 @@ namespace token
 	const std::map<TokenType, std::string> tokenTypeToString =
 	{
 		{ILLEGAL, "ILLEGAL"},
+		{ILLEGAL_NUMERIC, "ILLEGAL_NUMERIC"},
 		{END_OF_FILE, "END_OF_FILE"},
 		{ASSIGN, "EQUALS"},
 		{PLUS, "PLUS"},

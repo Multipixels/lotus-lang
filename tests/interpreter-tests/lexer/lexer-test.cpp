@@ -354,12 +354,12 @@ TEST(LexerTest, NumericalValues)
         TokenLiteralPair(token::FLOAT_LITERAL, "2.0f"),
         TokenLiteralPair(token::FLOAT_LITERAL, "3.232321f"),
         TokenLiteralPair(token::FLOAT_LITERAL, "123.456789f"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
-        TokenLiteralPair(token::ILLEGAL, "ILLEGAL"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.0"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.f"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.0.0.0"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.0f101"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.0f01f01"),
+        TokenLiteralPair(token::ILLEGAL_NUMERIC, "1.0f01.01"),
         TokenLiteralPair(token::END_OF_FILE, ""),
     };
 
