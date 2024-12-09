@@ -34,15 +34,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
+    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
