@@ -153,3 +153,53 @@ TEST(ParserTest, DeclaringBooleanStatement)
 			<< "Test #" << i << '\n';
 	}
 }
+
+TEST(ParserTest, DeclaringCharacterStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedIdentifier;
+		char expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"character a = 'b';", "a", 'b'},
+		{"character c = 'c';", "c", 'c'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		ASSERT_EQ(statement->TokenLiteral(), "character")
+			<< "Test #" << i << '\n';
+
+		// Test declaration identifier literal and name
+		ASSERT_EQ(statement->NodeType(), "DeclareCharacterStatement");
+		ast::DeclareCharacterStatement* declareCharacterStatement = (ast::DeclareCharacterStatement*)statement;
+
+		EXPECT_EQ(declareCharacterStatement->m_name.m_name, tests[i].expectedIdentifier)
+			<< "Test #" << i << '\n';
+		EXPECT_EQ(declareCharacterStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+			<< "Test #" << i << '\n';
+
+		// Test declaration integer literal and value
+		ASSERT_EQ(declareCharacterStatement->m_value->NodeType(), "CharacterLiteral");
+		ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)(declareCharacterStatement->m_value);
+
+		EXPECT_EQ(characterLiteral->m_value, tests[i].expectedValue)
+			<< "Test #" << i << '\n';
+
+		char charToString[2] = { tests[i].expectedValue, '\0' };
+		EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
+			<< "Test #" << i << '\n';
+	}
+}

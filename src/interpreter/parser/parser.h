@@ -31,9 +31,11 @@ namespace parser
 		ast::DeclareIntegerStatement* parseIntegerDeclaration();
 		ast::DeclareFloatStatement* parseFloatDeclaration();
 		ast::DeclareBooleanStatement* parseBooleanDeclaration();
+		ast::DeclareCharacterStatement* parseCharacterDeclaration();
 
 		// EXPRESSIONS
 
 		ast::Expression* parseExpression();
+		ast::Expression* parseCharacterLiteral();
 	};
 }

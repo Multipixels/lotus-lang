@@ -93,6 +93,19 @@ namespace ast
 		std::string m_nodeType = "DeclareBooleanStatement";
 	};
 
+	class DeclareCharacterStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Identifier m_name;
+		Expression* m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "DeclareCharacterStatement";
+	};
+
 	class IntegerLiteral : public Expression
 	{
 	public:
@@ -127,5 +140,17 @@ namespace ast
 		std::string TokenLiteral();
 	private:
 		std::string m_nodeType = "BooleanLiteral";
+	};
+
+	class CharacterLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		char m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "CharacterLiteral";
 	};
 }

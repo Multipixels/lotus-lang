@@ -54,6 +54,8 @@ namespace parser
 			return parseFloatDeclaration();
 		case token:: BOOLEAN_TYPE:
 			return parseBooleanDeclaration();
+		case token::CHARACTER_TYPE:
+			return parseCharacterDeclaration();
 		}
 	}
 
@@ -144,6 +146,35 @@ namespace parser
 		return statement;
 	}
 
+	ast::DeclareCharacterStatement* Parser::parseCharacterDeclaration()
+	{
+		ast::DeclareCharacterStatement* statement = new ast::DeclareCharacterStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::IDENTIFIER))
+		{
+			return NULL;
+		}
+
+		statement->m_name.m_token = m_currentToken;
+		statement->m_name.m_name = m_currentToken.m_literal;
+
+		if (!expectPeek(token::ASSIGN))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_value = parseCharacterLiteral();
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	}
+
 	ast::Expression* Parser::parseExpression()
 	{
 		switch (m_currentToken.m_type) 
@@ -178,5 +209,13 @@ namespace parser
 			}
 
 		}
+	}
+
+	ast::Expression* Parser::parseCharacterLiteral()
+	{
+		ast::CharacterLiteral* expression = new ast::CharacterLiteral;
+		expression->m_token = m_currentToken;
+		expression->m_value = m_currentToken.m_literal[0];
+		return expression;
 	}
 }

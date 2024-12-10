@@ -30,6 +30,11 @@ namespace ast
 		return m_token.m_literal;
 	}
 
+	std::string DeclareCharacterStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
@@ -44,6 +49,11 @@ namespace ast
 	}
 
 	std::string BooleanLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
+	std::string CharacterLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
 	}
