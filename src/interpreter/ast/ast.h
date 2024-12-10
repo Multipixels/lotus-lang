@@ -80,6 +80,19 @@ namespace ast
 		std::string m_nodeType = "DeclareFloatStatement";
 	};
 
+	class DeclareBooleanStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Identifier m_name;
+		Expression* m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "DeclareBooleanStatement";
+	};
+
 	class IntegerLiteral : public Expression
 	{
 	public:
@@ -102,5 +115,17 @@ namespace ast
 		std::string TokenLiteral();
 	private:
 		std::string m_nodeType = "FloatLiteral";
+	};
+
+	class BooleanLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		bool m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "BooleanLiteral";
 	};
 }

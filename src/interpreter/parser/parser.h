@@ -30,6 +30,7 @@ namespace parser
 		ast::Statement* parseStatement();
 		ast::DeclareIntegerStatement* parseIntegerDeclaration();
 		ast::DeclareFloatStatement* parseFloatDeclaration();
+		ast::DeclareBooleanStatement* parseBooleanDeclaration();
 
 		// EXPRESSIONS
 

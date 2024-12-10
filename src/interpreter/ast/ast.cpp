@@ -25,6 +25,11 @@ namespace ast
 		return m_token.m_literal;
 	}
 
+	std::string DeclareBooleanStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
@@ -36,5 +41,10 @@ namespace ast
 		outputString << stof(m_token.m_literal);
 
 		return outputString.str();
+	}
+
+	std::string BooleanLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
 	}
 }

@@ -52,6 +52,8 @@ namespace parser
 			return parseIntegerDeclaration();
 		case token::FLOAT_TYPE:
 			return parseFloatDeclaration();
+		case token:: BOOLEAN_TYPE:
+			return parseBooleanDeclaration();
 		}
 	}
 
@@ -113,6 +115,35 @@ namespace parser
 		return statement;
 	}
 
+	ast::DeclareBooleanStatement* Parser::parseBooleanDeclaration()
+	{
+		ast::DeclareBooleanStatement* statement = new ast::DeclareBooleanStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::IDENTIFIER))
+		{
+			return NULL;
+		}
+
+		statement->m_name.m_token = m_currentToken;
+		statement->m_name.m_name = m_currentToken.m_literal;
+
+		if (!expectPeek(token::ASSIGN))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_value = parseExpression();
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	}
+
 	ast::Expression* Parser::parseExpression()
 	{
 		switch (m_currentToken.m_type) 
@@ -131,6 +162,21 @@ namespace parser
 				expression->m_value = stof(m_currentToken.m_literal);
 				return expression;
 			}
+		case token::TRUE_LITERAL:
+			{
+				ast::BooleanLiteral* expression = new ast::BooleanLiteral;
+				expression->m_token = m_currentToken;
+				expression->m_value = true;
+				return expression;
+			}
+		case token::FALSE_LITERAL:
+			{
+				ast::BooleanLiteral* expression = new ast::BooleanLiteral;
+				expression->m_token = m_currentToken;
+				expression->m_value = false;
+				return expression;
+			}
+
 		}
 	}
 }
