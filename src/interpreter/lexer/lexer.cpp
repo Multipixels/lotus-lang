@@ -302,17 +302,19 @@ namespace lexer
 			}
 		}
 
-		std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
 		if (!seenDecimal && !seenF) // No decimal, no 'f'
 		{
+			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
 			return token::Token(token::INTEGER_LITERAL, number_literal);
 		}
 		else if(seenF && (!seenDecimal || (seenDecimal && seenSecondDigit))) // Seen 'f' and seen decimal digits or see 'f' with no dot
 		{
+			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition - 1); // Ensure 'f' is not included
 			return token::Token(token::FLOAT_LITERAL, number_literal);
 		} 
 		else
 		{
+			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
 			return token::Token(token::ILLEGAL_NUMERIC, number_literal);
 		}
 		

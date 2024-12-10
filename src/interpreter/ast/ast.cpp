@@ -1,4 +1,7 @@
+#include <sstream>
+
 #include "ast.h"
+
 
 namespace ast
 {
@@ -17,6 +20,11 @@ namespace ast
 		return m_token.m_literal;
 	}
 
+	std::string DeclareFloatStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
@@ -24,6 +32,9 @@ namespace ast
 
 	std::string FloatLiteral::TokenLiteral()
 	{
-		return m_token.m_literal;
+		std::ostringstream outputString;
+		outputString << stof(m_token.m_literal);
+
+		return outputString.str();
 	}
 }
