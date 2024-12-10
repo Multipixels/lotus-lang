@@ -11,18 +11,27 @@ namespace ast
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
+		virtual std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "Node";
 	};
 
 	class Statement : public Node 
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
+		virtual std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "Statement";
 	};
 
 	class Expression : public Node 
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
+		virtual std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "Expression";
 	};
 
 	class Program
@@ -39,7 +48,10 @@ namespace ast
 		token::Token m_token;
 		std::string m_name;
 
+		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "Identifier";
 	};
 
 	class DeclareIntegerStatement : public Statement
@@ -49,7 +61,10 @@ namespace ast
 		Identifier m_name;
 		Expression *m_value;
 
+		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "DeclareIntegerStatement";
 	};
 
 	class IntegerLiteral : public Expression
@@ -58,6 +73,21 @@ namespace ast
 		token::Token m_token;
 		int m_value;
 
+		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "IntegerLiteral";
+	};
+
+	class FloatLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		float m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "FloatLiteral";
 	};
 }

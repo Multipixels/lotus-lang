@@ -21,4 +21,9 @@ namespace ast
 	{
 		return m_token.m_literal;
 	}
+
+	std::string FloatLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
 }
