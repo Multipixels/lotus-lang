@@ -54,6 +54,8 @@ namespace ast
 		std::string m_nodeType = "Identifier";
 	};
 
+	// STATEMENTS
+
 	class DeclareIntegerStatement : public Statement
 	{
 	public:
@@ -110,13 +112,27 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_value;
+		Expression* m_returnValue;
 
 		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
 	private:
 		std::string m_nodeType = "ReturnStatement";
 	};
+
+	class ExpressionStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Expression* m_expression;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "ExpressionStatement";
+	};
+
+	// EXPRESSIONS
 
 	class IntegerLiteral : public Expression
 	{

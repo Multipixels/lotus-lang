@@ -40,6 +40,11 @@ namespace ast
 		return "return";
 	}
 
+	std::string ExpressionStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

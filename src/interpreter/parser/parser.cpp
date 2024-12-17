@@ -58,6 +58,8 @@ namespace parser
 			return parseCharacterDeclaration();
 		case token::RETURN:
 			return parseReturnStatement();
+		default:
+			return parseExpressionStatement();
 		}
 	}
 
@@ -86,6 +88,7 @@ namespace parser
 		{
 			return NULL;
 		}
+		nextToken();
 
 		return statement;
 	}
@@ -115,6 +118,7 @@ namespace parser
 		{
 			return NULL;
 		}
+		nextToken();
 
 		return statement;
 	}
@@ -144,6 +148,7 @@ namespace parser
 		{
 			return NULL;
 		}
+		nextToken();
 
 		return statement;
 	}
@@ -167,12 +172,13 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_value = parseCharacterLiteral();
+		statement->m_value = parseExpression();
 
 		if (!expectPeek(token::SEMICOLON))
 		{
 			return NULL;
 		}
+		nextToken();
 
 		return statement;
 	}
@@ -184,12 +190,28 @@ namespace parser
 
 		nextToken();
 
-		statement->m_value = parseExpression();
+		statement->m_returnValue = parseExpression();
 
 		if (!expectPeek(token::SEMICOLON))
 		{
 			return NULL;
 		}
+		nextToken();
+
+		return statement;
+	}
+
+	ast::ExpressionStatement* Parser::parseExpressionStatement()
+	{
+		ast::ExpressionStatement* statement = new ast::ExpressionStatement;
+		statement->m_token = m_currentToken;
+		statement->m_expression = parseExpression();
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+		nextToken();
 
 		return statement;
 	}
@@ -199,35 +221,42 @@ namespace parser
 		switch (m_currentToken.m_type) 
 		{
 		case token::INTEGER_LITERAL:
-			{
-				ast::IntegerLiteral* expression = new ast::IntegerLiteral;
-				expression->m_token = m_currentToken;
-				expression->m_value = stoi(m_currentToken.m_literal);
-				return expression;
-			}
+			return parseIntegerLiteral();
 		case token::FLOAT_LITERAL:
-			{
-				ast::FloatLiteral* expression = new ast::FloatLiteral;
-				expression->m_token = m_currentToken;
-				expression->m_value = stof(m_currentToken.m_literal);
-				return expression;
-			}
+			return parseFloatLiteral();
 		case token::TRUE_LITERAL:
-			{
-				ast::BooleanLiteral* expression = new ast::BooleanLiteral;
-				expression->m_token = m_currentToken;
-				expression->m_value = true;
-				return expression;
-			}
+			return parseBooleanLiteral();
 		case token::FALSE_LITERAL:
-			{
-				ast::BooleanLiteral* expression = new ast::BooleanLiteral;
-				expression->m_token = m_currentToken;
-				expression->m_value = false;
-				return expression;
-			}
-
+			return parseBooleanLiteral();
+		case token::CHARACTER_LITERAL:
+			return parseCharacterLiteral();
+		case token::IDENTIFIER:
+			return parseIdentifier();
 		}
+	}
+
+	ast::Expression* Parser::parseIntegerLiteral()
+	{
+		ast::IntegerLiteral* expression = new ast::IntegerLiteral;
+		expression->m_token = m_currentToken;
+		expression->m_value = stoi(m_currentToken.m_literal);
+		return expression;
+	}
+
+	ast::Expression* Parser::parseFloatLiteral()
+	{
+		ast::FloatLiteral* expression = new ast::FloatLiteral;
+		expression->m_token = m_currentToken;
+		expression->m_value = stof(m_currentToken.m_literal);
+		return expression;
+	}
+
+	ast::Expression* Parser::parseBooleanLiteral()
+	{
+		ast::BooleanLiteral* expression = new ast::BooleanLiteral;
+		expression->m_token = m_currentToken;
+		expression->m_value = currentTokenIs(token::TRUE_LITERAL);
+		return expression;
 	}
 
 	ast::Expression* Parser::parseCharacterLiteral()
@@ -236,5 +265,17 @@ namespace parser
 		expression->m_token = m_currentToken;
 		expression->m_value = m_currentToken.m_literal[0];
 		return expression;
+	}
+
+	ast::Expression* Parser::parseIdentifier()
+	{
+		ast::Identifier* expression = new ast::Identifier;
+		expression->m_token = m_currentToken;
+		expression->m_name = m_currentToken.m_literal;
+		return expression;
+	}
+
+	bool Parser::currentTokenIs(token::TokenType token) {
+		return m_currentToken.m_type == token;
 	}
 }

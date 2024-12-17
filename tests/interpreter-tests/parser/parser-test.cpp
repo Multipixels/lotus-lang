@@ -3,7 +3,6 @@
 #include <any> // Testing suite uses C++ 17 for this
 #include <map>
 #include <sstream>
-#include <unordered_map> // For hashing strings to use in switch cases
 
 #include "parser-test.h"
 #include "parser.h"
@@ -190,7 +189,9 @@ TEST(ParserTest, ReturnStatements)
 	TestCase tests[] =
 	{
 		{"return 5;", 5},
+		{"return 3.40f;", 3.40f},
 		{"return true;", true},
+		{"return 'a';", 'a'},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -206,11 +207,53 @@ TEST(ParserTest, ReturnStatements)
 		ASSERT_EQ(statement->TokenLiteral(), "return")
 			<< "Test #" << i << '\n';
 
-		// Test declaration identifier literal and name
+		// Test to see if this is a return statement
 		ASSERT_EQ(statement->NodeType(), "ReturnStatement");
 		ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)statement;
 
-		testLiteralExpression(returnStatement->m_value, tests[i].expectedValue, i);
+		// Test expression separately
+		testLiteralExpression(returnStatement->m_returnValue, tests[i].expectedValue, i);
+	}
+}
+
+
+TEST(ParserTest, Identifiers)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedIdentifer;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"someIdentifier;", "someIdentifier"},
+		{"some_identifier;", "some_identifier"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		// Test to see if this is an identifier
+		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "Identifier");
+		ast::Identifier* identifier = (ast::Identifier*)expressionStatement->m_expression;
+
+		// Test to see if identifier fields are right
+		EXPECT_EQ(identifier->m_name, tests[i].expectedIdentifer)
+			<< "Test #" << i << '\n';
+		EXPECT_EQ(identifier->TokenLiteral(), tests[i].expectedIdentifer)
+			<< "Test #" << i << '\n';
 	}
 }
 

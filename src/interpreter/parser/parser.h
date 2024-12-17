@@ -33,10 +33,18 @@ namespace parser
 		ast::DeclareBooleanStatement* parseBooleanDeclaration();
 		ast::DeclareCharacterStatement* parseCharacterDeclaration();
 		ast::ReturnStatement* parseReturnStatement();
+		ast::ExpressionStatement* parseExpressionStatement();
 
 		// EXPRESSIONS
 
 		ast::Expression* parseExpression();
+		ast::Expression* parseIntegerLiteral();
+		ast::Expression* parseFloatLiteral();
+		ast::Expression* parseBooleanLiteral();
 		ast::Expression* parseCharacterLiteral();
+		ast::Expression* parseIdentifier();
+
+		// HELPERS
+		bool currentTokenIs(token::TokenType token);
 	};
 }
