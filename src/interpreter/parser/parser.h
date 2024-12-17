@@ -32,6 +32,7 @@ namespace parser
 		ast::DeclareFloatStatement* parseFloatDeclaration();
 		ast::DeclareBooleanStatement* parseBooleanDeclaration();
 		ast::DeclareCharacterStatement* parseCharacterDeclaration();
+		ast::ReturnStatement* parseReturnStatement();
 
 		// EXPRESSIONS
 

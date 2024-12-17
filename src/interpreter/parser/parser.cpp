@@ -52,10 +52,12 @@ namespace parser
 			return parseIntegerDeclaration();
 		case token::FLOAT_TYPE:
 			return parseFloatDeclaration();
-		case token:: BOOLEAN_TYPE:
+		case token::BOOLEAN_TYPE:
 			return parseBooleanDeclaration();
 		case token::CHARACTER_TYPE:
 			return parseCharacterDeclaration();
+		case token::RETURN:
+			return parseReturnStatement();
 		}
 	}
 
@@ -166,6 +168,23 @@ namespace parser
 		nextToken();
 
 		statement->m_value = parseCharacterLiteral();
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	}
+
+	ast::ReturnStatement* Parser::parseReturnStatement()
+	{
+		ast::ReturnStatement* statement = new ast::ReturnStatement;
+		statement->m_token = m_currentToken;
+
+		nextToken();
+
+		statement->m_value = parseExpression();
 
 		if (!expectPeek(token::SEMICOLON))
 		{

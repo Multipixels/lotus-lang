@@ -1,6 +1,9 @@
 #include "pch.h"
 
+#include <any> // Testing suite uses C++ 17 for this
+#include <map>
 #include <sstream>
+#include <unordered_map> // For hashing strings to use in switch cases
 
 #include "parser-test.h"
 #include "parser.h"
@@ -43,14 +46,8 @@ TEST(ParserTest, DeclaringIntegerStatement)
 		EXPECT_EQ(declareIntegerStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << '\n';
 
-		// Test declaration integer literal and value
-		ASSERT_EQ(declareIntegerStatement->m_value->NodeType(), "IntegerLiteral");
-		ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)(declareIntegerStatement->m_value);
-
-		EXPECT_EQ(integerLiteral->m_value, tests[i].expectedValue)
-			<< "Test #" << i << '\n';
-		EXPECT_EQ(integerLiteral->TokenLiteral(), std::to_string(tests[i].expectedValue))
-			<< "Test #" << i << '\n';
+		// Test integer literal and value
+		testIntegerLiteral(declareIntegerStatement->m_value, tests[i].expectedValue, i);
 	}
 }
 
@@ -92,17 +89,8 @@ TEST(ParserTest, DeclaringFloatStatement)
 		EXPECT_EQ(declareFloatStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << '\n';
 
-		// Test declaration integer literal and value
-		ASSERT_EQ(declareFloatStatement->m_value->NodeType(), "FloatLiteral");
-		ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)(declareFloatStatement->m_value);
-
-		std::ostringstream outputString;
-		outputString << tests[i].expectedValue;
-
-		EXPECT_EQ(floatLiteral->m_value, tests[i].expectedValue)
-			<< "Test #" << i << '\n';
-		EXPECT_EQ(floatLiteral->TokenLiteral(), outputString.str())
-			<< "Test #" << i << '\n';
+		// Test float literal and value
+		testFloatLiteral(declareFloatStatement->m_value, tests[i].expectedValue, i);
 	}
 }
 
@@ -143,14 +131,8 @@ TEST(ParserTest, DeclaringBooleanStatement)
 		EXPECT_EQ(declareBooleanStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << '\n';
 
-		// Test declaration integer literal and value
-		ASSERT_EQ(declareBooleanStatement->m_value->NodeType(), "BooleanLiteral");
-		ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)(declareBooleanStatement->m_value);
-
-		EXPECT_EQ(booleanLiteral->m_value, tests[i].expectedValue)
-			<< "Test #" << i << '\n';
-		EXPECT_EQ(booleanLiteral->TokenLiteral(), tests[i].expectedValue ? "true" : "false")
-			<< "Test #" << i << '\n';
+		// Test boolean literal and value
+		testBooleanLiteral(declareBooleanStatement->m_value, tests[i].expectedValue, i);
 	}
 }
 
@@ -191,15 +173,129 @@ TEST(ParserTest, DeclaringCharacterStatement)
 		EXPECT_EQ(declareCharacterStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << '\n';
 
-		// Test declaration integer literal and value
-		ASSERT_EQ(declareCharacterStatement->m_value->NodeType(), "CharacterLiteral");
-		ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)(declareCharacterStatement->m_value);
-
-		EXPECT_EQ(characterLiteral->m_value, tests[i].expectedValue)
-			<< "Test #" << i << '\n';
-
-		char charToString[2] = { tests[i].expectedValue, '\0' };
-		EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
-			<< "Test #" << i << '\n';
+		// Test character literal and value
+		testCharacterLiteral(declareCharacterStatement->m_value, tests[i].expectedValue, i);
 	}
+}
+
+
+TEST(ParserTest, ReturnStatements)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"return 5;", 5},
+		{"return true;", true},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		ASSERT_EQ(statement->TokenLiteral(), "return")
+			<< "Test #" << i << '\n';
+
+		// Test declaration identifier literal and name
+		ASSERT_EQ(statement->NodeType(), "ReturnStatement");
+		ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)statement;
+
+		testLiteralExpression(returnStatement->m_value, tests[i].expectedValue, i);
+	}
+}
+
+void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber)
+{
+	// Cannot use a switch on type as std::string is not integral
+	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
+
+	std::string expectedValueType = expectedValue.type().name();
+	if(expectedValueType == "int")
+	{
+		testIntegerLiteral(expression, std::any_cast<int>(expectedValue), testNumber);
+	}
+	else if (expectedValueType == "float")
+	{
+		testFloatLiteral(expression, std::any_cast<float>(expectedValue), testNumber);
+	}
+	else if (expectedValueType == "bool")
+	{
+		testBooleanLiteral(expression, std::any_cast<bool>(expectedValue), testNumber);
+	}
+	else if (expectedValueType == "char")
+	{
+		testCharacterLiteral(expression, std::any_cast<char>(expectedValue), testNumber);
+	}
+	else
+	{
+		FAIL()
+			<< "Test #" << testNumber << '\n';
+	}
+}
+
+void testIntegerLiteral(ast::Expression* expression, int expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "IntegerLiteral")
+		<< "Test #" << testNumber << '\n';
+
+	ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)expression;
+
+	EXPECT_EQ(integerLiteral->m_value, expectedValue)
+		<< "Test #" << testNumber << '\n';
+	EXPECT_EQ(integerLiteral->TokenLiteral(), std::to_string(expectedValue))
+		<< "Test #" << testNumber << '\n';
+}
+
+void testFloatLiteral(ast::Expression* expression, float expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "FloatLiteral")
+		<< "Test #" << testNumber << '\n';
+
+	ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)expression;
+
+	std::ostringstream outputString;
+	outputString << expectedValue;
+
+	EXPECT_EQ(floatLiteral->m_value, expectedValue)
+		<< "Test #" << testNumber << '\n';
+	EXPECT_EQ(floatLiteral->TokenLiteral(), outputString.str())
+		<< "Test #" << testNumber << '\n';
+}
+
+void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "BooleanLiteral")
+		<< "Test #" << testNumber << '\n';
+
+	ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)expression;
+
+	EXPECT_EQ(booleanLiteral->m_value, expectedValue)
+		<< "Test #" << testNumber << '\n';
+	EXPECT_EQ(booleanLiteral->TokenLiteral(), expectedValue ? "true" : "false")
+		<< "Test #" << testNumber << '\n';
+}
+
+void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "CharacterLiteral")
+		<< "Test #" << testNumber << '\n';
+
+	ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)expression;
+
+	char charToString[2] = { expectedValue, '\0' };
+
+	EXPECT_EQ(characterLiteral->m_value, expectedValue)
+		<< "Test #" << testNumber << '\n';
+	EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
+		<< "Test #" << testNumber << '\n';
 }

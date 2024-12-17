@@ -35,6 +35,11 @@ namespace ast
 		return m_token.m_literal;
 	}
 
+	std::string ReturnStatement::TokenLiteral()
+	{
+		return "return";
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

@@ -106,6 +106,18 @@ namespace ast
 		std::string m_nodeType = "DeclareCharacterStatement";
 	};
 
+	class ReturnStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Expression* m_value;
+
+		std::string NodeType() override { return m_nodeType; }
+		std::string TokenLiteral();
+	private:
+		std::string m_nodeType = "ReturnStatement";
+	};
+
 	class IntegerLiteral : public Expression
 	{
 	public:
