@@ -177,7 +177,7 @@ namespace lexer
 			{
 				token = readNumber();
 			}
-			else if (isLetter(m_currentChar))
+			else if (validIdentifierChar(m_currentChar))
 			{
 				std::string identifier_literal;
 				readIdentifier(&identifier_literal);
@@ -323,7 +323,7 @@ namespace lexer
 	void Lexer::readIdentifier(std::string* output) 
 	{
 		int startPosition = m_currentPosition;
-		while (isLetter(peekChar()))
+		while (validIdentifierChar(peekChar()))
 		{
 			readChar();
 		}
@@ -379,6 +379,11 @@ namespace lexer
 	bool Lexer::isDigit(char character)
 	{
 		return isdigit(character);
+	}
+	
+	bool Lexer::validIdentifierChar(char character)
+	{
+		return isLetter(character) || character == '_';
 	}
 
 	char Lexer::peekChar()

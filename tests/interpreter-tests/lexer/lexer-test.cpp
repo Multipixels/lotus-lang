@@ -24,8 +24,8 @@ TEST(LexerTest, LexNextToken)
 
 -- Atomic data types
 boolean someTruthValue -* this is an inner comment *- = false;
-boolean anotherTruthValue = true;
-integer someInteger = 1;
+boolean another_truth_value = true;
+integer _someInteger = 1;
 float someFloat = 1f;
 float anotherFloat = 2.5f;
 character theLetterA = 'a';
@@ -96,12 +96,12 @@ a || b;
         TokenLiteralPair(token::FALSE_LITERAL, "false"),
         TokenLiteralPair(token::SEMICOLON, ";"),
         TokenLiteralPair(token::BOOLEAN_TYPE, "boolean"),
-        TokenLiteralPair(token::IDENTIFIER, "anotherTruthValue"),
+        TokenLiteralPair(token::IDENTIFIER, "another_truth_value"),
         TokenLiteralPair(token::ASSIGN, "="),
         TokenLiteralPair(token::TRUE_LITERAL, "true"),
         TokenLiteralPair(token::SEMICOLON, ";"),
         TokenLiteralPair(token::INTEGER_TYPE, "integer"),
-        TokenLiteralPair(token::IDENTIFIER, "someInteger"),
+        TokenLiteralPair(token::IDENTIFIER, "_someInteger"),
         TokenLiteralPair(token::ASSIGN, "="),
         TokenLiteralPair(token::INTEGER_LITERAL, "1"),
         TokenLiteralPair(token::SEMICOLON, ";"),

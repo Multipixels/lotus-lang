@@ -47,6 +47,9 @@ namespace lexer
 		bool isLetter(char character);
 		bool isDigit(char character);
 
+		// Checks if a character is valid in an identifier
+		bool validIdentifierChar(char character);
+
 		// Returns the character in 'm_nextPosition' without progressing through the input string.
 		char peekChar();
 
