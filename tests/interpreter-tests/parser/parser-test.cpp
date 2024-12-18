@@ -245,10 +245,142 @@ TEST(ParserTest, IdentifierExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		// Test to see if this is an identifier
 		testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i);
 	}
 }
+
+
+TEST(ParserTest, IntegerLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		int expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5;", 5},
+		{"34;", 34},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testIntegerLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+	}
+}
+
+
+TEST(ParserTest, FloatLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		float expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5.303f;", 5.303f},
+		{"231.99f;", 231.99f},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testFloatLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+	}
+}
+
+
+TEST(ParserTest, BooleanLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		bool expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"true;", true},
+		{"false;", false},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testBooleanLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+	}
+}
+
+
+TEST(ParserTest, CharacterLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		char expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"'a';", 'a'},
+		{"'d';", 'd'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+	}
+}
+
 
 void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber)
 {
