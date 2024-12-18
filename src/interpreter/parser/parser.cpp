@@ -1,5 +1,6 @@
 #include "parser.h"
 
+
 namespace parser
 {
 	Parser::Parser(lexer::Lexer lexer)
@@ -7,6 +8,13 @@ namespace parser
 	{
 		nextToken();
 		nextToken();
+
+		registerPrefixFunction(token::IDENTIFIER, &Parser::parseIdentifier);
+		registerPrefixFunction(token::INTEGER_LITERAL, &Parser::parseIntegerLiteral);
+		registerPrefixFunction(token::FLOAT_LITERAL, &Parser::parseFloatLiteral);
+		registerPrefixFunction(token::TRUE_LITERAL, &Parser::parseBooleanLiteral);
+		registerPrefixFunction(token::FALSE_LITERAL, &Parser::parseBooleanLiteral);
+		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -82,7 +90,7 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_value = parseExpression();
+		statement->m_value = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -112,7 +120,7 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_value = parseExpression();
+		statement->m_value = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -142,7 +150,7 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_value = parseExpression();
+		statement->m_value = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -172,7 +180,7 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_value = parseExpression();
+		statement->m_value = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -190,7 +198,7 @@ namespace parser
 
 		nextToken();
 
-		statement->m_returnValue = parseExpression();
+		statement->m_returnValue = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -205,7 +213,7 @@ namespace parser
 	{
 		ast::ExpressionStatement* statement = new ast::ExpressionStatement;
 		statement->m_token = m_currentToken;
-		statement->m_expression = parseExpression();
+		statement->m_expression = parseExpression(LOWEST);
 
 		if (!expectPeek(token::SEMICOLON))
 		{
@@ -216,23 +224,16 @@ namespace parser
 		return statement;
 	}
 
-	ast::Expression* Parser::parseExpression()
+	ast::Expression* Parser::parseExpression(Precedence precedence)
 	{
-		switch (m_currentToken.m_type) 
+		ast::Expression* (Parser:: * prefix)() = m_prefixParseFunctions.at(m_currentToken.m_type);
+
+		if (prefix == NULL)
 		{
-		case token::INTEGER_LITERAL:
-			return parseIntegerLiteral();
-		case token::FLOAT_LITERAL:
-			return parseFloatLiteral();
-		case token::TRUE_LITERAL:
-			return parseBooleanLiteral();
-		case token::FALSE_LITERAL:
-			return parseBooleanLiteral();
-		case token::CHARACTER_LITERAL:
-			return parseCharacterLiteral();
-		case token::IDENTIFIER:
-			return parseIdentifier();
+			return NULL;
 		}
+
+		return (this->*prefix)();
 	}
 
 	ast::Expression* Parser::parseIntegerLiteral()
@@ -273,6 +274,16 @@ namespace parser
 		expression->m_token = m_currentToken;
 		expression->m_name = m_currentToken.m_literal;
 		return expression;
+	}
+
+	void Parser::registerPrefixFunction(token::TokenType tokenType, PrefixParseFunction prefixParseFunction)
+	{
+		m_prefixParseFunctions[tokenType] = prefixParseFunction;
+	}
+
+	void Parser::registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction)
+	{
+		m_infixParseFunctions[tokenType] = infixParseFunction;
 	}
 
 	bool Parser::currentTokenIs(token::TokenType token) {
