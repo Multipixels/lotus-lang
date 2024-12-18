@@ -178,7 +178,7 @@ TEST(ParserTest, DeclaringCharacterStatement)
 }
 
 
-TEST(ParserTest, ReturnStatements)
+TEST(ParserTest, ReturnStatement)
 {
 	typedef struct TestCase
 	{
@@ -217,7 +217,7 @@ TEST(ParserTest, ReturnStatements)
 }
 
 
-TEST(ParserTest, Identifiers)
+TEST(ParserTest, IdentifierExpression)
 {
 	typedef struct TestCase
 	{
@@ -246,14 +246,7 @@ TEST(ParserTest, Identifiers)
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		// Test to see if this is an identifier
-		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "Identifier");
-		ast::Identifier* identifier = (ast::Identifier*)expressionStatement->m_expression;
-
-		// Test to see if identifier fields are right
-		EXPECT_EQ(identifier->m_name, tests[i].expectedIdentifer)
-			<< "Test #" << i << '\n';
-		EXPECT_EQ(identifier->TokenLiteral(), tests[i].expectedIdentifer)
-			<< "Test #" << i << '\n';
+		testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i);
 	}
 }
 
@@ -340,5 +333,17 @@ void testCharacterLiteral(ast::Expression* expression, char expectedValue, int t
 	EXPECT_EQ(characterLiteral->m_value, expectedValue)
 		<< "Test #" << testNumber << '\n';
 	EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
+		<< "Test #" << testNumber << '\n';
+}
+
+void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "Identifier");
+	ast::Identifier* identifier = (ast::Identifier*)expression;
+
+	// Test to see if identifier fields are right
+	EXPECT_EQ(identifier->m_name, *expectedValue)
+		<< "Test #" << testNumber << '\n';
+	EXPECT_EQ(identifier->TokenLiteral(), *expectedValue)
 		<< "Test #" << testNumber << '\n';
 }
