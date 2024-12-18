@@ -4,8 +4,8 @@
 #include <map>
 #include <sstream>
 
-#include "parser-test.h"
 #include "parser.h"
+#include "parser-test.h"
 
 
 TEST(ParserTest, DeclaringIntegerStatement)

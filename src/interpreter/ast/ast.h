@@ -11,7 +11,8 @@ namespace ast
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
-		virtual std::string NodeType() { return m_nodeType; }
+		virtual std::string String() = 0;
+		virtual std::string NodeType() = 0;
 	private:
 		std::string m_nodeType = "Node";
 	};
@@ -20,7 +21,8 @@ namespace ast
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
-		virtual std::string NodeType() { return m_nodeType; }
+		virtual std::string String() = 0;
+		virtual std::string NodeType() = 0;
 	private:
 		std::string m_nodeType = "Statement";
 	};
@@ -29,7 +31,8 @@ namespace ast
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
-		virtual std::string NodeType() { return m_nodeType; }
+		virtual std::string String() = 0;
+		virtual std::string NodeType() = 0;
 	private:
 		std::string m_nodeType = "Expression";
 	};
@@ -40,6 +43,7 @@ namespace ast
 		std::vector<Statement*> m_statements;
 
 		std::string TokenLiteral();
+		std::string String();
 	};
 
 	class Identifier : public Expression
@@ -48,8 +52,9 @@ namespace ast
 		token::Token m_token;
 		std::string m_name;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "Identifier";
 	};
@@ -63,8 +68,9 @@ namespace ast
 		Identifier m_name;
 		Expression *m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "DeclareIntegerStatement";
 	};
@@ -76,8 +82,9 @@ namespace ast
 		Identifier m_name;
 		Expression* m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "DeclareFloatStatement";
 	};
@@ -89,8 +96,9 @@ namespace ast
 		Identifier m_name;
 		Expression* m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "DeclareBooleanStatement";
 	};
@@ -102,8 +110,9 @@ namespace ast
 		Identifier m_name;
 		Expression* m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "DeclareCharacterStatement";
 	};
@@ -114,8 +123,9 @@ namespace ast
 		token::Token m_token;
 		Expression* m_returnValue;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "ReturnStatement";
 	};
@@ -126,8 +136,9 @@ namespace ast
 		token::Token m_token;
 		Expression* m_expression;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "ExpressionStatement";
 	};
@@ -140,8 +151,9 @@ namespace ast
 		token::Token m_token;
 		int m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "IntegerLiteral";
 	};
@@ -152,8 +164,9 @@ namespace ast
 		token::Token m_token;
 		float m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "FloatLiteral";
 	};
@@ -164,8 +177,9 @@ namespace ast
 		token::Token m_token;
 		bool m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "BooleanLiteral";
 	};
@@ -176,8 +190,9 @@ namespace ast
 		token::Token m_token;
 		char m_value;
 
-		std::string NodeType() override { return m_nodeType; }
 		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "CharacterLiteral";
 	};
