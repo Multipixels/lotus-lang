@@ -19,6 +19,7 @@ namespace parser
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
+		registerPrefixFunction(token::LPARENTHESIS, &Parser::parseGroupedExpression);
 
 		registerInfixFunction(token::PLUS, &Parser::parseInfixExpression);
 		registerInfixFunction(token::MINUS, &Parser::parseInfixExpression);
@@ -355,6 +356,20 @@ namespace parser
 		Precedence precedence = currentPrecedence();
 		nextToken();
 		expression->m_right_expression = parseExpression(precedence);
+
+		return expression;
+	}
+
+	ast::Expression* Parser::parseGroupedExpression()
+	{
+		nextToken();
+
+		ast::Expression* expression = parseExpression(LOWEST);
+
+		if(!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
 
 		return expression;
 	}

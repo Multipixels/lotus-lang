@@ -96,6 +96,7 @@ namespace parser
 		ast::Expression* parseExpression(Precedence precedence);
 		ast::Expression* parsePrefixExpression();
 		ast::Expression* parseInfixExpression(ast::Expression* leftExpression);
+		ast::Expression* parseGroupedExpression();
 		ast::Expression* parseIntegerLiteral();
 		ast::Expression* parseFloatLiteral();
 		ast::Expression* parseBooleanLiteral();

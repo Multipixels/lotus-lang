@@ -512,6 +512,8 @@ TEST(ParserTest, OperatorPrecedence)
 		{"a > b == b > c;", "((a > b) == (b > c));"},
 		{"a >= b != b >= c;", "((a >= b) != (b >= c));"},
 		{"3 + 4 * 6 == 3 * 1 + 4 * 6;", "((3 + (4 * 6)) == ((3 * 1) + (4 * 6)));"},
+		{"a + (b + c);", "(a + (b + c));"},
+		{"(5 + 6) * 7;", "((5 + 6) * 7);"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
