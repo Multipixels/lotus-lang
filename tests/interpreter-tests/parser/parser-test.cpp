@@ -549,11 +549,6 @@ TEST(ParserTest, Errors)
 		ast::Program* program = parser.ParseProgram();
 
 		EXPECT_EQ(parser.m_errors[0], tests[i].expectedError);
-
-		for (int j = 0; j < parser.m_errors.size(); j++)
-		{
-			std::cout << "`" << tests[i].input << "`: " << parser.m_errors[j] << std::endl;
-		}
 	}
 }
 
