@@ -17,6 +17,19 @@ namespace parser
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
+
+		registerInfixFunction(token::PLUS, &Parser::parseInfixExpression);
+		registerInfixFunction(token::MINUS, &Parser::parseInfixExpression);
+		registerInfixFunction(token::ASTERIK, &Parser::parseInfixExpression);
+		registerInfixFunction(token::SLASH, &Parser::parseInfixExpression);
+		registerInfixFunction(token::RCHEVRON, &Parser::parseInfixExpression);
+		registerInfixFunction(token::GEQ, &Parser::parseInfixExpression);
+		registerInfixFunction(token::LCHEVRON, &Parser::parseInfixExpression);
+		registerInfixFunction(token::LEQ, &Parser::parseInfixExpression);
+		registerInfixFunction(token::EQ, &Parser::parseInfixExpression);
+		registerInfixFunction(token::NEQ, &Parser::parseInfixExpression);
+		registerInfixFunction(token::AND, &Parser::parseInfixExpression);
+		registerInfixFunction(token::OR, &Parser::parseInfixExpression);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -52,6 +65,38 @@ namespace parser
 			return true;
 		}
 		return false;
+	}
+
+	bool Parser::currentTokenIs(token::TokenType token)
+	{
+		return m_currentToken.m_type == token;
+	}
+
+	bool Parser::peekTokenIs(token::TokenType token) 
+	{
+		return m_peekToken.m_type == token;
+	}
+
+	Parser::Precedence Parser::peekPrecedence()
+	{
+		// Check if precedence table has token, and if it does, return precedence of it.
+		if (precedenceOfTokenType.count(m_peekToken.m_type) >= 1)
+		{
+			return precedenceOfTokenType.at(m_peekToken.m_type);
+		}
+
+		return LOWEST;
+	}
+
+	Parser::Precedence Parser::currentPrecedence()
+	{
+		// Check if precedence table has token, and if it does, return precedence of it.
+		if (precedenceOfTokenType.count(m_currentToken.m_type) >= 1)
+		{
+			return precedenceOfTokenType.at(m_currentToken.m_type);
+		}
+
+		return LOWEST;
 	}
 
 	ast::Statement* Parser::parseStatement()
@@ -228,7 +273,7 @@ namespace parser
 
 	ast::Expression* Parser::parseExpression(Precedence precedence)
 	{
-		ast::Expression* (Parser:: * prefix)() = m_prefixParseFunctions.at(m_currentToken.m_type);
+		PrefixParseFunction prefix = m_prefixParseFunctions.at(m_currentToken.m_type);
 
 		if (prefix == NULL)
 		{
@@ -237,6 +282,20 @@ namespace parser
 		
 		// Dereference this member function pointer and call it
 		ast::Expression* leftExpression = (this->*prefix)();
+
+		while (!peekTokenIs(token::SEMICOLON) && precedence < peekPrecedence())
+		{
+			InfixParseFunction infix = m_infixParseFunctions.at(m_peekToken.m_type);
+			
+			if (infix == NULL)
+			{
+				return NULL;
+			}
+
+			nextToken();
+
+			leftExpression = (this->*infix)(leftExpression);
+		}
 
 		return leftExpression;
 	}
@@ -251,6 +310,21 @@ namespace parser
 		nextToken();
 
 		expression->m_right_expression = parseExpression(LOWEST);
+
+		return expression;
+	}
+
+	ast::Expression* Parser::parseInfixExpression(ast::Expression* leftExpression)
+	{
+		ast::InfixExpression* expression = new ast::InfixExpression;
+
+		expression->m_token = m_currentToken;
+		expression->m_operator = m_currentToken.m_literal;
+		expression->m_left_expression = leftExpression;
+
+		Precedence precedence = currentPrecedence();
+		nextToken();
+		expression->m_right_expression = parseExpression(precedence);
 
 		return expression;
 	}
@@ -303,9 +377,5 @@ namespace parser
 	void Parser::registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction)
 	{
 		m_infixParseFunctions[tokenType] = infixParseFunction;
-	}
-
-	bool Parser::currentTokenIs(token::TokenType token) {
-		return m_currentToken.m_type == token;
 	}
 }

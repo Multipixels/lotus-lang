@@ -6,17 +6,6 @@
 namespace parser
 {
 
-	typedef enum Precedence
-	{
-		LOWEST,			// default
-		EQUALS,			// ==
-		LESSGREATER,	// < or >
-		SUM,			// a + b
-		PRODUCT,		// a * b
-		PREFIX,			// -X or !x
-		CALL,			// function call
-	} Precedence;
-
 	class Parser
 	{
 	public:
@@ -36,11 +25,51 @@ namespace parser
 		// Parses the program described by the lexer and returns a parsed program
 		ast::Program* ParseProgram();
 	private:
+		typedef enum Precedence
+		{
+			LOWEST,			// default
+			EQUALS,			// ==
+			LESSGREATER,	// < or >
+			SUM,			// a + b
+			PRODUCT,		// a * b
+			PREFIX,			// -X or !x
+			CALL,			// function call
+		} Precedence;
+
+		const std::map<token::TokenType, Precedence> precedenceOfTokenType =
+		{
+			{token::EQ, EQUALS},
+			{token::NEQ, EQUALS},
+			{token::LEQ, LESSGREATER},
+			{token::LCHEVRON, LESSGREATER},
+			{token::GEQ, LESSGREATER},
+			{token::RCHEVRON, LESSGREATER},
+			{token::PLUS, SUM},
+			{token::MINUS, SUM},
+			{token::OR, SUM},
+			{token::ASTERIK, PRODUCT},
+			{token::SLASH, PRODUCT},
+			{token::AND, PRODUCT},
+		};
+
 		// Cycles through to the next token in the lexer
 		void nextToken();
 
 		// Checks if peek token type is as expected. If it is, cycle to it
 		bool expectPeek(token::TokenType tokenType);
+
+		// Checks if the current token type is as given
+		bool currentTokenIs(token::TokenType token);
+
+		// Checks if the peek token type is as given
+		bool peekTokenIs(token::TokenType token);
+
+		// Returns the precedence of the token in front of current token.
+		Precedence peekPrecedence();
+
+		// Returns the precedence of the token in the current token.
+		Precedence currentPrecedence();
+
 
 		// STATEMENTS
 
@@ -56,6 +85,7 @@ namespace parser
 
 		ast::Expression* parseExpression(Precedence precedence);
 		ast::Expression* parsePrefixExpression();
+		ast::Expression* parseInfixExpression(ast::Expression* leftExpression);
 		ast::Expression* parseIntegerLiteral();
 		ast::Expression* parseFloatLiteral();
 		ast::Expression* parseBooleanLiteral();
@@ -69,8 +99,5 @@ namespace parser
 		
 		// Registers an infix function into the parser
 		void registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction);
-		
-		// Checks if the current token type is as given
-		bool currentTokenIs(token::TokenType token);
 	};
 }

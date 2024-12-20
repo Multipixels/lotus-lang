@@ -7,7 +7,6 @@
 #include "parser.h"
 #include "parser-test.h"
 
-
 TEST(ParserTest, DeclaringIntegerStatement)
 {
 	typedef struct TestCase
@@ -382,13 +381,15 @@ TEST(ParserTest, CharacterLiteralExpression)
 }
 
 
-TEST(ParserTest, PrefixExpressions)
+
+
+TEST(ParserTest, PrefixExpression)
 {
 	typedef struct TestCase
 	{
 		std::string input;
 		std::string expectedOperator;
-		std::any expectedValue;
+		std::any expectedExpression;
 	} TestCase;
 
 	TestCase tests[] =
@@ -418,7 +419,58 @@ TEST(ParserTest, PrefixExpressions)
 
 		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
 		
-		testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedValue, i);
+		testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedExpression, i);
+	}
+}
+
+
+TEST(ParserTest, InfixExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedLeftExpression;
+		std::string expectedOperator;
+		std::any expectedRightExpression;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5 + 6;", 5, "+", 6},
+		{"5 - 6;", 5, "-", 6},
+		{"5 * 6;", 5, "*", 6},
+		{"5 / 6;", 5, "/", 6},
+		{"5 > 6;", 5, ">", 6},
+		{"5 >= 6;", 5, ">=", 6},
+		{"5 < 6;", 5, "<", 6},
+		{"5 <= 6;", 5, "<=", 6},
+		{"5 == 6;", 5, "==", 6},
+		{"5 != 6;", 5, "!=", 6},
+		{"true && false;", true, "&&", false},
+		{"true || false;", true, "||", false},
+	};
+
+	for (int i = 10; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "InfixExpression");
+		ast::InfixExpression* infixExpression = (ast::InfixExpression*)(expressionStatement->m_expression);
+
+		EXPECT_EQ(infixExpression->m_operator, tests[i].expectedOperator);
+
+		testLiteralExpression(infixExpression->m_left_expression, tests[i].expectedLeftExpression, i);
+		testLiteralExpression(infixExpression->m_right_expression, tests[i].expectedRightExpression, i);
 	}
 }
 

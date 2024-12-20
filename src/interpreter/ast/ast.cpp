@@ -173,4 +173,20 @@ namespace ast
 
 		return outputString.str();
 	}
+
+	std::string InfixExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string InfixExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << "("
+			<< m_left_expression->String() 
+			<< " " << m_operator << " "
+			<< m_right_expression->String() 
+			<< ")";
+
+		return outputString.str();
+	}
 }

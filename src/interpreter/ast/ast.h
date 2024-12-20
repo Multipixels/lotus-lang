@@ -210,4 +210,19 @@ namespace ast
 	private:
 		std::string m_nodeType = "PrefixExpression";
 	};
+
+	class InfixExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		ast::Expression* m_left_expression;
+		std::string m_operator;
+		ast::Expression* m_right_expression;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "InfixExpression";
+	};
 }
