@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "parser.h"
 
 
@@ -64,6 +66,8 @@ namespace parser
 			nextToken();
 			return true;
 		}
+
+		expectedPeekError(tokenType);
 		return false;
 	}
 
@@ -97,6 +101,28 @@ namespace parser
 		}
 
 		return LOWEST;
+	}
+
+	void Parser::expectedPeekError(token::TokenType expectedToken)
+	{
+		std::ostringstream error;
+
+		error << "Expected " << token::tokenTypeToString.at(expectedToken)
+			<< ". Got " << token::tokenTypeToString.at(m_peekToken.m_type)
+			<< " instead.";
+
+		m_errors.push_back(error.str());
+	}
+
+	void Parser::noPrefixParseFunction(token::TokenType operatorError)
+	{
+		std::ostringstream error;
+
+		error << "No prefix function defined for " 
+			<< token::tokenTypeToString.at(operatorError)
+			<< ".";
+
+		m_errors.push_back(error.str());
 	}
 
 	ast::Statement* Parser::parseStatement()
@@ -273,10 +299,14 @@ namespace parser
 
 	ast::Expression* Parser::parseExpression(Precedence precedence)
 	{
-		PrefixParseFunction prefix = m_prefixParseFunctions.at(m_currentToken.m_type);
-
-		if (prefix == NULL)
+		PrefixParseFunction prefix;
+		if (m_prefixParseFunctions.count(m_currentToken.m_type) >= 1)
 		{
+			prefix = m_prefixParseFunctions.at(m_currentToken.m_type);
+		}
+		else
+		{
+			noPrefixParseFunction(m_currentToken.m_type);
 			return NULL;
 		}
 		
@@ -289,7 +319,7 @@ namespace parser
 			
 			if (infix == NULL)
 			{
-				return NULL;
+				return leftExpression;
 			}
 
 			nextToken();

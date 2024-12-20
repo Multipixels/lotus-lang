@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ast.h"
+#include "parser.h"
 
+void checkParserErrors(parser::Parser* parser);
 
 void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber = -1);
 void testIntegerLiteral(ast::Expression* expression, int expectedValue, int testNumber = -1);

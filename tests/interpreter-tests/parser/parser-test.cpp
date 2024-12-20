@@ -4,7 +4,6 @@
 #include <map>
 #include <sstream>
 
-#include "parser.h"
 #include "parser-test.h"
 
 TEST(ParserTest, DeclaringIntegerStatement)
@@ -27,6 +26,7 @@ TEST(ParserTest, DeclaringIntegerStatement)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -45,7 +45,7 @@ TEST(ParserTest, DeclaringIntegerStatement)
 			<< "Test #" << i << '\n';
 
 		// Test integer literal and value
-		testIntegerLiteral(declareIntegerStatement->m_value, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(declareIntegerStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -70,6 +70,7 @@ TEST(ParserTest, DeclaringFloatStatement)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -88,7 +89,7 @@ TEST(ParserTest, DeclaringFloatStatement)
 			<< "Test #" << i << '\n';
 
 		// Test float literal and value
-		testFloatLiteral(declareFloatStatement->m_value, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(declareFloatStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -112,6 +113,7 @@ TEST(ParserTest, DeclaringBooleanStatement)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -130,7 +132,7 @@ TEST(ParserTest, DeclaringBooleanStatement)
 			<< "Test #" << i << '\n';
 
 		// Test boolean literal and value
-		testBooleanLiteral(declareBooleanStatement->m_value, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(declareBooleanStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -154,6 +156,7 @@ TEST(ParserTest, DeclaringCharacterStatement)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -172,7 +175,7 @@ TEST(ParserTest, DeclaringCharacterStatement)
 			<< "Test #" << i << '\n';
 
 		// Test character literal and value
-		testCharacterLiteral(declareCharacterStatement->m_value, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(declareCharacterStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -198,6 +201,7 @@ TEST(ParserTest, ReturnStatement)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -211,7 +215,7 @@ TEST(ParserTest, ReturnStatement)
 		ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)statement;
 
 		// Test expression separately
-		testLiteralExpression(returnStatement->m_returnValue, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(returnStatement->m_returnValue, tests[i].expectedValue, i));
 	}
 }
 
@@ -235,6 +239,7 @@ TEST(ParserTest, IdentifierExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -244,7 +249,7 @@ TEST(ParserTest, IdentifierExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i);
+		ASSERT_NO_FATAL_FAILURE(testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i));
 	}
 }
 
@@ -268,6 +273,7 @@ TEST(ParserTest, IntegerLiteralExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -277,7 +283,7 @@ TEST(ParserTest, IntegerLiteralExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		testIntegerLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
 }
 
@@ -301,6 +307,7 @@ TEST(ParserTest, FloatLiteralExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -310,7 +317,7 @@ TEST(ParserTest, FloatLiteralExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		testFloatLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
 }
 
@@ -334,6 +341,7 @@ TEST(ParserTest, BooleanLiteralExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -343,7 +351,7 @@ TEST(ParserTest, BooleanLiteralExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		testBooleanLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
 }
 
@@ -367,6 +375,7 @@ TEST(ParserTest, CharacterLiteralExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -376,11 +385,9 @@ TEST(ParserTest, CharacterLiteralExpression)
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i);
+		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
 }
-
-
 
 
 TEST(ParserTest, PrefixExpression)
@@ -405,6 +412,7 @@ TEST(ParserTest, PrefixExpression)
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -419,7 +427,7 @@ TEST(ParserTest, PrefixExpression)
 
 		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
 		
-		testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedExpression, i);
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedExpression, i));
 	}
 }
 
@@ -450,11 +458,12 @@ TEST(ParserTest, InfixExpression)
 		{"true || false;", true, "||", false},
 	};
 
-	for (int i = 10; i < sizeof(tests) / sizeof(TestCase); i++)
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
 		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
@@ -469,11 +478,101 @@ TEST(ParserTest, InfixExpression)
 
 		EXPECT_EQ(infixExpression->m_operator, tests[i].expectedOperator);
 
-		testLiteralExpression(infixExpression->m_left_expression, tests[i].expectedLeftExpression, i);
-		testLiteralExpression(infixExpression->m_right_expression, tests[i].expectedRightExpression, i);
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, tests[i].expectedLeftExpression, i));
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, tests[i].expectedRightExpression, i));
 	}
 }
 
+
+TEST(ParserTest, OperatorPrecedence)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expected;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5 + 6;", "(5 + 6);"},
+		{"!true;", "(!true);"},
+		{"!5;", "(!5);"},
+		{"!-5;", "(!(-5));"},
+		{"a + b + c;", "((a + b) + c);"},
+		{"a + b - c;", "((a + b) - c);"},
+		{"a - b + c;", "((a - b) + c);"},
+		{"a * b * c;", "((a * b) * c);"},
+		{"a * b / c;", "((a * b) / c);"},
+		{"a / b * c;", "((a / b) * c);"},
+		{"a + b * c;", "(a + (b * c));"},
+		{"a + b / c;", "(a + (b / c));"},
+		{"a * b + c;", "((a * b) + c);"},
+		{"a / b - c;", "((a / b) - c);"},
+		{"a + b * c + d / e - f;", "(((a + (b * c)) + (d / e)) - f);"},
+		{"a > b == b > c;", "((a > b) == (b > c));"},
+		{"a >= b != b >= c;", "((a >= b) != (b >= c));"},
+		{"3 + 4 * 6 == 3 * 1 + 4 * 6;", "((3 + (4 * 6)) == ((3 * 1) + (4 * 6)));"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		EXPECT_EQ(program->String(), tests[i].expected);
+	}
+}
+
+
+TEST(ParserTest, Errors)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedError;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5 + 6", "Expected SEMICOLON. Got END_OF_FILE instead."},
+		{"5 + ;", "No prefix function defined for SEMICOLON."},
+		{"+ 6;", "No prefix function defined for PLUS."},
+		{"5 6;", "Expected SEMICOLON. Got INTEGER_LITERAL instead."},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		EXPECT_EQ(parser.m_errors[0], tests[i].expectedError);
+
+		for (int j = 0; j < parser.m_errors.size(); j++)
+		{
+			std::cout << "`" << tests[i].input << "`: " << parser.m_errors[j] << std::endl;
+		}
+	}
+}
+
+
+void checkParserErrors(parser::Parser* parser)
+{
+	if (parser->m_errors.size() == 0)
+	{
+		return;
+	}
+
+	for (int i = 0; i < parser->m_errors.size(); i++)
+	{
+		std::cout << "Parser error: " << parser->m_errors[i]
+			<< std::endl;
+	}
+
+	FAIL();
+}
 
 void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber)
 {
@@ -483,19 +582,19 @@ void testLiteralExpression(ast::Expression* expression, std::any expectedValue, 
 	std::string expectedValueType = expectedValue.type().name();
 	if(expectedValueType == "int")
 	{
-		testIntegerLiteral(expression, std::any_cast<int>(expectedValue), testNumber);
+		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(expression, std::any_cast<int>(expectedValue), testNumber));
 	}
 	else if (expectedValueType == "float")
 	{
-		testFloatLiteral(expression, std::any_cast<float>(expectedValue), testNumber);
+		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(expression, std::any_cast<float>(expectedValue), testNumber));
 	}
 	else if (expectedValueType == "bool")
 	{
-		testBooleanLiteral(expression, std::any_cast<bool>(expectedValue), testNumber);
+		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(expression, std::any_cast<bool>(expectedValue), testNumber));
 	}
 	else if (expectedValueType == "char")
 	{
-		testCharacterLiteral(expression, std::any_cast<char>(expectedValue), testNumber);
+		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expression, std::any_cast<char>(expectedValue), testNumber));
 	}
 	else
 	{

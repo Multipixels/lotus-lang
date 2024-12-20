@@ -20,6 +20,8 @@ namespace parser
 		std::map<token::TokenType, PrefixParseFunction> m_prefixParseFunctions;
 		std::map<token::TokenType, InfixParseFunction> m_infixParseFunctions;
 
+		std::vector<std::string> m_errors;
+
 		Parser(lexer::Lexer lexer);
 		
 		// Parses the program described by the lexer and returns a parsed program
@@ -69,6 +71,14 @@ namespace parser
 
 		// Returns the precedence of the token in the current token.
 		Precedence currentPrecedence();
+
+		// ERRORS
+
+		// Peek token is not as expected.
+		void expectedPeekError(token::TokenType expectedToken);
+
+		// Prefix function not defined.
+		void noPrefixParseFunction(token::TokenType operatorError);
 
 
 		// STATEMENTS
