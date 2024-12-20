@@ -55,6 +55,7 @@ namespace parser
 		// EXPRESSIONS
 
 		ast::Expression* parseExpression(Precedence precedence);
+		ast::Expression* parsePrefixExpression();
 		ast::Expression* parseIntegerLiteral();
 		ast::Expression* parseFloatLiteral();
 		ast::Expression* parseBooleanLiteral();

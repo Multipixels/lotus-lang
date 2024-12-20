@@ -382,6 +382,47 @@ TEST(ParserTest, CharacterLiteralExpression)
 }
 
 
+TEST(ParserTest, PrefixExpressions)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedOperator;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"!true;", "!", true},
+		{"!false;", "!", false},
+		{"-5;", "-", 5},
+		{"-5.5f;", "-", 5.5f},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << '\n';
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "PrefixExpression");
+		ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)(expressionStatement->m_expression);
+
+		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
+		
+		testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedValue, i);
+	}
+}
+
+
 void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber)
 {
 	// Cannot use a switch on type as std::string is not integral

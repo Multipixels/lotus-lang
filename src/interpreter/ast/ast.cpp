@@ -160,4 +160,17 @@ namespace ast
 
 		return charToString;
 	}
+
+	std::string PrefixExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string PrefixExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << "(" << m_operator
+			<< m_right_expression->String() << ")";
+
+		return outputString.str();
+	}
 }

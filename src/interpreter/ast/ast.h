@@ -196,4 +196,18 @@ namespace ast
 	private:
 		std::string m_nodeType = "CharacterLiteral";
 	};
+
+	class PrefixExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		std::string m_operator;
+		ast::Expression *m_right_expression;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "PrefixExpression";
+	};
 }

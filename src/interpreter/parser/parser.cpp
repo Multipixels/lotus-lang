@@ -15,6 +15,8 @@ namespace parser
 		registerPrefixFunction(token::TRUE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::FALSE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
+		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
+		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -232,8 +234,25 @@ namespace parser
 		{
 			return NULL;
 		}
+		
+		// Dereference this member function pointer and call it
+		ast::Expression* leftExpression = (this->*prefix)();
 
-		return (this->*prefix)();
+		return leftExpression;
+	}
+
+	ast::Expression* Parser::parsePrefixExpression()
+	{
+		ast::PrefixExpression* expression = new ast::PrefixExpression;
+
+		expression->m_token = m_currentToken;
+		expression->m_operator = m_currentToken.m_literal;
+
+		nextToken();
+
+		expression->m_right_expression = parseExpression(LOWEST);
+
+		return expression;
 	}
 
 	ast::Expression* Parser::parseIntegerLiteral()
