@@ -33,6 +33,7 @@ namespace parser
 		registerInfixFunction(token::NEQ, &Parser::parseInfixExpression);
 		registerInfixFunction(token::AND, &Parser::parseInfixExpression);
 		registerInfixFunction(token::OR, &Parser::parseInfixExpression);
+		registerInfixFunction(token::ASSIGN, &Parser::parseInfixExpression);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -140,6 +141,8 @@ namespace parser
 			return parseCharacterDeclaration();
 		case token::RETURN:
 			return parseReturnStatement();
+		case token::IF:
+			return parseIfStatement();
 		default:
 			return parseExpressionStatement();
 		}
@@ -170,7 +173,6 @@ namespace parser
 		{
 			return NULL;
 		}
-		nextToken();
 
 		return statement;
 	}
@@ -200,7 +202,6 @@ namespace parser
 		{
 			return NULL;
 		}
-		nextToken();
 
 		return statement;
 	}
@@ -230,7 +231,6 @@ namespace parser
 		{
 			return NULL;
 		}
-		nextToken();
 
 		return statement;
 	}
@@ -260,7 +260,6 @@ namespace parser
 		{
 			return NULL;
 		}
-		nextToken();
 
 		return statement;
 	}
@@ -278,7 +277,6 @@ namespace parser
 		{
 			return NULL;
 		}
-		nextToken();
 
 		return statement;
 	}
@@ -293,7 +291,56 @@ namespace parser
 		{
 			return NULL;
 		}
+
+		return statement;
+	}
+
+	ast::BlockStatement* Parser::parseBlockStatement()
+	{
+		ast::BlockStatement* statement = new ast::BlockStatement;
+		statement->m_token = m_currentToken;
+
 		nextToken();
+
+		while (!currentTokenIs(token::RBRACE) && !currentTokenIs(token::END_OF_FILE))
+		{
+			ast::Statement* subStatement = parseStatement();
+			if (subStatement != NULL)
+			{
+				statement->m_statements.push_back(subStatement);
+			}
+			nextToken();
+		}
+
+		return statement;
+	}
+
+	ast::IfStatement* Parser::parseIfStatement()
+	{
+		ast::IfStatement* statement = new ast::IfStatement;
+		statement->m_token = m_currentToken;
+		
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		nextToken();
+		statement->m_condition = parseExpression(LOWEST);
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_consequence = parseBlockStatement();
+
+		statement->m_alternative = 0;
 
 		return statement;
 	}

@@ -30,6 +30,7 @@ namespace parser
 		typedef enum Precedence
 		{
 			LOWEST,			// default
+			ASSIGNMENT,		// =
 			EQUALS,			// ==
 			LESSGREATER,	// < or >
 			SUM,			// a + b
@@ -40,6 +41,7 @@ namespace parser
 
 		const std::map<token::TokenType, Precedence> precedenceOfTokenType =
 		{
+			{token::ASSIGN, ASSIGNMENT},
 			{token::EQ, EQUALS},
 			{token::NEQ, EQUALS},
 			{token::LEQ, LESSGREATER},
@@ -90,6 +92,8 @@ namespace parser
 		ast::DeclareCharacterStatement* parseCharacterDeclaration();
 		ast::ReturnStatement* parseReturnStatement();
 		ast::ExpressionStatement* parseExpressionStatement();
+		ast::BlockStatement* parseBlockStatement();
+		ast::IfStatement* parseIfStatement();
 
 		// EXPRESSIONS
 

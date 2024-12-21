@@ -30,19 +30,19 @@ TEST(ParserTest, DeclaringIntegerStatement)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->TokenLiteral(), "integer")
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->NodeType(), "DeclareIntegerStatement");
 		ast::DeclareIntegerStatement* declareIntegerStatement = (ast::DeclareIntegerStatement*)statement;
 
 		EXPECT_EQ(declareIntegerStatement->m_name.m_name, tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 		EXPECT_EQ(declareIntegerStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test integer literal and value
 		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(declareIntegerStatement->m_value, tests[i].expectedValue, i));
@@ -74,19 +74,19 @@ TEST(ParserTest, DeclaringFloatStatement)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->TokenLiteral(), "float")
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->NodeType(), "DeclareFloatStatement");
 		ast::DeclareFloatStatement* declareFloatStatement = (ast::DeclareFloatStatement*)statement;
 
 		EXPECT_EQ(declareFloatStatement->m_name.m_name, tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 		EXPECT_EQ(declareFloatStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test float literal and value
 		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(declareFloatStatement->m_value, tests[i].expectedValue, i));
@@ -117,19 +117,19 @@ TEST(ParserTest, DeclaringBooleanStatement)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->TokenLiteral(), "boolean")
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->NodeType(), "DeclareBooleanStatement");
 		ast::DeclareBooleanStatement* declareBooleanStatement = (ast::DeclareBooleanStatement*)statement;
 
 		EXPECT_EQ(declareBooleanStatement->m_name.m_name, tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 		EXPECT_EQ(declareBooleanStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test boolean literal and value
 		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(declareBooleanStatement->m_value, tests[i].expectedValue, i));
@@ -160,19 +160,19 @@ TEST(ParserTest, DeclaringCharacterStatement)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->TokenLiteral(), "character")
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->NodeType(), "DeclareCharacterStatement");
 		ast::DeclareCharacterStatement* declareCharacterStatement = (ast::DeclareCharacterStatement*)statement;
 
 		EXPECT_EQ(declareCharacterStatement->m_name.m_name, tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 		EXPECT_EQ(declareCharacterStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test character literal and value
 		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(declareCharacterStatement->m_value, tests[i].expectedValue, i));
@@ -205,10 +205,10 @@ TEST(ParserTest, ReturnStatement)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->TokenLiteral(), "return")
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is a return statement
 		ASSERT_EQ(statement->NodeType(), "ReturnStatement");
@@ -243,7 +243,7 @@ TEST(ParserTest, IdentifierExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -277,7 +277,7 @@ TEST(ParserTest, IntegerLiteralExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -311,7 +311,7 @@ TEST(ParserTest, FloatLiteralExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -345,7 +345,7 @@ TEST(ParserTest, BooleanLiteralExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -379,7 +379,7 @@ TEST(ParserTest, CharacterLiteralExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -416,7 +416,7 @@ TEST(ParserTest, PrefixExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -467,7 +467,7 @@ TEST(ParserTest, InfixExpression)
 
 		ast::Statement* statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << '\n';
+			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
@@ -555,6 +555,47 @@ TEST(ParserTest, Errors)
 }
 
 
+TEST(ParserTest, IfStatement)
+{
+	std::string input = R"(
+if(true) {
+	integer b = 5;
+	c = b + 3 * 2;
+} 
+)";
+
+	std::string expectedString = 
+R"(if (true)
+{
+integer b = 5;
+(c = (b + (3 * 2)));
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is an if statement
+	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+
+	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
+	ASSERT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	ASSERT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	ASSERT_TRUE(ifStatement->m_alternative == NULL);
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
 void checkParserErrors(parser::Parser* parser)
 {
 	if (parser->m_errors.size() == 0)
@@ -596,27 +637,27 @@ void testLiteralExpression(ast::Expression* expression, std::any expectedValue, 
 	else
 	{
 		FAIL()
-			<< "Test #" << testNumber << '\n';
+			<< "Test #" << testNumber << std::endl;
 	}
 }
 
 void testIntegerLiteral(ast::Expression* expression, int expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->NodeType(), "IntegerLiteral")
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 
 	ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)expression;
 
 	EXPECT_EQ(integerLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(integerLiteral->TokenLiteral(), std::to_string(expectedValue))
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 }
 
 void testFloatLiteral(ast::Expression* expression, float expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->NodeType(), "FloatLiteral")
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 
 	ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)expression;
 
@@ -624,37 +665,37 @@ void testFloatLiteral(ast::Expression* expression, float expectedValue, int test
 	outputString << expectedValue;
 
 	EXPECT_EQ(floatLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(floatLiteral->TokenLiteral(), outputString.str())
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 }
 
 void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->NodeType(), "BooleanLiteral")
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 
 	ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)expression;
 
 	EXPECT_EQ(booleanLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(booleanLiteral->TokenLiteral(), expectedValue ? "true" : "false")
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 }
 
 void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->NodeType(), "CharacterLiteral")
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 
 	ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)expression;
 
 	char charToString[2] = { expectedValue, '\0' };
 
 	EXPECT_EQ(characterLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 }
 
 void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber)
@@ -664,7 +705,19 @@ void testIdentifier(ast::Expression* expression, std::string* expectedValue, int
 
 	// Test to see if identifier fields are right
 	EXPECT_EQ(identifier->m_name, *expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(identifier->TokenLiteral(), *expectedValue)
-		<< "Test #" << testNumber << '\n';
+		<< "Test #" << testNumber << std::endl;
+}
+
+void testInfixExpression(ast::Expression* expression, std::any leftValue, std::string op, std::any rightValue, int testNumber)
+{
+	ASSERT_EQ(expression->NodeType(), "InfixExpression");
+	ast::InfixExpression* infixExpression = (ast::InfixExpression*)expression;
+
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, leftValue, testNumber));
+
+	EXPECT_EQ(infixExpression->m_operator, op);
+
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, leftValue, testNumber));
 }

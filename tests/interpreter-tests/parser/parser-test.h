@@ -11,3 +11,5 @@ void testFloatLiteral(ast::Expression* expression, float expectedValue, int test
 void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber = -1);
 void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber = -1);
 void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber = -1);
+
+void testInfixExpression(ast::Expression* expression, std::any leftValue, std::string op, std::any rightValue, int testNumber = -1);

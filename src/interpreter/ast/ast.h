@@ -143,6 +143,34 @@ namespace ast
 		std::string m_nodeType = "ExpressionStatement";
 	};
 
+	class BlockStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		std::vector<Statement*> m_statements;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "BlockStatement";
+	};
+
+	class IfStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Expression* m_condition;
+		BlockStatement* m_consequence;
+		BlockStatement* m_alternative;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "IfStatement";
+	};
+
 	// EXPRESSIONS
 
 	class IntegerLiteral : public Expression

@@ -117,6 +117,43 @@ namespace ast
 		return output.str();
 	}
 
+	std::string BlockStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string BlockStatement::String()
+	{
+		std::ostringstream output;
+
+		for (int i = 0; i < m_statements.size(); i++)
+		{
+			output << m_statements[i]->String() << std::endl;
+		}
+
+		return output.str();
+	}
+
+	std::string IfStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string IfStatement::String()
+	{
+		std::ostringstream output;
+
+		output << "if (" << m_condition->String() << ")" << std::endl 
+			<< "{" << std::endl
+			<< m_consequence->String() 
+			<< "}" << std::endl;
+
+		if (m_alternative != NULL)
+		{
+			output << "else " << m_alternative->String();
+		}
+
+		return output.str();
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
