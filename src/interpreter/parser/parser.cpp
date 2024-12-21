@@ -147,6 +147,8 @@ namespace parser
 			return parseWhileStatement();
 		case token::DO:
 			return parseDoWhileStatement();
+		case token::ITERATE:
+			return parseIterateStatement();
 		default:
 			return parseExpressionStatement();
 		}
@@ -439,6 +441,42 @@ namespace parser
 		{
 			return NULL;
 		}
+
+		return statement;
+	}
+
+	ast::IterateStatement* Parser::parseIterateStatement()
+	{
+		ast::IterateStatement* statement = new ast::IterateStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_var = (ast::Identifier*)parseIdentifier();
+
+		if (!expectPeek(token::COLON))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_collection = parseExpression(LOWEST);
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_consequence = parseBlockStatement();
 
 		return statement;
 	}

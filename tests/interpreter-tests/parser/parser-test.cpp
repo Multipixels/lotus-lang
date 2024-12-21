@@ -866,6 +866,50 @@ while (false);
 }
 
 
+TEST(ParserTest, IterateStatement)
+{
+	std::string input = R"(
+iterate(var : myCollection) {
+	5;
+	true;
+}
+)";
+
+	std::string expectedString =
+		R"(iterate (var : myCollection)
+{
+5;
+true;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is a while statement
+	ASSERT_EQ(statement->NodeType(), "IterateStatement");
+	ast::IterateStatement* iterateStatement = (ast::IterateStatement*)statement;
+
+	EXPECT_EQ(iterateStatement->m_var->m_name, "var");
+	
+	ASSERT_EQ(iterateStatement->m_collection->NodeType(), "Identifier");
+	ast::Identifier* collection = (ast::Identifier*)iterateStatement->m_collection;
+	EXPECT_EQ(collection->m_name, "myCollection");
+
+	ASSERT_EQ(iterateStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(iterateStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(iterateStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
 void checkParserErrors(parser::Parser* parser)
 {
 	if (parser->m_errors.size() == 0)

@@ -199,6 +199,22 @@ namespace ast
 		return output.str();
 	}
 
+	std::string IterateStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string IterateStatement::String()
+	{
+		std::ostringstream output;
+
+		output << "iterate (" << m_var->String() << " : " << m_collection->String() << ")" << std::endl
+			<< "{" << std::endl
+			<< m_consequence->String()
+			<< "}" << std::endl;
+
+		return output.str();
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

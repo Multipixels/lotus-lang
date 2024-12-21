@@ -200,6 +200,21 @@ namespace ast
 		std::string m_nodeType = "DoWhileStatement";
 	};
 
+	class IterateStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Identifier* m_var;
+		Expression* m_collection;
+		BlockStatement* m_consequence;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "IterateStatement";
+	};
+
 	// EXPRESSIONS
 
 	class IntegerLiteral : public Expression
