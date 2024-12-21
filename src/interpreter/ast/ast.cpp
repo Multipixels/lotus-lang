@@ -182,6 +182,23 @@ namespace ast
 		return output.str();
 	}
 
+	std::string DoWhileStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string DoWhileStatement::String()
+	{
+		std::ostringstream output;
+
+		output << "do" << std::endl
+			<< "{" << std::endl
+			<< m_consequence->String()
+			<< "}" << std::endl
+			<< "while (" << m_condition->String() << ");" << std::endl;
+
+		return output.str();
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

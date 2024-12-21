@@ -145,6 +145,8 @@ namespace parser
 			return parseIfStatement();
 		case token::WHILE:
 			return parseWhileStatement();
+		case token::DO:
+			return parseDoWhileStatement();
 		default:
 			return parseExpressionStatement();
 		}
@@ -400,6 +402,44 @@ namespace parser
 		}
 
 		statement->m_consequence = parseBlockStatement();
+		return statement;
+	}
+
+	ast::DoWhileStatement* Parser::parseDoWhileStatement()
+	{
+		ast::DoWhileStatement* statement = new ast::DoWhileStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_consequence = parseBlockStatement();
+
+		if (!expectPeek(token::WHILE))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		nextToken();
+		statement->m_condition = parseExpression(LOWEST);
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
 		return statement;
 	}
 

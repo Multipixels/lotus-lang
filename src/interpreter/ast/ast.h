@@ -186,6 +186,20 @@ namespace ast
 		std::string m_nodeType = "WhileStatement";
 	};
 
+	class DoWhileStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		BlockStatement* m_consequence;
+		Expression* m_condition;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "DoWhileStatement";
+	};
+
 	// EXPRESSIONS
 
 	class IntegerLiteral : public Expression

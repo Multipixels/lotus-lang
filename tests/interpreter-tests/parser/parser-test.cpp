@@ -825,6 +825,47 @@ true;
 }
 
 
+TEST(ParserTest, DoWhileStatement)
+{
+	std::string input = R"(
+do {
+	5;
+	true;
+} while(false);
+)";
+
+	std::string expectedString =
+		R"(do
+{
+5;
+true;
+}
+while (false);
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is a while statement
+	ASSERT_EQ(statement->NodeType(), "DoWhileStatement");
+	ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)statement;
+
+
+	ASSERT_EQ(doWhileStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(doWhileStatement->m_condition, false, 0));
+	EXPECT_EQ(program->String(), expectedString);
+
+}
+
+
 void checkParserErrors(parser::Parser* parser)
 {
 	if (parser->m_errors.size() == 0)
