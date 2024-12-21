@@ -585,12 +585,10 @@ integer b = 5;
 	ASSERT_EQ(statement->NodeType(), "IfStatement");
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
-	ASSERT_EQ(ifStatement->m_consequence.size(), 1);
-
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
-	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 	EXPECT_TRUE(ifStatement->m_alternative == NULL);
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -637,17 +635,17 @@ return c;
 	ASSERT_EQ(statement->NodeType(), "IfStatement");
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
-	ASSERT_EQ(ifStatement->m_consequence.size(), 1);
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
-	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
-
-	EXPECT_TRUE(ifStatement->m_alternative != NULL);
-	ASSERT_EQ(ifStatement->m_alternative->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_alternative->m_statements[0]->NodeType(), "DeclareBooleanStatement");
-	EXPECT_EQ(ifStatement->m_alternative->m_statements[1]->NodeType(), "ReturnStatement");
+	ast::IfStatement* elseStatement = ifStatement->m_alternative;
+	ASSERT_TRUE(elseStatement != NULL);
+	EXPECT_TRUE(elseStatement->m_condition == NULL);
+	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -673,7 +671,7 @@ else if(false)
 integer b = 5;
 (c = (b + (3 * 2)));
 }
-else if(false)
+else if (false)
 {
 boolean c = true;
 return c;
@@ -693,19 +691,18 @@ return c;
 	ASSERT_EQ(statement->NodeType(), "IfStatement");
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
-	ASSERT_EQ(ifStatement->m_consequence.size(), 2);
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
-	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+	ast::IfStatement* elseIfStatement = ifStatement->m_alternative;
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement->m_condition, false, 0));
+	ASSERT_EQ(elseIfStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[1], false, 0));
-	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
-
-	EXPECT_TRUE(ifStatement->m_alternative == NULL);
+	EXPECT_TRUE(elseIfStatement->m_alternative == NULL);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -739,12 +736,12 @@ else
 integer b = 5;
 (c = (b + (3 * 2)));
 }
-else if(false)
+else if (false)
 {
 boolean c = true;
 return c;
 }
-else if((3 < 5.5))
+else if ((3 < 5.5))
 {
 }
 else
@@ -766,26 +763,27 @@ float lol = 3.5;
 	ASSERT_EQ(statement->NodeType(), "IfStatement");
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
-	ASSERT_EQ(ifStatement->m_consequence.size(), 3);
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
-	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
-	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+	ast::IfStatement* elseIfStatement1 = ifStatement->m_alternative;
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement1->m_condition, false, 0));
+	ASSERT_EQ(elseIfStatement1->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
-	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[1], false, 0));
-	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
+	ast::IfStatement* elseIfStatement2 = elseIfStatement1->m_alternative;
+	EXPECT_NO_FATAL_FAILURE(testInfixExpression(elseIfStatement2->m_condition, 3, "<", 5.5f), 0);
+	ASSERT_EQ(elseIfStatement2->m_consequence->m_statements.size(), 0);
 
-	EXPECT_NO_FATAL_FAILURE(testInfixExpression(ifStatement->m_condition[2], 3, "<", 5.5f), 0);
-	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
-	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
-
-	EXPECT_TRUE(ifStatement->m_alternative != NULL);
-	ASSERT_EQ(ifStatement->m_alternative->m_statements.size(), 1);
-	EXPECT_EQ(ifStatement->m_alternative->m_statements[0]->NodeType(), "DeclareFloatStatement");
+	ast::IfStatement* elseStatement = elseIfStatement2->m_alternative;
+	ASSERT_TRUE(elseStatement != NULL);
+	EXPECT_TRUE(elseStatement->m_condition == NULL);
+	EXPECT_TRUE(elseStatement->m_consequence != NULL);
+	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 1);
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareFloatStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
 }

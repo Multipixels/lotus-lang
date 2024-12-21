@@ -326,7 +326,7 @@ namespace parser
 		}
 
 		nextToken();
-		statement->m_condition.push_back(parseExpression(LOWEST));
+		statement->m_condition = parseExpression(LOWEST);
 
 		if (!expectPeek(token::RPARENTHESIS))
 		{
@@ -338,48 +338,39 @@ namespace parser
 			return NULL;
 		}
 
-		statement->m_consequence.push_back(parseBlockStatement());
+		statement->m_consequence = parseBlockStatement();
 
 		// Handling else ifs and elses
-		while (peekTokenIs(token::ELSE))
+		if (peekTokenIs(token::ELSE))
 		{
 			nextToken();
-			if (peekTokenIs(token::IF)) // Else If
-			{
-				nextToken();
-				if (!expectPeek(token::LPARENTHESIS))
-				{
-					return NULL;
-				}
 
-				nextToken();
-				statement->m_condition.push_back(parseExpression(LOWEST));
-
-				if (!expectPeek(token::RPARENTHESIS))
-				{
-					return NULL;
-				}
-
-				if (!expectPeek(token::LBRACE))
-				{
-					return NULL;
-				}
-
-				statement->m_consequence.push_back(parseBlockStatement());
-			}
-			else // Else
-			{
-				if (!expectPeek(token::LBRACE))
-				{
-					return NULL;
-				}
-
-				statement->m_alternative = parseBlockStatement();
-				return statement;
-			}
+			statement->m_alternative = parseElseStatement();
+			return statement;
 		}
 
 		statement->m_alternative = 0;
+		return statement;
+	}
+
+	ast::IfStatement* Parser::parseElseStatement()
+	{
+		if (peekTokenIs(token::IF))
+		{
+			nextToken();
+			return parseIfStatement();
+		}
+
+		ast::IfStatement* statement = new ast::IfStatement;
+		
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_condition = NULL;
+		statement->m_consequence = parseBlockStatement();
+
 		return statement;
 	}
 
