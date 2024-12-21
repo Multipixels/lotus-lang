@@ -95,6 +95,7 @@ namespace parser
 		ast::BlockStatement* parseBlockStatement();
 		ast::IfStatement* parseIfStatement();
 		ast::IfStatement* parseElseStatement();
+		ast::WhileStatement* parseWhileStatement();
 
 		// EXPRESSIONS
 

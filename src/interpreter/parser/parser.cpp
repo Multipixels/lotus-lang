@@ -143,6 +143,8 @@ namespace parser
 			return parseReturnStatement();
 		case token::IF:
 			return parseIfStatement();
+		case token::WHILE:
+			return parseWhileStatement();
 		default:
 			return parseExpressionStatement();
 		}
@@ -371,6 +373,33 @@ namespace parser
 
 		statement->m_consequence = parseBlockStatement();
 
+		return statement;
+	}
+
+	ast::WhileStatement* Parser::parseWhileStatement()
+	{
+		ast::WhileStatement* statement = new ast::WhileStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		nextToken();
+		statement->m_condition = parseExpression(LOWEST);
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_consequence = parseBlockStatement();
 		return statement;
 	}
 

@@ -786,6 +786,45 @@ float lol = 3.5;
 }
 
 
+TEST(ParserTest, WhileStatement)
+{
+	std::string input = R"(
+while(true) {
+	5;
+	true;
+} 
+)";
+
+	std::string expectedString =
+		R"(while (true)
+{
+5;
+true;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is a while statement
+	ASSERT_EQ(statement->NodeType(), "WhileStatement");
+	ast::WhileStatement* whileStatement = (ast::WhileStatement*)statement;
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(whileStatement->m_condition, true, 0));
+	ASSERT_EQ(whileStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(whileStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(whileStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
 void checkParserErrors(parser::Parser* parser)
 {
 	if (parser->m_errors.size() == 0)

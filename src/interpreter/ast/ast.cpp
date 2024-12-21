@@ -166,6 +166,22 @@ namespace ast
 		return output.str();
 	}
 
+	std::string WhileStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string WhileStatement::String()
+	{
+		std::ostringstream output;
+
+		output << "while (" << m_condition->String() << ")" << std::endl
+			<< "{" << std::endl
+			<< m_consequence->String()
+			<< "}" << std::endl;
+
+		return output.str();
+	}
+
 	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

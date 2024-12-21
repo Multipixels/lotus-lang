@@ -172,6 +172,20 @@ namespace ast
 		std::string m_nodeType = "IfStatement";
 	};
 
+	class WhileStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Expression* m_condition;
+		BlockStatement* m_consequence;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "WhileStatement";
+	};
+
 	// EXPRESSIONS
 
 	class IntegerLiteral : public Expression
