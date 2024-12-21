@@ -141,7 +141,7 @@ namespace ast
 	{
 		std::ostringstream output;
 
-		if (m_condition != NULL)
+		if (m_token.m_type == token::IF)
 		{
 			output << "if (" << m_condition->String() << ")" << std::endl;
 		}
@@ -153,7 +153,7 @@ namespace ast
 		if (m_alternative != NULL)
 		{
 			output << "else";
-			if (m_alternative->m_condition != NULL)
+			if (m_alternative->m_token.m_type == token::IF)
 			{
 				output << " " << m_alternative->String();
 			} 

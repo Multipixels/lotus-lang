@@ -156,6 +156,7 @@ namespace ast
 		std::string m_nodeType = "BlockStatement";
 	};
 
+	// Check m_token to treat as a regular if statement or else statement. 
 	class IfStatement : public Statement
 	{
 	public:

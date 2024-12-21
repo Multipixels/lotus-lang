@@ -362,13 +362,13 @@ namespace parser
 		}
 
 		ast::IfStatement* statement = new ast::IfStatement;
-		
+		statement->m_token = m_currentToken;
+
 		if (!expectPeek(token::LBRACE))
 		{
 			return NULL;
 		}
 
-		statement->m_condition = NULL;
 		statement->m_consequence = parseBlockStatement();
 
 		return statement;
