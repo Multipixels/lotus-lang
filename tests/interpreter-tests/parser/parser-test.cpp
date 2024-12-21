@@ -585,12 +585,207 @@ integer b = 5;
 	ASSERT_EQ(statement->NodeType(), "IfStatement");
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
-	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
+	ASSERT_EQ(ifStatement->m_consequence.size(), 1);
 
-	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	ASSERT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
-	ASSERT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
-	ASSERT_TRUE(ifStatement->m_alternative == NULL);
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
+	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_TRUE(ifStatement->m_alternative == NULL);
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
+TEST(ParserTest, IfElseStatement)
+{
+	std::string input = R"(
+if(true) {
+	integer b = 5;
+	c = b + 3 * 2;
+}
+else
+{
+	boolean c = false;
+	return c;
+}
+)";
+
+	std::string expectedString =
+		R"(if (true)
+{
+integer b = 5;
+(c = (b + (3 * 2)));
+}
+else
+{
+boolean c = false;
+return c;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is an if statement
+	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+
+	ASSERT_EQ(ifStatement->m_consequence.size(), 1);
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
+	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+
+	EXPECT_TRUE(ifStatement->m_alternative != NULL);
+	ASSERT_EQ(ifStatement->m_alternative->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_alternative->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(ifStatement->m_alternative->m_statements[1]->NodeType(), "ReturnStatement");
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
+TEST(ParserTest, IfElseIfStatement)
+{
+	std::string input = R"(
+if(true) {
+	integer b = 5;
+	c = b + 3 * 2;
+}
+else if(false)
+{
+	boolean c = true;
+	return c;
+}
+)";
+
+	std::string expectedString =
+		R"(if (true)
+{
+integer b = 5;
+(c = (b + (3 * 2)));
+}
+else if(false)
+{
+boolean c = true;
+return c;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is an if statement
+	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+
+	ASSERT_EQ(ifStatement->m_consequence.size(), 2);
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
+	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[1], false, 0));
+	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
+
+	EXPECT_TRUE(ifStatement->m_alternative == NULL);
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
+TEST(ParserTest, IfElseIfElseStatement)
+{
+	std::string input = R"(
+if(true) {
+	integer b = 5;
+	c = b + 3 * 2;
+}
+else if(false)
+{
+	boolean c = true;
+	return c;
+}
+else if(3 < 5.5f)
+{
+
+}
+else
+{
+	float lol = 3.5f;
+}
+)";
+
+	std::string expectedString =
+		R"(if (true)
+{
+integer b = 5;
+(c = (b + (3 * 2)));
+}
+else if(false)
+{
+boolean c = true;
+return c;
+}
+else if((3 < 5.5))
+{
+}
+else
+{
+float lol = 3.5;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is an if statement
+	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+
+	ASSERT_EQ(ifStatement->m_consequence.size(), 3);
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[0], true, 0));
+	ASSERT_EQ(ifStatement->m_consequence[0]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence[0]->m_statements[1]->NodeType(), "ExpressionStatement");
+
+	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition[1], false, 0));
+	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
+
+	EXPECT_NO_FATAL_FAILURE(testInfixExpression(ifStatement->m_condition[2], 3, "<", 5.5f), 0);
+	ASSERT_EQ(ifStatement->m_consequence[1]->m_statements.size(), 2);
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(ifStatement->m_consequence[1]->m_statements[1]->NodeType(), "ReturnStatement");
+
+	EXPECT_TRUE(ifStatement->m_alternative != NULL);
+	ASSERT_EQ(ifStatement->m_alternative->m_statements.size(), 1);
+	EXPECT_EQ(ifStatement->m_alternative->m_statements[0]->NodeType(), "DeclareFloatStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -719,5 +914,5 @@ void testInfixExpression(ast::Expression* expression, std::any leftValue, std::s
 
 	EXPECT_EQ(infixExpression->m_operator, op);
 
-	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, leftValue, testNumber));
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, rightValue, testNumber));
 }

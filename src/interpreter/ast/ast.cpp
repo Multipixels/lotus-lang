@@ -141,14 +141,25 @@ namespace ast
 	{
 		std::ostringstream output;
 
-		output << "if (" << m_condition->String() << ")" << std::endl 
+		output << "if (" << m_condition[0]->String() << ")" << std::endl
 			<< "{" << std::endl
-			<< m_consequence->String() 
+			<< m_consequence[0]->String()
 			<< "}" << std::endl;
+
+		for (int i = 1; i < m_condition.size(); i++)
+		{
+			output << "else if(" << m_condition[i]->String() << ")" << std::endl
+				<< "{" << std::endl
+				<< m_consequence[i]->String()
+				<< "}" << std::endl;
+		}
 
 		if (m_alternative != NULL)
 		{
-			output << "else " << m_alternative->String();
+			output << "else" << std::endl
+				<< "{" << std::endl
+				<< m_alternative->String()
+				<< "}" << std::endl;
 		}
 
 		return output.str();

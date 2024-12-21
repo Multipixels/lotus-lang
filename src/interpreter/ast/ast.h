@@ -160,8 +160,8 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_condition;
-		BlockStatement* m_consequence;
+		std::vector<Expression*> m_condition;
+		std::vector<BlockStatement*> m_consequence;
 		BlockStatement* m_alternative;
 
 		std::string TokenLiteral();
