@@ -34,6 +34,7 @@ namespace parser
 		registerInfixFunction(token::AND, &Parser::parseInfixExpression);
 		registerInfixFunction(token::OR, &Parser::parseInfixExpression);
 		registerInfixFunction(token::ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::LPARENTHESIS, &Parser::parseCallExpression);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -570,6 +571,16 @@ namespace parser
 		return expression;
 	}
 
+	ast::Expression* Parser::parseCallExpression(ast::Expression* leftExpression)
+	{
+		ast::CallExpression* expression = new ast::CallExpression;
+		expression->m_token = m_currentToken;
+		expression->m_function = leftExpression;
+		parseCallParameters(&expression->m_parameters);
+
+		return expression;
+	}
+
 	void Parser::registerPrefixFunction(token::TokenType tokenType, PrefixParseFunction prefixParseFunction)
 	{
 		m_prefixParseFunctions[tokenType] = prefixParseFunction;
@@ -605,5 +616,23 @@ namespace parser
 
 			parameters->push_back(statement);
 		}
+	}
+
+	void Parser::parseCallParameters(std::vector<ast::Expression*>* parameters)
+	{
+		while (!peekTokenIs(token::RPARENTHESIS))
+		{
+			nextToken();
+
+			ast::Expression* statement = parseExpression(LOWEST);
+
+			if (peekTokenIs(token::COMMA))
+			{
+				nextToken();
+			}
+
+			parameters->push_back(statement);
+		}
+		nextToken();
 	}
 }

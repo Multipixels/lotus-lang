@@ -54,6 +54,7 @@ namespace parser
 			{token::ASTERIK, PRODUCT},
 			{token::SLASH, PRODUCT},
 			{token::AND, PRODUCT},
+			{token::LPARENTHESIS, CALL},
 		};
 
 		// Cycles through to the next token in the lexer
@@ -108,6 +109,7 @@ namespace parser
 		ast::Expression* parseBooleanLiteral();
 		ast::Expression* parseCharacterLiteral();
 		ast::Expression* parseIdentifier();
+		ast::Expression* parseCallExpression(ast::Expression* leftExpression);
 
 		// HELPERS
 
@@ -118,5 +120,7 @@ namespace parser
 		void registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction);
 	
 		void parseParameters(std::vector<ast::DeclareVariableStatement*> *parameters);
+
+		void parseCallParameters(std::vector<ast::Expression*>* parameters);
 	};
 }

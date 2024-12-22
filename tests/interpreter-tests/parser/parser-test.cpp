@@ -864,7 +864,7 @@ while (false);
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
-	// Test to see if this is this is a while statement
+	// Test to see if this is this is a do while statement
 	ASSERT_EQ(statement->NodeType(), "DoWhileStatement");
 	ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)statement;
 
@@ -904,7 +904,7 @@ true;
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
-	// Test to see if this is this is a while statement
+	// Test to see if this is this is an iterate loop
 	ASSERT_EQ(statement->NodeType(), "IterateStatement");
 	ast::IterateStatement* iterateStatement = (ast::IterateStatement*)statement;
 
@@ -946,7 +946,7 @@ return 5.1;
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
-	// Test to see if this is this is a while statement
+	// Test to see if this is this is a function declaration
 	ASSERT_EQ(statement->NodeType(), "DeclareFunctionStatement");
 	ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)statement;
 
@@ -972,7 +972,46 @@ return 5.1;
 
 	// Check output
 	EXPECT_EQ(program->String(), expectedString);
-	
+}
+
+
+TEST(ParserTest, CallExpression)
+{
+	std::string input = "add(1, 2, 3 * 4, test);";
+	std::string expectedString = "add(1, 2, (3 * 4), test);";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is a call expression
+	ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+	ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+	ASSERT_EQ(expressionStatement->m_expression->NodeType(), "CallExpression");
+	ast::CallExpression* callExpression = (ast::CallExpression*)expressionStatement->m_expression;
+
+	// Check m_token
+	EXPECT_EQ(callExpression->m_token.m_type, token::LPARENTHESIS);
+
+	// Check m_function
+	ASSERT_EQ(callExpression->m_function->NodeType(), "Identifier");
+	ast::Identifier* identifier2 = (ast::Identifier*)callExpression->m_function;
+	EXPECT_EQ(identifier2->m_name, "add");
+
+	// Check m_parameters
+	ASSERT_EQ(callExpression->m_parameters.size(), 4);
+	EXPECT_EQ(callExpression->m_parameters[0]->NodeType(), "IntegerLiteral");
+	EXPECT_EQ(callExpression->m_parameters[1]->NodeType(), "IntegerLiteral");
+	EXPECT_EQ(callExpression->m_parameters[2]->NodeType(), "InfixExpression");
+	EXPECT_EQ(callExpression->m_parameters[3]->NodeType(), "Identifier");
+
+	// Check output
+	EXPECT_EQ(program->String(), expectedString);
 }
 
 

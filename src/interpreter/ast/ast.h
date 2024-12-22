@@ -170,6 +170,20 @@ namespace ast
 		std::string m_nodeType = "InfixExpression";
 	};
 
+	class CallExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		ast::Expression* m_function; // Either an identifier or function literal
+		std::vector<ast::Expression*> m_parameters;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "CallExpression";
+	};
+
 	// STATEMENTS
 
 	class DeclareVariableStatement : public Statement

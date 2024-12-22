@@ -134,6 +134,30 @@ namespace ast
 		return outputString.str();
 	}
 
+	std::string CallExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string CallExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << m_function->String()
+			<< "(";
+
+		for (int i = 0; i < m_parameters.size(); i++)
+		{
+			outputString << m_parameters[i]->String();
+			if (i != m_parameters.size() - 1)
+			{
+				outputString << ", ";
+			}
+		}
+
+		outputString << ")";
+
+		return outputString.str();
+	}
+
 	std::string DeclareVariableStatement::TokenLiteral()
 	{
 		return m_token.m_literal;
