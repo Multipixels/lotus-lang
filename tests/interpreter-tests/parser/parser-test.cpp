@@ -573,8 +573,7 @@ R"(if (true)
 {
 integer b = 5;
 (c = (b + (3 * 2)));
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -623,8 +622,7 @@ else
 {
 boolean c = false;
 return c;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -680,8 +678,7 @@ else if (false)
 {
 boolean c = true;
 return c;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -753,8 +750,7 @@ else if ((3 < 5.5))
 else
 {
 float lol = 3.5;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -812,8 +808,7 @@ while(true) {
 {
 5;
 true;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -851,9 +846,7 @@ do {
 {
 5;
 true;
-}
-while (false);
-)";
+} while (false);)";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -878,6 +871,52 @@ while (false);
 }
 
 
+TEST(ParserTest, ForStatement)
+{
+	std::string input = R"(
+for (integer i = 0; i < 10; i = i + 1;) {
+	5;
+	true;
+}
+)";
+
+	std::string expectedString =
+		R"(for (integer i = 0; (i < 10); (i = (i + 1));)
+{
+5;
+true;
+})";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is an iterate loop
+	ASSERT_EQ(statement->NodeType(), "ForStatement");
+	ast::ForStatement* forStatement = (ast::ForStatement*)statement;
+
+	// Test m_initialization
+	EXPECT_EQ(forStatement->m_initialization->NodeType(), "DeclareVariableStatement");
+
+	// Test m_condition
+	EXPECT_EQ(forStatement->m_condition->NodeType(), "ExpressionStatement");
+
+	// Test m_updation
+	EXPECT_EQ(forStatement->m_updation->NodeType(), "ExpressionStatement");
+	
+	// Test m_consequence
+	ASSERT_EQ(forStatement->m_consequence->m_statements.size(), 2);
+	EXPECT_EQ(forStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(forStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+
+	EXPECT_EQ(program->String(), expectedString);
+}
+
 TEST(ParserTest, IterateStatement)
 {
 	std::string input = R"(
@@ -892,8 +931,7 @@ iterate(var : myCollection) {
 {
 5;
 true;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -934,8 +972,7 @@ float(integer a, boolean b) myFunction {
 		R"(float(integer a, boolean b) myFunction
 {
 return 5.1;
-}
-)";
+})";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
@@ -1011,6 +1048,139 @@ TEST(ParserTest, CallExpression)
 	EXPECT_EQ(callExpression->m_parameters[3]->NodeType(), "Identifier");
 
 	// Check output
+	EXPECT_EQ(program->String(), expectedString);
+}
+
+
+TEST(ParserTest, ExampleLotus)
+{
+	std::string input =
+		R"(
+-- These are comments
+-- Double dashes create a single-line comment
+
+-* These 
+                    are
+    multi
+            line
+    comments
+*-
+
+-- Atomic data types
+boolean someTruthValue -* this is an inner comment *- = false;
+boolean another_truth_value = true;
+integer _someInteger = 1;
+float someFloat = 1f;
+float anotherFloat = 2.5f;
+character theLetterA = 'a';
+
+-- TODO
+-- Collections and dictionaries
+-- collection<integer> myCollection = [2, 1, 6, 3, 8];
+-- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
+-- myCollection[2];
+-- string myString = "hello";
+-- collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
+
+-- Functions
+integer(integer a, boolean b) myFunction
+{
+    integer c = 23;
+    return c;
+}
+
+-- Control structures
+if (someTruthValue)
+{
+
+}
+else if (anotherTruthValue)
+{
+
+} 
+else 
+{
+
+}
+
+while (anotherTruthValue)
+{
+
+}
+
+do {
+
+} while (someTruthValue);
+
+for (integer i = 0; i < 10; i = i + 1;) {
+
+}
+
+iterate(var : myCollection) {
+
+}
+
+-- Built in functions
+--log("Hello World!");  TODO
+length(myCollection);
+
+-- Operators
+a == b;
+a != b;
+a < b; a > b; a <= b; a >= b;
+!a;
+a && b;
+a || b;
+)";
+
+std::string expectedString = R"(boolean someTruthValue = false;
+boolean another_truth_value = true;
+integer _someInteger = 1;
+float someFloat = 1;
+float anotherFloat = 2.5;
+character theLetterA = 'a';
+integer(integer a, boolean b) myFunction
+{
+integer c = 23;
+return c;
+}
+if (someTruthValue)
+{
+}
+else if (anotherTruthValue)
+{
+}
+else
+{
+}
+while (anotherTruthValue)
+{
+}
+do
+{
+} while (someTruthValue);
+for (integer i = 0; (i < 10); (i = (i + 1));)
+{
+}
+iterate (var : myCollection)
+{
+}
+length(myCollection);
+(a == b);
+(a != b);
+(a < b);
+(a > b);
+(a <= b);
+(a >= b);
+(!a);
+(a && b);
+(a || b);)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
 	EXPECT_EQ(program->String(), expectedString);
 }
 

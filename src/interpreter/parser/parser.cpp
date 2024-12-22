@@ -164,6 +164,8 @@ namespace parser
 			return parseWhileStatement();
 		case token::DO:
 			return parseDoWhileStatement();
+		case token::FOR:
+			return parseForStatement();
 		case token::ITERATE:
 			return parseIterateStatement();
 		default:
@@ -415,6 +417,40 @@ namespace parser
 		{
 			return NULL;
 		}
+
+		return statement;
+	}
+
+	ast::ForStatement* Parser::parseForStatement()
+	{
+		ast::ForStatement* statement = new ast::ForStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_initialization = parseStatement();
+		nextToken();
+
+		statement->m_condition = parseStatement();
+		nextToken();
+
+		statement->m_updation = parseStatement();
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::LBRACE))
+		{
+			return NULL;
+		}
+
+		statement->m_consequence = parseBlockStatement();
 
 		return statement;
 	}

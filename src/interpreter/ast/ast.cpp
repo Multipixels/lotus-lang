@@ -16,6 +16,7 @@ namespace ast
 		for (int i = 0; i < m_statements.size(); i++)
 		{
 			output << m_statements[i]->String();
+			if (i != m_statements.size() - 1) output << std::endl;
 		}
 
 		return output.str();
@@ -85,7 +86,7 @@ namespace ast
 	}
 	std::string CharacterLiteral::String()
 	{
-		char charToString[2] = { m_value, '\0' };
+		char charToString[4] = { '\'', m_value, '\'', '\0'};
 
 		return charToString;
 	}
@@ -198,7 +199,7 @@ namespace ast
 		output << ") " << m_name.String() << std::endl 
 			<< "{" << std::endl
 			<< m_body->m_body->String()
-			<< "}" << std::endl;
+			<< "}";
 
 		return output.str();
 	}
@@ -245,11 +246,11 @@ namespace ast
 
 		output << "{" << std::endl
 			<< m_consequence->String()
-			<< "}" << std::endl;
+			<< "}";
 
 		if (m_alternative != NULL)
 		{
-			output << "else";
+			output << std::endl << "else";
 			if (m_alternative->m_token.m_type == token::IF)
 			{
 				output << " " << m_alternative->String();
@@ -274,7 +275,7 @@ namespace ast
 		output << "while (" << m_condition->String() << ")" << std::endl
 			<< "{" << std::endl
 			<< m_consequence->String()
-			<< "}" << std::endl;
+			<< "}";
 
 		return output.str();
 	}
@@ -290,8 +291,26 @@ namespace ast
 		output << "do" << std::endl
 			<< "{" << std::endl
 			<< m_consequence->String()
-			<< "}" << std::endl
-			<< "while (" << m_condition->String() << ");" << std::endl;
+			<< "} while (" << m_condition->String() << ");";
+
+		return output.str();
+	}
+
+	std::string ForStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string ForStatement::String()
+	{
+		std::ostringstream output;
+
+		output << "for ("
+			<< m_initialization->String() << " "
+			<< m_condition->String() << " "
+			<< m_updation->String() << ")" << std::endl
+			<< "{" << std::endl
+			<< m_consequence->String()
+			<< "}";
 
 		return output.str();
 	}
@@ -307,7 +326,7 @@ namespace ast
 		output << "iterate (" << m_var->String() << " : " << m_collection->String() << ")" << std::endl
 			<< "{" << std::endl
 			<< m_consequence->String()
-			<< "}" << std::endl;
+			<< "}";
 
 		return output.str();
 	}

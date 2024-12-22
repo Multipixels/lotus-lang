@@ -285,6 +285,22 @@ namespace ast
 		std::string m_nodeType = "DoWhileStatement";
 	};
 
+	class ForStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		Statement* m_initialization;
+		Statement* m_condition;
+		Statement* m_updation;
+		BlockStatement* m_consequence;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "ForStatement";
+	};
+
 	class IterateStatement : public Statement
 	{
 	public:
