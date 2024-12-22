@@ -6,7 +6,7 @@
 TEST(ASTTest, TestProgramString)
 {
 	ast::Program* program = new ast::Program;
-	ast::DeclareIntegerStatement* declareInt = new ast::DeclareIntegerStatement;
+	ast::DeclareVariableStatement* declareInt = new ast::DeclareVariableStatement;
 	ast::Identifier* identifier = new ast::Identifier;
 
 	identifier->m_token.m_type = token::IDENTIFIER;

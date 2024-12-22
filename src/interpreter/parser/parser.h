@@ -86,10 +86,8 @@ namespace parser
 		// STATEMENTS
 
 		ast::Statement* parseStatement();
-		ast::DeclareIntegerStatement* parseIntegerDeclaration();
-		ast::DeclareFloatStatement* parseFloatDeclaration();
-		ast::DeclareBooleanStatement* parseBooleanDeclaration();
-		ast::DeclareCharacterStatement* parseCharacterDeclaration();
+		ast::DeclareVariableStatement* parseVariableDeclaration();
+		ast::DeclareFunctionStatement* parseFunctionDeclaration();
 		ast::ReturnStatement* parseReturnStatement();
 		ast::ExpressionStatement* parseExpressionStatement();
 		ast::BlockStatement* parseBlockStatement();
@@ -118,5 +116,7 @@ namespace parser
 		
 		// Registers an infix function into the parser
 		void registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction);
+	
+		void parseParameters(std::vector<ast::DeclareVariableStatement*> *parameters);
 	};
 }

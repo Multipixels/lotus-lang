@@ -46,6 +46,8 @@ namespace ast
 		std::string String();
 	};
 
+	// REQUISITES
+
 	class Identifier : public Expression
 	{
 	public:
@@ -59,23 +61,118 @@ namespace ast
 		std::string m_nodeType = "Identifier";
 	};
 
+	class BlockStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		std::vector<Statement*> m_statements;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "BlockStatement";
+	};
+
+	// EXPRESSIONS
+
+	class IntegerLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		int m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "IntegerLiteral";
+	};
+
+	class FloatLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		float m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "FloatLiteral";
+	};
+
+	class BooleanLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		bool m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "BooleanLiteral";
+	};
+
+	class CharacterLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		char m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "CharacterLiteral";
+	};
+
+	class FunctionLiteral : public Expression
+	{
+	public:
+		token::Token m_token;
+		ast::BlockStatement* m_body;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "FunctionLiteral";
+	};
+
+	class PrefixExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		std::string m_operator;
+		ast::Expression* m_right_expression;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "PrefixExpression";
+	};
+
+	class InfixExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		ast::Expression* m_left_expression;
+		std::string m_operator;
+		ast::Expression* m_right_expression;
+
+		std::string TokenLiteral();
+		std::string String();
+		std::string NodeType() { return m_nodeType; }
+	private:
+		std::string m_nodeType = "InfixExpression";
+	};
+
 	// STATEMENTS
 
-	class DeclareIntegerStatement : public Statement
-	{
-	public:
-		token::Token m_token;
-		Identifier m_name;
-		Expression *m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "DeclareIntegerStatement";
-	};
-
-	class DeclareFloatStatement : public Statement
+	class DeclareVariableStatement : public Statement
 	{
 	public:
 		token::Token m_token;
@@ -86,35 +183,22 @@ namespace ast
 		std::string String();
 		std::string NodeType() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "DeclareFloatStatement";
+		std::string m_nodeType = "DeclareVariableStatement";
 	};
 
-	class DeclareBooleanStatement : public Statement
+	class DeclareFunctionStatement : public Statement
 	{
 	public:
-		token::Token m_token;
-		Identifier m_name;
-		Expression* m_value;
+		token::Token m_token; // function type (integer, boolean, etc.)
+		std::vector<ast::DeclareVariableStatement*> m_parameters;
+		ast::Identifier m_name;
+		ast::FunctionLiteral* m_body;
 
 		std::string TokenLiteral();
 		std::string String();
 		std::string NodeType() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "DeclareBooleanStatement";
-	};
-
-	class DeclareCharacterStatement : public Statement
-	{
-	public:
-		token::Token m_token;
-		Identifier m_name;
-		Expression* m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "DeclareCharacterStatement";
+		std::string m_nodeType = "DeclareFunctionStatement";
 	};
 
 	class ReturnStatement : public Statement
@@ -141,19 +225,6 @@ namespace ast
 		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "ExpressionStatement";
-	};
-
-	class BlockStatement : public Statement
-	{
-	public:
-		token::Token m_token;
-		std::vector<Statement*> m_statements;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "BlockStatement";
 	};
 
 	// Check m_token to treat as a regular if statement or else statement. 
@@ -213,88 +284,5 @@ namespace ast
 		std::string NodeType() { return m_nodeType; }
 	private:
 		std::string m_nodeType = "IterateStatement";
-	};
-
-	// EXPRESSIONS
-
-	class IntegerLiteral : public Expression
-	{
-	public:
-		token::Token m_token;
-		int m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "IntegerLiteral";
-	};
-
-	class FloatLiteral : public Expression
-	{
-	public:
-		token::Token m_token;
-		float m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "FloatLiteral";
-	};
-
-	class BooleanLiteral : public Expression
-	{
-	public:
-		token::Token m_token;
-		bool m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "BooleanLiteral";
-	};
-
-	class CharacterLiteral : public Expression
-	{
-	public:
-		token::Token m_token;
-		char m_value;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "CharacterLiteral";
-	};
-
-	class PrefixExpression : public Expression
-	{
-	public:
-		token::Token m_token;
-		std::string m_operator;
-		ast::Expression *m_right_expression;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "PrefixExpression";
-	};
-
-	class InfixExpression : public Expression
-	{
-	public:
-		token::Token m_token;
-		ast::Expression* m_left_expression;
-		std::string m_operator;
-		ast::Expression* m_right_expression;
-
-		std::string TokenLiteral();
-		std::string String();
-		std::string NodeType() { return m_nodeType; }
-	private:
-		std::string m_nodeType = "InfixExpression";
 	};
 }

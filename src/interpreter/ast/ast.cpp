@@ -30,62 +30,151 @@ namespace ast
 		return m_name;
 	}
 
-	std::string DeclareIntegerStatement::TokenLiteral()
+	std::string BlockStatement::TokenLiteral()
 	{
 		return m_token.m_literal;
 	}
-	std::string DeclareIntegerStatement::String()
+	std::string BlockStatement::String()
 	{
 		std::ostringstream output;
 
-		output << TokenLiteral() << " "
-			<< m_name.String() << " = "
-			<< m_value->String() << ";";
+		for (int i = 0; i < m_statements.size(); i++)
+		{
+			output << m_statements[i]->String() << std::endl;
+		}
 
 		return output.str();
 	}
 
-	std::string DeclareFloatStatement::TokenLiteral()
+	std::string IntegerLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;
 	}
-	std::string DeclareFloatStatement::String()
+	std::string IntegerLiteral::String()
+	{
+		return std::to_string(m_value);
+	}
+
+	std::string FloatLiteral::TokenLiteral()
+	{
+		std::ostringstream outputString;
+		outputString << stof(m_token.m_literal);
+
+		return outputString.str();
+	}
+	std::string FloatLiteral::String()
+	{
+		std::ostringstream outputString;
+		outputString << m_value;
+
+		return outputString.str();
+	}
+
+	std::string BooleanLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string BooleanLiteral::String()
+	{
+		return m_value ? "true" : "false";
+	}
+
+	std::string CharacterLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string CharacterLiteral::String()
+	{
+		char charToString[2] = { m_value, '\0' };
+
+		return charToString;
+	}
+
+	std::string FunctionLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string FunctionLiteral::String()
+	{
+		std::ostringstream outputString;
+
+		outputString << "{" << std::endl
+			<< m_body->String()
+			<< "}" << std::endl;
+
+		return outputString.str();
+	}
+
+	std::string PrefixExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string PrefixExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << "(" << m_operator
+			<< m_right_expression->String() << ")";
+
+		return outputString.str();
+	}
+
+	std::string InfixExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string InfixExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << "("
+			<< m_left_expression->String()
+			<< " " << m_operator << " "
+			<< m_right_expression->String()
+			<< ")";
+
+		return outputString.str();
+	}
+
+	std::string DeclareVariableStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string DeclareVariableStatement::String()
 	{
 		std::ostringstream output;
 
 		output << TokenLiteral() << " "
-			<< m_name.String() << " = "
-			<< m_value->String() << ";";
+			<< m_name.String();
+		
+		if (m_value != NULL)
+		{
+			output << " = " << m_value->String();
+		}
+		
+		output << ";";
 
 		return output.str();
 	}
 
-	std::string DeclareBooleanStatement::TokenLiteral()
+	std::string DeclareFunctionStatement::TokenLiteral()
 	{
 		return m_token.m_literal;
 	}
-	std::string DeclareBooleanStatement::String()
+	std::string DeclareFunctionStatement::String()
 	{
 		std::ostringstream output;
 
-		output << TokenLiteral() << " "
-			<< m_name.String() << " = "
-			<< m_value->String() << ";";
+		output << TokenLiteral() << "(";
 
-		return output.str();
-	}
+		for (int i = 0; i < m_parameters.size(); i++)
+		{
+			output << m_parameters[i]->String().substr(0, m_parameters[i]->String().length() - 1);
+			if (i != m_parameters.size() - 1) output << ", ";
+		}
 
-	std::string DeclareCharacterStatement::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string DeclareCharacterStatement::String()
-	{
-		std::ostringstream output;
-
-		output << TokenLiteral() << " "
-			<< m_name.String() << " = "
-			<< m_value->String() << ";";
+		output << ") " << m_name.String() << std::endl 
+			<< "{" << std::endl
+			<< m_body->m_body->String()
+			<< "}" << std::endl;
 
 		return output.str();
 	}
@@ -113,22 +202,6 @@ namespace ast
 		std::ostringstream output;
 
 		output << m_expression->String() << ";";
-
-		return output.str();
-	}
-
-	std::string BlockStatement::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string BlockStatement::String()
-	{
-		std::ostringstream output;
-
-		for (int i = 0; i < m_statements.size(); i++)
-		{
-			output << m_statements[i]->String() << std::endl;
-		}
 
 		return output.str();
 	}
@@ -213,78 +286,5 @@ namespace ast
 			<< "}" << std::endl;
 
 		return output.str();
-	}
-
-	std::string IntegerLiteral::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string IntegerLiteral::String()
-	{
-		return std::to_string(m_value);
-	}
-
-	std::string FloatLiteral::TokenLiteral()
-	{
-		std::ostringstream outputString;
-		outputString << stof(m_token.m_literal);
-
-		return outputString.str();
-	}
-	std::string FloatLiteral::String()
-	{
-		std::ostringstream outputString;
-		outputString << m_value;
-
-		return outputString.str();
-	}
-
-	std::string BooleanLiteral::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string BooleanLiteral::String()
-	{
-		return m_value ? "true" : "false";
-	}
-
-	std::string CharacterLiteral::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string CharacterLiteral::String()
-	{
-		char charToString[2] = { m_value, '\0' };
-
-		return charToString;
-	}
-
-	std::string PrefixExpression::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string PrefixExpression::String()
-	{
-		std::ostringstream outputString;
-		outputString << "(" << m_operator
-			<< m_right_expression->String() << ")";
-
-		return outputString.str();
-	}
-
-	std::string InfixExpression::TokenLiteral()
-	{
-		return m_token.m_literal;
-	}
-	std::string InfixExpression::String()
-	{
-		std::ostringstream outputString;
-		outputString << "("
-			<< m_left_expression->String() 
-			<< " " << m_operator << " "
-			<< m_right_expression->String() 
-			<< ")";
-
-		return outputString.str();
 	}
 }

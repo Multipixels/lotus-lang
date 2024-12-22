@@ -24,7 +24,7 @@ string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 -- Functions
-integer myFunction(integer a, boolean b) 
+integer(integer a, boolean b) myFunction
 {
     integer c = 23;
     return c;

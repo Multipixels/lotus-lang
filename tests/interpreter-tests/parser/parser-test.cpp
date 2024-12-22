@@ -36,16 +36,17 @@ TEST(ParserTest, DeclaringIntegerStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareIntegerStatement");
-		ast::DeclareIntegerStatement* declareIntegerStatement = (ast::DeclareIntegerStatement*)statement;
+		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::INTEGER_TYPE);
 
-		EXPECT_EQ(declareIntegerStatement->m_name.m_name, tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
-		EXPECT_EQ(declareIntegerStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
 
 		// Test integer literal and value
-		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(declareIntegerStatement->m_value, tests[i].expectedValue, i));
+		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(declareVariableStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -80,16 +81,17 @@ TEST(ParserTest, DeclaringFloatStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareFloatStatement");
-		ast::DeclareFloatStatement* declareFloatStatement = (ast::DeclareFloatStatement*)statement;
+		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::FLOAT_TYPE);
 
-		EXPECT_EQ(declareFloatStatement->m_name.m_name, tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
-		EXPECT_EQ(declareFloatStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
 
 		// Test float literal and value
-		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(declareFloatStatement->m_value, tests[i].expectedValue, i));
+		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(declareVariableStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -123,16 +125,17 @@ TEST(ParserTest, DeclaringBooleanStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareBooleanStatement");
-		ast::DeclareBooleanStatement* declareBooleanStatement = (ast::DeclareBooleanStatement*)statement;
+		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::BOOLEAN_TYPE);
 
-		EXPECT_EQ(declareBooleanStatement->m_name.m_name, tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
-		EXPECT_EQ(declareBooleanStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
 
 		// Test boolean literal and value
-		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(declareBooleanStatement->m_value, tests[i].expectedValue, i));
+		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(declareVariableStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -166,16 +169,17 @@ TEST(ParserTest, DeclaringCharacterStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareCharacterStatement");
-		ast::DeclareCharacterStatement* declareCharacterStatement = (ast::DeclareCharacterStatement*)statement;
+		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::CHARACTER_TYPE);
 
-		EXPECT_EQ(declareCharacterStatement->m_name.m_name, tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
-		EXPECT_EQ(declareCharacterStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+		EXPECT_EQ(declareVariableStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
 			<< "Test #" << i << std::endl;
 
 		// Test character literal and value
-		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(declareCharacterStatement->m_value, tests[i].expectedValue, i));
+		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(declareVariableStatement->m_value, tests[i].expectedValue, i));
 	}
 }
 
@@ -587,7 +591,8 @@ integer b = 5;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -636,13 +641,15 @@ return c;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
 	ast::IfStatement* elseStatement = ifStatement->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
 	EXPECT_EQ(elseStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -691,14 +698,16 @@ return c;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
 	ast::IfStatement* elseIfStatement = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
 	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -762,14 +771,16 @@ float lol = 3.5;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareIntegerStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 
 	ast::IfStatement* elseIfStatement1 = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement1->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement1->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement1->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->NodeType(), "DeclareBooleanStatement");
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
 	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
 
 	ast::IfStatement* elseIfStatement2 = elseIfStatement1->m_alternative;
@@ -780,7 +791,8 @@ float lol = 3.5;
 	ast::IfStatement* elseStatement = elseIfStatement2->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 1);
-	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareFloatStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->TokenLiteral(), "float");
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -907,6 +919,60 @@ true;
 	EXPECT_EQ(iterateStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
 	
 	EXPECT_EQ(program->String(), expectedString);
+}
+
+
+TEST(ParserTest, DeclareFunctionStatement)
+{
+	std::string input = R"(
+float(integer a, boolean b) myFunction {
+	return 5.1f;
+}
+)";
+
+	std::string expectedString =
+		R"(float(integer a, boolean b) myFunction
+{
+return 5.1;
+}
+)";
+
+	lexer::Lexer lexer(&input);
+	parser::Parser parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+	ast::Statement* statement = program->m_statements[0];
+	ASSERT_EQ(program->m_statements.size(), 1)
+		<< "Test #0" << std::endl;
+
+	// Test to see if this is this is a while statement
+	ASSERT_EQ(statement->NodeType(), "DeclareFunctionStatement");
+	ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)statement;
+
+	// Check m_token
+	EXPECT_EQ(declareFunctionStatement->m_token.m_type, token::FLOAT_TYPE);
+
+	// Check m_parameters
+	
+	ASSERT_EQ(declareFunctionStatement->m_parameters.size(), 2);
+	EXPECT_EQ(declareFunctionStatement->m_parameters[0]->m_token.m_type, token::INTEGER_TYPE);
+	EXPECT_EQ(declareFunctionStatement->m_parameters[0]->m_name.m_name, "a");
+	EXPECT_TRUE(declareFunctionStatement->m_parameters[0]->m_value == NULL);
+	EXPECT_EQ(declareFunctionStatement->m_parameters[1]->m_token.m_type, token::BOOLEAN_TYPE);
+	EXPECT_EQ(declareFunctionStatement->m_parameters[1]->m_name.m_name, "b");
+	EXPECT_TRUE(declareFunctionStatement->m_parameters[1]->m_value == NULL);
+
+	// Check m_name
+	EXPECT_EQ(declareFunctionStatement->m_name.m_name, "myFunction");
+
+	// Check body
+	ASSERT_EQ(declareFunctionStatement->m_body->m_body->m_statements.size(), 1);
+	EXPECT_EQ(declareFunctionStatement->m_body->m_body->m_statements[0]->NodeType(), "ReturnStatement");
+
+	// Check output
+	EXPECT_EQ(program->String(), expectedString);
+	
 }
 
 

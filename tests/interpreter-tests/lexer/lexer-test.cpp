@@ -38,7 +38,7 @@ string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 -- Functions
-integer myFunction(integer a, boolean b) 
+integer(integer a, boolean b) myFunction
 {
     integer c = 23;
     return c;
@@ -189,7 +189,6 @@ a || b;
         TokenLiteralPair(token::RBRACKET, "]"),
         TokenLiteralPair(token::SEMICOLON, ";"),
         TokenLiteralPair(token::INTEGER_TYPE, "integer"),
-        TokenLiteralPair(token::IDENTIFIER, "myFunction"),
         TokenLiteralPair(token::LPARENTHESIS, "("),
         TokenLiteralPair(token::INTEGER_TYPE, "integer"),
         TokenLiteralPair(token::IDENTIFIER, "a"),
@@ -197,6 +196,7 @@ a || b;
         TokenLiteralPair(token::BOOLEAN_TYPE, "boolean"),
         TokenLiteralPair(token::IDENTIFIER, "b"),
         TokenLiteralPair(token::RPARENTHESIS, ")"),
+        TokenLiteralPair(token::IDENTIFIER, "myFunction"),
         TokenLiteralPair(token::LBRACE, "{"),
         TokenLiteralPair(token::INTEGER_TYPE, "integer"),
         TokenLiteralPair(token::IDENTIFIER, "c"),

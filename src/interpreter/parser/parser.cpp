@@ -132,13 +132,29 @@ namespace parser
 		switch (m_currentToken.m_type)
 		{
 		case token::INTEGER_TYPE:
-			return parseIntegerDeclaration();
+			if (peekTokenIs(token::LPARENTHESIS))
+			{
+				return parseFunctionDeclaration();
+			}
+			return parseVariableDeclaration();
 		case token::FLOAT_TYPE:
-			return parseFloatDeclaration();
+			if (peekTokenIs(token::LPARENTHESIS))
+			{
+				return parseFunctionDeclaration();
+			}
+			return parseVariableDeclaration();
 		case token::BOOLEAN_TYPE:
-			return parseBooleanDeclaration();
+			if (peekTokenIs(token::LPARENTHESIS))
+			{
+				return parseFunctionDeclaration();
+			}
+			return parseVariableDeclaration();
 		case token::CHARACTER_TYPE:
-			return parseCharacterDeclaration();
+			if (peekTokenIs(token::LPARENTHESIS))
+			{
+				return parseFunctionDeclaration();
+			}
+			return parseVariableDeclaration();
 		case token::RETURN:
 			return parseReturnStatement();
 		case token::IF:
@@ -154,11 +170,11 @@ namespace parser
 		}
 	}
 
-	ast::DeclareIntegerStatement* Parser::parseIntegerDeclaration()
+	ast::DeclareVariableStatement* Parser::parseVariableDeclaration()
 	{
-		ast::DeclareIntegerStatement* statement = new ast::DeclareIntegerStatement;
+		ast::DeclareVariableStatement* statement = new ast::DeclareVariableStatement;
 		statement->m_token = m_currentToken;
-		
+
 		if (!expectPeek(token::IDENTIFIER))
 		{
 			return NULL;
@@ -167,6 +183,14 @@ namespace parser
 		statement->m_name.m_token = m_currentToken;
 		statement->m_name.m_name = m_currentToken.m_literal;
 
+		// Declaration without assignment
+		if (peekTokenIs(token::SEMICOLON))
+		{
+			nextToken();
+			return statement;
+		}
+
+		// Declaration with assignment
 		if (!expectPeek(token::ASSIGN))
 		{
 			return NULL;
@@ -181,91 +205,40 @@ namespace parser
 		}
 
 		return statement;
-	}
+	};
 
-	ast::DeclareFloatStatement* Parser::parseFloatDeclaration()
+	ast::DeclareFunctionStatement* Parser::parseFunctionDeclaration()
 	{
-		ast::DeclareFloatStatement* statement = new ast::DeclareFloatStatement;
+		ast::DeclareFunctionStatement* statement = new ast::DeclareFunctionStatement;
 		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LPARENTHESIS))
+		{
+			return NULL;
+		}
+
+		parseParameters(&statement->m_parameters);
+
+		if (!expectPeek(token::RPARENTHESIS))
+		{
+			return NULL;
+		}
 
 		if (!expectPeek(token::IDENTIFIER))
 		{
 			return NULL;
 		}
 
-		statement->m_name.m_token = m_currentToken;
-		statement->m_name.m_name = m_currentToken.m_literal;
+		statement->m_name = *((ast::Identifier*)parseIdentifier());
 
-		if (!expectPeek(token::ASSIGN))
-		{
-			return NULL;
-		}
-		nextToken();
-
-		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
+		if (!expectPeek(token::LBRACE))
 		{
 			return NULL;
 		}
 
-		return statement;
-	}
-
-	ast::DeclareBooleanStatement* Parser::parseBooleanDeclaration()
-	{
-		ast::DeclareBooleanStatement* statement = new ast::DeclareBooleanStatement;
-		statement->m_token = m_currentToken;
-
-		if (!expectPeek(token::IDENTIFIER))
-		{
-			return NULL;
-		}
-
-		statement->m_name.m_token = m_currentToken;
-		statement->m_name.m_name = m_currentToken.m_literal;
-
-		if (!expectPeek(token::ASSIGN))
-		{
-			return NULL;
-		}
-		nextToken();
-
-		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
-
-		return statement;
-	}
-
-	ast::DeclareCharacterStatement* Parser::parseCharacterDeclaration()
-	{
-		ast::DeclareCharacterStatement* statement = new ast::DeclareCharacterStatement;
-		statement->m_token = m_currentToken;
-
-		if (!expectPeek(token::IDENTIFIER))
-		{
-			return NULL;
-		}
-
-		statement->m_name.m_token = m_currentToken;
-		statement->m_name.m_name = m_currentToken.m_literal;
-
-		if (!expectPeek(token::ASSIGN))
-		{
-			return NULL;
-		}
-		nextToken();
-
-		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
+		statement->m_body = new ast::FunctionLiteral;
+		statement->m_body->m_token = m_currentToken;
+		statement->m_body->m_body = parseBlockStatement();
 
 		return statement;
 	}
@@ -605,5 +578,32 @@ namespace parser
 	void Parser::registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction)
 	{
 		m_infixParseFunctions[tokenType] = infixParseFunction;
+	}
+
+	void Parser::parseParameters(std::vector<ast::DeclareVariableStatement*>* parameters)
+	{
+		while (!peekTokenIs(token::RPARENTHESIS))
+		{
+			nextToken();
+
+			ast::DeclareVariableStatement* statement = new ast::DeclareVariableStatement;
+			statement->m_token = m_currentToken;
+
+			if (!expectPeek(token::IDENTIFIER))
+			{
+				parameters->push_back(NULL);
+				continue;
+			}
+
+			statement->m_name.m_token = m_currentToken;
+			statement->m_name.m_name = m_currentToken.m_literal;
+
+			if (peekTokenIs(token::COMMA))
+			{
+				nextToken();
+			}
+
+			parameters->push_back(statement);
+		}
 	}
 }
