@@ -7,14 +7,43 @@
 
 namespace ast
 {
+	enum NodeType
+	{
+		NODE,
+		STATEMENT_NODE,
+		EXPRESSION_NODE,
+		PROGRAM_NODE,
+
+		IDENTIFIER_NODE,
+		BLOCK_STATEMENT_NODE,
+		INTEGER_LITERAL_NODE,
+		FLOAT_LITERAL_NODE,
+		BOOLEAN_LITERAL_NODE,
+		CHARACTER_LITERAL_NODE,
+		FUNCTION_LITERAL_NODE,
+		PREFIX_EXPRESSION_NODE,
+		INFIX_EXPRESSION_NODE,
+		CALL_EXPRESSION_NODE,
+
+		DECLARE_VARIABLE_STATEMENT_NODE,
+		DECLARE_FUNCTION_STATEMENT_NODE,
+		RETURN_STATEMENT_NODE,
+		EXPRESSION_STATEMENT_NODE,
+		IF_STATEMENT_NODE,
+		WHILE_STATEMENT_NODE,
+		DO_WHILE_STATEMENT_NODE,
+		FOR_STATEMENT_NODE,
+		ITERATE_STATEMENT_NODE,
+	};
+
 	class Node
 	{
 	public:
 		virtual std::string TokenLiteral() = 0;
 		virtual std::string String() = 0;
-		virtual std::string NodeType() = 0;
+		virtual NodeType Type() = 0;
 	private:
-		std::string m_nodeType = "Node";
+		NodeType m_nodeType = NODE;
 	};
 
 	class Statement : public Node 
@@ -22,9 +51,9 @@ namespace ast
 	public:
 		virtual std::string TokenLiteral() = 0;
 		virtual std::string String() = 0;
-		virtual std::string NodeType() = 0;
+		virtual NodeType Type() = 0;
 	private:
-		std::string m_nodeType = "Statement";
+		NodeType m_nodeType = STATEMENT_NODE;
 	};
 
 	class Expression : public Node 
@@ -32,18 +61,21 @@ namespace ast
 	public:
 		virtual std::string TokenLiteral() = 0;
 		virtual std::string String() = 0;
-		virtual std::string NodeType() = 0;
+		virtual NodeType Type() = 0;
 	private:
-		std::string m_nodeType = "Expression";
+		NodeType m_nodeType = EXPRESSION_NODE;
 	};
 
-	class Program
+	class Program : public Node
 	{
 	public:
 		std::vector<Statement*> m_statements;
 
 		std::string TokenLiteral();
 		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = PROGRAM_NODE;
 	};
 
 	// REQUISITES
@@ -56,9 +88,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "Identifier";
+		NodeType m_nodeType = IDENTIFIER_NODE;
 	};
 
 	class BlockStatement : public Statement
@@ -69,9 +101,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "BlockStatement";
+		NodeType m_nodeType = BLOCK_STATEMENT_NODE;
 	};
 
 	// EXPRESSIONS
@@ -84,9 +116,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "IntegerLiteral";
+		NodeType m_nodeType = INTEGER_LITERAL_NODE;
 	};
 
 	class FloatLiteral : public Expression
@@ -97,9 +129,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "FloatLiteral";
+		NodeType m_nodeType = FLOAT_LITERAL_NODE;
 	};
 
 	class BooleanLiteral : public Expression
@@ -110,9 +142,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "BooleanLiteral";
+		NodeType m_nodeType = BOOLEAN_LITERAL_NODE;
 	};
 
 	class CharacterLiteral : public Expression
@@ -123,9 +155,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "CharacterLiteral";
+		NodeType m_nodeType = CHARACTER_LITERAL_NODE;
 	};
 
 	class FunctionLiteral : public Expression
@@ -136,9 +168,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "FunctionLiteral";
+		NodeType m_nodeType = FUNCTION_LITERAL_NODE;
 	};
 
 	class PrefixExpression : public Expression
@@ -150,9 +182,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "PrefixExpression";
+		NodeType m_nodeType = PREFIX_EXPRESSION_NODE;
 	};
 
 	class InfixExpression : public Expression
@@ -165,9 +197,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "InfixExpression";
+		NodeType m_nodeType = INFIX_EXPRESSION_NODE;
 	};
 
 	class CallExpression : public Expression
@@ -179,9 +211,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "CallExpression";
+		NodeType m_nodeType = CALL_EXPRESSION_NODE;
 	};
 
 	// STATEMENTS
@@ -195,9 +227,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "DeclareVariableStatement";
+		NodeType m_nodeType = DECLARE_VARIABLE_STATEMENT_NODE;
 	};
 
 	class DeclareFunctionStatement : public Statement
@@ -210,9 +242,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "DeclareFunctionStatement";
+		NodeType m_nodeType = DECLARE_FUNCTION_STATEMENT_NODE;
 	};
 
 	class ReturnStatement : public Statement
@@ -223,9 +255,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "ReturnStatement";
+		NodeType m_nodeType = RETURN_STATEMENT_NODE;
 	};
 
 	class ExpressionStatement : public Statement
@@ -236,9 +268,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "ExpressionStatement";
+		NodeType m_nodeType = EXPRESSION_STATEMENT_NODE;
 	};
 
 	// Check m_token to treat as a regular if statement or else statement. 
@@ -252,9 +284,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "IfStatement";
+		NodeType m_nodeType = IF_STATEMENT_NODE;
 	};
 
 	class WhileStatement : public Statement
@@ -266,9 +298,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "WhileStatement";
+		NodeType m_nodeType = WHILE_STATEMENT_NODE;
 	};
 
 	class DoWhileStatement : public Statement
@@ -280,9 +312,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "DoWhileStatement";
+		NodeType m_nodeType = DO_WHILE_STATEMENT_NODE;
 	};
 
 	class ForStatement : public Statement
@@ -296,9 +328,9 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "ForStatement";
+		NodeType m_nodeType = FOR_STATEMENT_NODE;
 	};
 
 	class IterateStatement : public Statement
@@ -311,8 +343,8 @@ namespace ast
 
 		std::string TokenLiteral();
 		std::string String();
-		std::string NodeType() { return m_nodeType; }
+		NodeType Type() { return m_nodeType; }
 	private:
-		std::string m_nodeType = "IterateStatement";
+		NodeType m_nodeType = ITERATE_STATEMENT_NODE;
 	};
 }

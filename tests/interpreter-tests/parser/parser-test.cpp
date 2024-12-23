@@ -36,7 +36,7 @@ TEST(ParserTest, DeclaringIntegerStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::INTEGER_TYPE);
 
@@ -81,7 +81,7 @@ TEST(ParserTest, DeclaringFloatStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::FLOAT_TYPE);
 
@@ -125,7 +125,7 @@ TEST(ParserTest, DeclaringBooleanStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::BOOLEAN_TYPE);
 
@@ -169,7 +169,7 @@ TEST(ParserTest, DeclaringCharacterStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->NodeType(), "DeclareVariableStatement");
+		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::CHARACTER_TYPE);
 
@@ -215,7 +215,7 @@ TEST(ParserTest, ReturnStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is a return statement
-		ASSERT_EQ(statement->NodeType(), "ReturnStatement");
+		ASSERT_EQ(statement->Type(), ast::RETURN_STATEMENT_NODE);
 		ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)statement;
 
 		// Test expression separately
@@ -250,7 +250,7 @@ TEST(ParserTest, IdentifierExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i));
@@ -284,7 +284,7 @@ TEST(ParserTest, IntegerLiteralExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
@@ -318,7 +318,7 @@ TEST(ParserTest, FloatLiteralExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
@@ -352,7 +352,7 @@ TEST(ParserTest, BooleanLiteralExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
@@ -386,7 +386,7 @@ TEST(ParserTest, CharacterLiteralExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
@@ -423,10 +423,10 @@ TEST(ParserTest, PrefixExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "PrefixExpression");
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::PREFIX_EXPRESSION_NODE);
 		ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)(expressionStatement->m_expression);
 
 		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
@@ -474,10 +474,10 @@ TEST(ParserTest, InfixExpression)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		ASSERT_EQ(expressionStatement->m_expression->NodeType(), "InfixExpression");
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::INFIX_EXPRESSION_NODE);
 		ast::InfixExpression* infixExpression = (ast::InfixExpression*)(expressionStatement->m_expression);
 
 		EXPECT_EQ(infixExpression->m_operator, tests[i].expectedOperator);
@@ -585,14 +585,14 @@ integer b = 5;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
-	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -634,21 +634,21 @@ return c;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
-	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	ast::IfStatement* elseStatement = ifStatement->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
-	EXPECT_EQ(elseStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[1]->Type(), ast::RETURN_STATEMENT_NODE);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -690,22 +690,22 @@ return c;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
-	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	ast::IfStatement* elseIfStatement = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
-	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
+	EXPECT_EQ(elseIfStatement->m_consequence->m_statements[1]->Type(), ast::RETURN_STATEMENT_NODE);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -762,22 +762,22 @@ float lol = 3.5;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
-	ASSERT_EQ(statement->NodeType(), "IfStatement");
+	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
 	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
-	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	ast::IfStatement* elseIfStatement1 = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement1->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement1->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement1->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
-	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->NodeType(), "ReturnStatement");
+	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->Type(), ast::RETURN_STATEMENT_NODE);
 
 	ast::IfStatement* elseIfStatement2 = elseIfStatement1->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testInfixExpression(elseIfStatement2->m_condition, 3, "<", 5.5f), 0);
@@ -787,7 +787,7 @@ float lol = 3.5;
 	ast::IfStatement* elseStatement = elseIfStatement2->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 1);
-	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->TokenLiteral(), "float");
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -820,13 +820,13 @@ true;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a while statement
-	ASSERT_EQ(statement->NodeType(), "WhileStatement");
+	ASSERT_EQ(statement->Type(), ast::WHILE_STATEMENT_NODE);
 	ast::WhileStatement* whileStatement = (ast::WhileStatement*)statement;
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(whileStatement->m_condition, true, 0));
 	ASSERT_EQ(whileStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(whileStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
-	EXPECT_EQ(whileStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(whileStatement->m_consequence->m_statements[0]->Type(), ast::EXPRESSION_STATEMENT_NODE);
+	EXPECT_EQ(whileStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -858,13 +858,13 @@ true;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a do while statement
-	ASSERT_EQ(statement->NodeType(), "DoWhileStatement");
+	ASSERT_EQ(statement->Type(), ast::DO_WHILE_STATEMENT_NODE);
 	ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)statement;
 
 
 	ASSERT_EQ(doWhileStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
-	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[0]->Type(), ast::EXPRESSION_STATEMENT_NODE);
+	EXPECT_EQ(doWhileStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(doWhileStatement->m_condition, false, 0));
 	EXPECT_EQ(program->String(), expectedString);
 
@@ -897,22 +897,22 @@ true;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an iterate loop
-	ASSERT_EQ(statement->NodeType(), "ForStatement");
+	ASSERT_EQ(statement->Type(), ast::FOR_STATEMENT_NODE);
 	ast::ForStatement* forStatement = (ast::ForStatement*)statement;
 
 	// Test m_initialization
-	EXPECT_EQ(forStatement->m_initialization->NodeType(), "DeclareVariableStatement");
+	EXPECT_EQ(forStatement->m_initialization->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
 
 	// Test m_condition
-	EXPECT_EQ(forStatement->m_condition->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(forStatement->m_condition->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	// Test m_updation
-	EXPECT_EQ(forStatement->m_updation->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(forStatement->m_updation->Type(), ast::EXPRESSION_STATEMENT_NODE);
 	
 	// Test m_consequence
 	ASSERT_EQ(forStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(forStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
-	EXPECT_EQ(forStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(forStatement->m_consequence->m_statements[0]->Type(), ast::EXPRESSION_STATEMENT_NODE);
+	EXPECT_EQ(forStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -943,18 +943,18 @@ true;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an iterate loop
-	ASSERT_EQ(statement->NodeType(), "IterateStatement");
+	ASSERT_EQ(statement->Type(), ast::ITERATE_STATEMENT_NODE);
 	ast::IterateStatement* iterateStatement = (ast::IterateStatement*)statement;
 
 	EXPECT_EQ(iterateStatement->m_var->m_name, "var");
 	
-	ASSERT_EQ(iterateStatement->m_collection->NodeType(), "Identifier");
+	ASSERT_EQ(iterateStatement->m_collection->Type(), ast::IDENTIFIER_NODE);
 	ast::Identifier* collection = (ast::Identifier*)iterateStatement->m_collection;
 	EXPECT_EQ(collection->m_name, "myCollection");
 
 	ASSERT_EQ(iterateStatement->m_consequence->m_statements.size(), 2);
-	EXPECT_EQ(iterateStatement->m_consequence->m_statements[0]->NodeType(), "ExpressionStatement");
-	EXPECT_EQ(iterateStatement->m_consequence->m_statements[1]->NodeType(), "ExpressionStatement");
+	EXPECT_EQ(iterateStatement->m_consequence->m_statements[0]->Type(), ast::EXPRESSION_STATEMENT_NODE);
+	EXPECT_EQ(iterateStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 	
 	EXPECT_EQ(program->String(), expectedString);
 }
@@ -984,7 +984,7 @@ return 5.1;
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a function declaration
-	ASSERT_EQ(statement->NodeType(), "DeclareFunctionStatement");
+	ASSERT_EQ(statement->Type(), ast::DECLARE_FUNCTION_STATEMENT_NODE);
 	ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)statement;
 
 	// Check m_token
@@ -1005,7 +1005,7 @@ return 5.1;
 
 	// Check body
 	ASSERT_EQ(declareFunctionStatement->m_body->m_body->m_statements.size(), 1);
-	EXPECT_EQ(declareFunctionStatement->m_body->m_body->m_statements[0]->NodeType(), "ReturnStatement");
+	EXPECT_EQ(declareFunctionStatement->m_body->m_body->m_statements[0]->Type(), ast::RETURN_STATEMENT_NODE);
 
 	// Check output
 	EXPECT_EQ(program->String(), expectedString);
@@ -1027,25 +1027,25 @@ TEST(ParserTest, CallExpression)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a call expression
-	ASSERT_EQ(statement->NodeType(), "ExpressionStatement");
+	ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 	ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
-	ASSERT_EQ(expressionStatement->m_expression->NodeType(), "CallExpression");
+	ASSERT_EQ(expressionStatement->m_expression->Type(), ast::CALL_EXPRESSION_NODE);
 	ast::CallExpression* callExpression = (ast::CallExpression*)expressionStatement->m_expression;
 
 	// Check m_token
 	EXPECT_EQ(callExpression->m_token.m_type, token::LPARENTHESIS);
 
 	// Check m_function
-	ASSERT_EQ(callExpression->m_function->NodeType(), "Identifier");
+	ASSERT_EQ(callExpression->m_function->Type(), ast::IDENTIFIER_NODE);
 	ast::Identifier* identifier2 = (ast::Identifier*)callExpression->m_function;
 	EXPECT_EQ(identifier2->m_name, "add");
 
 	// Check m_parameters
 	ASSERT_EQ(callExpression->m_parameters.size(), 4);
-	EXPECT_EQ(callExpression->m_parameters[0]->NodeType(), "IntegerLiteral");
-	EXPECT_EQ(callExpression->m_parameters[1]->NodeType(), "IntegerLiteral");
-	EXPECT_EQ(callExpression->m_parameters[2]->NodeType(), "InfixExpression");
-	EXPECT_EQ(callExpression->m_parameters[3]->NodeType(), "Identifier");
+	EXPECT_EQ(callExpression->m_parameters[0]->Type(), ast::INTEGER_LITERAL_NODE);
+	EXPECT_EQ(callExpression->m_parameters[1]->Type(), ast::INTEGER_LITERAL_NODE);
+	EXPECT_EQ(callExpression->m_parameters[2]->Type(), ast::INFIX_EXPRESSION_NODE);
+	EXPECT_EQ(callExpression->m_parameters[3]->Type(), ast::IDENTIFIER_NODE);
 
 	// Check output
 	EXPECT_EQ(program->String(), expectedString);
@@ -1232,7 +1232,7 @@ void testLiteralExpression(ast::Expression* expression, std::any expectedValue, 
 
 void testIntegerLiteral(ast::Expression* expression, int expectedValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "IntegerLiteral")
+	ASSERT_EQ(expression->Type(), ast::INTEGER_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
 	ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)expression;
@@ -1245,7 +1245,7 @@ void testIntegerLiteral(ast::Expression* expression, int expectedValue, int test
 
 void testFloatLiteral(ast::Expression* expression, float expectedValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "FloatLiteral")
+	ASSERT_EQ(expression->Type(), ast::FLOAT_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
 	ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)expression;
@@ -1261,7 +1261,7 @@ void testFloatLiteral(ast::Expression* expression, float expectedValue, int test
 
 void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "BooleanLiteral")
+	ASSERT_EQ(expression->Type(), ast::BOOLEAN_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
 	ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)expression;
@@ -1274,7 +1274,7 @@ void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int tes
 
 void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "CharacterLiteral")
+	ASSERT_EQ(expression->Type(), ast::CHARACTER_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
 	ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)expression;
@@ -1289,7 +1289,7 @@ void testCharacterLiteral(ast::Expression* expression, char expectedValue, int t
 
 void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "Identifier");
+	ASSERT_EQ(expression->Type(), ast::IDENTIFIER_NODE);
 	ast::Identifier* identifier = (ast::Identifier*)expression;
 
 	// Test to see if identifier fields are right
@@ -1301,7 +1301,7 @@ void testIdentifier(ast::Expression* expression, std::string* expectedValue, int
 
 void testInfixExpression(ast::Expression* expression, std::any leftValue, std::string op, std::any rightValue, int testNumber)
 {
-	ASSERT_EQ(expression->NodeType(), "InfixExpression");
+	ASSERT_EQ(expression->Type(), ast::INFIX_EXPRESSION_NODE);
 	ast::InfixExpression* infixExpression = (ast::InfixExpression*)expression;
 
 	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, leftValue, testNumber));

@@ -33,22 +33,22 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
@@ -69,7 +69,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,7 +108,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,17 +128,19 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ast\ast-test.h" />
+    <ClInclude Include="evaluator\evaluator-test.h" />
     <ClInclude Include="lexer\lexer-test.h" />
     <ClInclude Include="parser\parser-test.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ast\ast-test.cpp" />
+    <ClCompile Include="evaluator\evaluator-test.cpp" />
     <ClCompile Include="lexer\lexer-test.cpp" />
     <ClCompile Include="parser\parser-test.cpp" />
     <ClCompile Include="pch.cpp">
