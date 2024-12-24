@@ -57,6 +57,23 @@ TEST(EvaluatorTest, BooleanExpression)
 		{"!5;", false},
 		{"!!5;", true},
 		{"!0;", true},
+		{"2 > 3;", false},
+		{"2 >= 3;", false},
+		{"2 < 3;", true},
+		{"2 <= 3;", true},
+		{"3 < 3;", false},
+		{"3 >= 3;", true},
+		{"3 <= 3;", true},
+		{"1 == 2;", false},
+		{"1 == 1;", true},
+		{"1 != 2;", true},
+		{"1 != 1;", false},
+		{"true && true;", true},
+		{"true && false;", false},
+		{"true || true;", true},
+		{"true || false;", true},
+		{"false || false;", false},
+		{"(3 > 5) || (3 > 1 + 1);", true},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

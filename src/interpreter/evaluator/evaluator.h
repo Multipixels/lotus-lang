@@ -19,6 +19,9 @@ namespace evaluator
 
 	// Evaluates an integer infix expression
 	object::Object* evaluateIntegerInfixExpression(object::Integer* leftObject, std::string* infixOperator, object::Integer* rightObject);
+	
+	// Evaluates a boolean infix expression
+	object::Object* evaluateBooleanInfixExpression(object::Boolean* leftObject, std::string* infixOperator, object::Boolean* rightObject);
 
 	// Applies bang operator
 	object::Object* evalBangOperatorExpression(object::Object* expression);

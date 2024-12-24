@@ -75,6 +75,13 @@ namespace evaluator
 					(object::Integer*)leftObject, infixOperator, (object::Integer*)rightObject);
 			break;
 		}
+		case object::BOOLEAN:
+		{
+			if (rightObject->Type() == object::BOOLEAN)
+				return evaluateBooleanInfixExpression(
+					(object::Boolean*)leftObject, infixOperator, (object::Boolean*)rightObject);
+			break;
+		}
 		}
 
 		return &object::NULL_OBJECT;
@@ -87,6 +94,23 @@ namespace evaluator
 		if (*infixOperator == "-") return new object::Integer(leftObject->m_value - rightObject->m_value);
 		if (*infixOperator == "*") return new object::Integer(leftObject->m_value * rightObject->m_value);
 		if (*infixOperator == "/") return new object::Integer(leftObject->m_value / rightObject->m_value);
+		if (*infixOperator == "<") return new object::Boolean(leftObject->m_value < rightObject->m_value);
+		if (*infixOperator == "<=") return new object::Boolean(leftObject->m_value <= rightObject->m_value);
+		if (*infixOperator == ">") return new object::Boolean(leftObject->m_value > rightObject->m_value);
+		if (*infixOperator == ">=") return new object::Boolean(leftObject->m_value >= rightObject->m_value);
+		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
+		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
+
+		return &object::NULL_OBJECT;
+	}
+
+	object::Object* evaluateBooleanInfixExpression(object::Boolean* leftObject, std::string* infixOperator, object::Boolean* rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*infixOperator == "&&") return new object::Boolean(leftObject->m_value && rightObject->m_value);
+		if (*infixOperator == "||") return new object::Boolean(leftObject->m_value || rightObject->m_value);
+		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
+		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
 
 		return &object::NULL_OBJECT;
 	}
