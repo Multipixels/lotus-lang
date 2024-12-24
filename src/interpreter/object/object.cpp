@@ -5,6 +5,20 @@
 
 namespace object
 {
+	Null NULL_OBJECT;
+	Boolean TRUE_OBJECT(true);
+	Boolean FALSE_OBJECT(false);
+
+	Integer::Integer()
+		: m_value(0)
+	{
+	}
+
+	Integer::Integer(int value)
+		: m_value(value)
+	{
+	}
+
 	ObjectType Integer::Type()
 	{
 		return INTEGER;
@@ -16,6 +30,16 @@ namespace object
 		output << m_value;
 
 		return output.str();
+	}
+
+	Boolean::Boolean()
+		: m_value(false)
+	{
+	}
+
+	Boolean::Boolean(bool value)
+		: m_value(value)
+	{
 	}
 
 	ObjectType Boolean::Type()
@@ -30,6 +54,8 @@ namespace object
 
 		return output.str();
 	}
+
+	Null::Null() {};
 
 	ObjectType Null::Type()
 	{

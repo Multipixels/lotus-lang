@@ -19,6 +19,8 @@ namespace object
 	class Integer : public Object
 	{
 	public:
+		Integer();
+		Integer(int value);
 		ObjectType Type();
 		std::string Inspect();
 		int m_value;
@@ -27,6 +29,8 @@ namespace object
 	class Boolean : public Object
 	{
 	public:
+		Boolean();
+		Boolean(bool value);
 		ObjectType Type();
 		std::string Inspect();
 		bool m_value;
@@ -35,7 +39,12 @@ namespace object
 	class Null : public Object
 	{
 	public:
+		Null();
 		ObjectType Type();
 		std::string Inspect();
 	};
+
+	extern Null NULL_OBJECT;
+	extern Boolean TRUE_OBJECT;
+	extern Boolean FALSE_OBJECT;
 }
