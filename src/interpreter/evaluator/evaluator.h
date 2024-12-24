@@ -13,7 +13,17 @@ namespace evaluator
 
 	// Evaluates a prefix expression
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject);
+	
+	// Evaluates an infix expression
+	object::Object* evaluateInfixExpression(object::Object* leftObject, std::string* infixOperator, object::Object* rightObject);
 
-	// Evaluates a bang expression
+	// Evaluates an integer infix expression
+	object::Object* evaluateIntegerInfixExpression(object::Integer* leftObject, std::string* infixOperator, object::Integer* rightObject);
+
+	// Applies bang operator
 	object::Object* evalBangOperatorExpression(object::Object* expression);
+
+	// Applies negative operator (prefix)
+	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression);
+
 }

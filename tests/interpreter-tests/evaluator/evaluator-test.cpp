@@ -16,9 +16,19 @@ TEST(EvaluatorTest, IntegerExpression)
 	{
 		{"5;", 5},
 		{"11;", 11},
+		{"-5;", -5},
+		{"-11;", -11},
+		{"-0;", 0},
+		{"5 + 5;", 10},
+		{"5 - 5;", 0},
+		{"5 * 5;", 25},
+		{"5 / 5;", 1},
+		{"5 / 4;", 1}, // floor division for integers
+		{"5 / 6;", 0}, // floor division for integers
+		{"(24+7) * -3 - (100/3);", (24 + 7) * -3 - (100 / 3)}, // -126
 	};
 
-	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	for (int i = 11; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
 		

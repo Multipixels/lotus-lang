@@ -4,6 +4,8 @@ namespace evaluator
 {
 	object::Object* evaluate(ast::Node* node)
 	{
+		if (node == NULL) return &object::NULL_OBJECT;
+
 		switch (node->Type())
 		{
 		case ast::PROGRAM_NODE:
@@ -28,14 +30,21 @@ namespace evaluator
 			object::Object* rightObject = evaluate(prefixExpression->m_right_expression);
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
 		}
+		case ast::INFIX_EXPRESSION_NODE:
+		{
+			ast::InfixExpression* infixExpression = (ast::InfixExpression*)node;
+			object::Object* leftObject = evaluate(infixExpression->m_left_expression);
+			object::Object* rightObject = evaluate(infixExpression->m_right_expression);
+			return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
+		}
 		}
 
-		return NULL;
+		return &object::NULL_OBJECT;
 	}
 
 	object::Object* evaluateProgram(ast::Program* program)
 	{
-		object::Object* result = NULL;
+		object::Object* result = &object::NULL_OBJECT;
 
 		for (int i = 0; i < program->m_statements.size(); i++)
 		{
@@ -48,13 +57,38 @@ namespace evaluator
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*prefixOperator == "!")
-		{
-			return evalBangOperatorExpression(rightObject);
-		}
+		if (*prefixOperator == "!") return evalBangOperatorExpression(rightObject);
+		if (*prefixOperator == "-") return evalMinusPrefixOperatorExpression(rightObject);
 
 		// Temporary
-		return NULL;
+		return &object::NULL_OBJECT;
+	}
+
+	object::Object* evaluateInfixExpression(object::Object* leftObject, std::string* infixOperator, object::Object* rightObject)
+	{
+		switch (leftObject->Type())
+		{
+		case object::INTEGER:
+		{
+			if (rightObject->Type() == object::INTEGER) 
+				return evaluateIntegerInfixExpression(
+					(object::Integer*)leftObject, infixOperator, (object::Integer*)rightObject);
+			break;
+		}
+		}
+
+		return &object::NULL_OBJECT;
+	}
+
+	object::Object* evaluateIntegerInfixExpression(object::Integer* leftObject, std::string* infixOperator, object::Integer* rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*infixOperator == "+") return new object::Integer(leftObject->m_value + rightObject->m_value);
+		if (*infixOperator == "-") return new object::Integer(leftObject->m_value - rightObject->m_value);
+		if (*infixOperator == "*") return new object::Integer(leftObject->m_value * rightObject->m_value);
+		if (*infixOperator == "/") return new object::Integer(leftObject->m_value / rightObject->m_value);
+
+		return &object::NULL_OBJECT;
 	}
 
 	object::Object* evalBangOperatorExpression(object::Object* expression)
@@ -77,4 +111,15 @@ namespace evaluator
 
 		return &object::NULL_OBJECT;
 	}
+
+	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression)
+	{
+		if (expression->Type() != object::INTEGER) return &object::NULL_OBJECT;
+
+		object::Integer* integer = (object::Integer*)expression;
+		object::Integer* returnValue = new object::Integer(-integer->m_value);
+
+		return returnValue;
+	}
+
 }

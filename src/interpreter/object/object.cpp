@@ -49,10 +49,8 @@ namespace object
 
 	std::string Boolean::Inspect()
 	{
-		std::ostringstream output;
-		output << m_value;
-
-		return output.str();
+		if (m_value) return "true";
+		return "false";
 	}
 
 	Null::Null() {};

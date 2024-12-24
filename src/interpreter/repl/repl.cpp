@@ -1,6 +1,9 @@
 #include <string>
 #include <iostream>
 
+#include "parser.h"
+#include "evaluator.h"
+
 namespace repl 
 {
 	const std::string prompt = ">> ";
@@ -16,7 +19,11 @@ namespace repl
 			std::string input;
 			std::getline(std::cin, input);
 
-			std::cout << "This'll be the output" << std::endl;
+			lexer::Lexer lexer = lexer::Lexer(&input);
+			parser::Parser parser = parser::Parser(lexer);
+			ast::Program* program = parser.ParseProgram();
+
+			std::cout << evaluator::evaluate(program)->Inspect() << std::endl;
 		}
 
 

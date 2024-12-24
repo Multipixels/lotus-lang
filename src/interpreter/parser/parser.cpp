@@ -533,7 +533,7 @@ namespace parser
 
 		nextToken();
 
-		expression->m_right_expression = parseExpression(LOWEST);
+		expression->m_right_expression = parseExpression(PREFIX);
 
 		return expression;
 	}
