@@ -130,6 +130,28 @@ TEST(EvaluatorTest, BooleanExpression)
 	}
 }
 
+TEST(EvaluatorTest, CharacterExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		char expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"'a';", 'a'},
+		{"'d';", 'd'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testCharacterObject(evaluated, tests[i].expectedValue));
+	}
+}
+
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);

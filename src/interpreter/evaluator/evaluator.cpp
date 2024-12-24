@@ -30,6 +30,12 @@ namespace evaluator
 			object->m_value = ((ast::BooleanLiteral*)node)->m_value;
 			return object;
 		}
+		case ast::CHARACTER_LITERAL_NODE:
+		{
+			object::Character* object = new object::Character;
+			object->m_value = ((ast::CharacterLiteral*)node)->m_value;
+			return object;
+		}
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;
