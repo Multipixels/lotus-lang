@@ -32,6 +32,29 @@ namespace object
 		return output.str();
 	}
 
+	Float::Float()
+		: m_value(0)
+	{
+	}
+
+	Float::Float(float value)
+		: m_value(value)
+	{
+	}
+
+	ObjectType Float::Type()
+	{
+		return FLOAT;
+	}
+
+	std::string Float::Inspect()
+	{
+		std::ostringstream output;
+		output << m_value;
+
+		return output.str();
+	}
+
 	Boolean::Boolean()
 		: m_value(false)
 	{
@@ -51,6 +74,29 @@ namespace object
 	{
 		if (m_value) return "true";
 		return "false";
+	}
+
+	Character::Character()
+		: m_value('\0')
+	{
+	}
+
+	Character::Character(char value)
+		: m_value(value)
+	{
+	}
+
+	ObjectType Character::Type()
+	{
+		return CHARACTER;
+	}
+
+	std::string Character::Inspect()
+	{
+		std::ostringstream output;
+		output << m_value;
+
+		return output.str();
 	}
 
 	Null::Null() {};

@@ -5,7 +5,9 @@ namespace object
 	enum ObjectType
 	{
 		INTEGER,
+		FLOAT,
 		BOOLEAN,
+		CHARACTER,
 		NULL_TYPE,
 	};
 
@@ -26,6 +28,16 @@ namespace object
 		int m_value;
 	};
 
+	class Float : public Object
+	{
+	public:
+		Float();
+		Float(float value);
+		ObjectType Type();
+		std::string Inspect();
+		float m_value;
+	};
+
 	class Boolean : public Object
 	{
 	public:
@@ -34,6 +46,16 @@ namespace object
 		ObjectType Type();
 		std::string Inspect();
 		bool m_value;
+	};
+
+	class Character : public Object
+	{
+	public:
+		Character();
+		Character(char value);
+		ObjectType Type();
+		std::string Inspect();
+		char m_value;
 	};
 
 	class Null : public Object

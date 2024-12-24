@@ -18,6 +18,12 @@ namespace evaluator
 			object->m_value = ((ast::IntegerLiteral*)node)->m_value;
 			return object;
 		}
+		case ast::FLOAT_LITERAL_NODE:
+		{
+			object::Float* object = new object::Float;
+			object->m_value = ((ast::FloatLiteral*)node)->m_value;
+			return object;
+		}
 		case ast::BOOLEAN_LITERAL_NODE:
 		{
 			object::Boolean* object = new object::Boolean;
@@ -73,6 +79,19 @@ namespace evaluator
 			if (rightObject->Type() == object::INTEGER) 
 				return evaluateIntegerInfixExpression(
 					(object::Integer*)leftObject, infixOperator, (object::Integer*)rightObject);
+			if (rightObject->Type() == object::FLOAT)
+				return evaluateFloatInfixExpression(
+					new object::Float(((object::Integer*)leftObject)->m_value), infixOperator, (object::Float*)rightObject);
+			break;
+		}
+		case object::FLOAT:
+		{
+			if (rightObject->Type() == object::INTEGER)
+				return evaluateFloatInfixExpression(
+					(object::Float*)leftObject, infixOperator, new object::Float(((object::Integer*)rightObject)->m_value));
+			if (rightObject->Type() == object::FLOAT)
+				return evaluateFloatInfixExpression(
+					(object::Float*)leftObject, infixOperator, (object::Float*)rightObject);
 			break;
 		}
 		case object::BOOLEAN:
@@ -104,6 +123,23 @@ namespace evaluator
 		return &object::NULL_OBJECT;
 	}
 
+	object::Object* evaluateFloatInfixExpression(object::Float* leftObject, std::string* infixOperator, object::Float* rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*infixOperator == "+") return new object::Float(leftObject->m_value + rightObject->m_value);
+		if (*infixOperator == "-") return new object::Float(leftObject->m_value - rightObject->m_value);
+		if (*infixOperator == "*") return new object::Float(leftObject->m_value * rightObject->m_value);
+		if (*infixOperator == "/") return new object::Float(leftObject->m_value / rightObject->m_value);
+		if (*infixOperator == "<") return new object::Boolean(leftObject->m_value < rightObject->m_value);
+		if (*infixOperator == "<=") return new object::Boolean(leftObject->m_value <= rightObject->m_value);
+		if (*infixOperator == ">") return new object::Boolean(leftObject->m_value > rightObject->m_value);
+		if (*infixOperator == ">=") return new object::Boolean(leftObject->m_value >= rightObject->m_value);
+		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
+		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
+
+		return &object::NULL_OBJECT;
+	}
+
 	object::Object* evaluateBooleanInfixExpression(object::Boolean* leftObject, std::string* infixOperator, object::Boolean* rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
@@ -125,6 +161,12 @@ namespace evaluator
 			if (integer->m_value) return &object::FALSE_OBJECT;
 			else return &object::TRUE_OBJECT;
 		}
+		case object::FLOAT:
+		{
+			object::Float* floating = (object::Float*)expression;
+			if (floating->m_value) return &object::FALSE_OBJECT;
+			else return &object::TRUE_OBJECT;
+		}
 		case object::BOOLEAN:
 		{
 			object::Boolean* boolean = (object::Boolean*)expression;
@@ -138,12 +180,23 @@ namespace evaluator
 
 	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression)
 	{
-		if (expression->Type() != object::INTEGER) return &object::NULL_OBJECT;
+		switch (expression->Type())
+		{
+		case object::INTEGER:
+		{
+			object::Integer* integer = (object::Integer*)expression;
+			object::Integer* returnValue = new object::Integer(-integer->m_value);
+			return returnValue;
+		}
+		case object::FLOAT:
+		{
+			object::Float* floating = (object::Float*)expression;
+			object::Float* returnValue = new object::Float(-floating->m_value);
+			return returnValue;
+		}
+		}
 
-		object::Integer* integer = (object::Integer*)expression;
-		object::Integer* returnValue = new object::Integer(-integer->m_value);
-
-		return returnValue;
+		return &object::NULL_OBJECT;
 	}
 
 }
