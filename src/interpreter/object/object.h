@@ -105,4 +105,15 @@ namespace object
 	extern Null NULL_OBJECT;
 	extern Boolean TRUE_OBJECT;
 	extern Boolean FALSE_OBJECT;
+
+	class Environment
+	{
+	public:
+		Environment();
+
+		object::Object* getIdentifier(std::string* identifier);
+		void setIdentifier(std::string* identifier, Object* value);
+	private:
+		std::map<std::string, Object*> m_store;
+	};
 }

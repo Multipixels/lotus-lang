@@ -6,10 +6,10 @@
 namespace evaluator
 {
 	// Evaluates a node
-	object::Object* evaluate(ast::Node* node);
+	object::Object* evaluate(ast::Node* node, object::Environment* environment);
 
 	// Evaluates a program
-	object::Object* evaluateProgram(ast::Program* program);
+	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment);
 
 	// Evaluates a prefix expression
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject);

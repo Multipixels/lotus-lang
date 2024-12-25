@@ -186,12 +186,13 @@ TEST(EvaluatorTest, Error)
 
 	TestCase tests[] =
 	{
-		{"5 + true;", "Evaluation Error: 'integer + boolean' is not supported."},
-		{"5 + true; 5;", "Evaluation Error: 'integer + boolean' is not supported."},
-		{"5; 5 + true; 5;", "Evaluation Error: 'integer + boolean' is not supported."},
-		{"-true;", "Evaluation Error: '-boolean' is not supported."},
-		{"!'a';", "Evaluation Error: '!character' is not supported."},
-		{"true + true;", "Evaluation Error: 'boolean + boolean' is not supported."},
+		{"5 + true;", "'integer + boolean' is not supported."},
+		{"5 + true; 5;", "'integer + boolean' is not supported."},
+		{"5; 5 + true; 5;", "'integer + boolean' is not supported."},
+		{"-true;", "'-boolean' is not supported."},
+		{"!'a';", "'!character' is not supported."},
+		{"true + true;", "'boolean + boolean' is not supported."},
+		{"undefinedIdentifier;", "'undefinedIdentifier' is not defined."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -203,14 +204,65 @@ TEST(EvaluatorTest, Error)
 	}
 }
 
+TEST(EvaluatorTest, Declaration)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer a = 5; a;", 5},
+		{"float b = 4.5f; b;", 4.5f},
+		{"boolean c = false; c;", false},
+		{"character d = 'e'; d;", 'e'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+		
+	}
+}
+
 
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
 	parser::Parser parser = parser::Parser(lexer);
 	ast::Program* program = parser.ParseProgram();
+	object::Environment environment;
 
-	return evaluator::evaluate(program);
+	return evaluator::evaluate(program, &environment);
+}
+
+void testLiteralObject(object::Object* object, std::any expectedValue)
+{
+	// Cannot use a switch on type as std::string is not integral
+	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
+	
+	if (object == NULL) FAIL();
+
+	switch (object->Type())
+	{
+	case object::INTEGER:
+		EXPECT_NO_FATAL_FAILURE(testIntegerObject(object, std::any_cast<int>(expectedValue)));
+		return;
+	case object::FLOAT:
+		EXPECT_NO_FATAL_FAILURE(testFloatObject(object, std::any_cast<float>(expectedValue)));
+		return;
+	case object::BOOLEAN:
+		EXPECT_NO_FATAL_FAILURE(testBooleanObject(object, std::any_cast<bool>(expectedValue)));
+		return;
+	case object::CHARACTER:
+		EXPECT_NO_FATAL_FAILURE(testCharacterObject(object, std::any_cast<char>(expectedValue)));
+		return;
+	}
+
+	FAIL();
 }
 
 void testIntegerObject(object::Object* object, int expectedValue)

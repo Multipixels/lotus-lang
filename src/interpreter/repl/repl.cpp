@@ -11,6 +11,7 @@ namespace repl
 	int Start() 
 	{
 		bool isRunning = true;
+		object::Environment environment;
 
 		while (isRunning) 
 		{
@@ -23,7 +24,7 @@ namespace repl
 			parser::Parser parser = parser::Parser(lexer);
 			ast::Program* program = parser.ParseProgram();
 
-			std::cout << evaluator::evaluate(program)->Inspect() << std::endl;
+			std::cout << evaluator::evaluate(program, &environment)->Inspect() << std::endl;
 		}
 
 

@@ -5,16 +5,28 @@
 
 namespace evaluator
 {
-	object::Object* evaluate(ast::Node* node)
+	object::Object* evaluate(ast::Node* node, object::Environment* environment)
 	{
 		if (node == NULL) return &object::NULL_OBJECT;
 
 		switch (node->Type())
 		{
 		case ast::PROGRAM_NODE:
-			return evaluateProgram((ast::Program*)node);
+			return evaluateProgram((ast::Program*)node, environment);
+		case ast::IDENTIFIER_NODE:
+		{
+			object::Object* result = environment->getIdentifier(&((ast::Identifier*)node)->m_name);
+			if (result == NULL)
+			{
+				std::ostringstream error;
+				error << "'" << ((ast::Identifier*)node)->m_name << "' is not defined.";
+				return createError(error.str());
+			}
+
+			return result;
+		}
 		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(((ast::ExpressionStatement*)node)->m_expression);
+			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
 		case ast::INTEGER_LITERAL_NODE:
 		{
 			object::Integer* object = new object::Integer;
@@ -42,33 +54,47 @@ namespace evaluator
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;
-			object::Object* rightObject = evaluate(prefixExpression->m_right_expression);
+			object::Object* rightObject = evaluate(prefixExpression->m_right_expression, environment);
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
 		}
 		case ast::INFIX_EXPRESSION_NODE:
 		{
 			ast::InfixExpression* infixExpression = (ast::InfixExpression*)node;
-			object::Object* leftObject = evaluate(infixExpression->m_left_expression);
-			object::Object* rightObject = evaluate(infixExpression->m_right_expression);
+			object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
+			object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
 			return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
+		}
+		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
+		{
+			ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)node;
+			object::Object* object = evaluate(declareVariableStatement->m_value, environment);
+
+			if (object->Type() == object::ERROR)
+			{
+				return object;
+			}
+
+			environment->setIdentifier(&declareVariableStatement->m_name.m_name, object);
+
+			return &object::NULL_OBJECT;
 		}
 		case ast::RETURN_STATEMENT_NODE:
 		{
 			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;
-			return new object::Return(evaluate(returnStatement->m_returnValue));
+			return new object::Return(evaluate(returnStatement->m_returnValue, environment));
 		}
 		}
 
 		return NULL;
 	}
 
-	object::Object* evaluateProgram(ast::Program* program)
+	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment)
 	{
 		object::Object* result = &object::NULL_OBJECT;
 
 		for (int i = 0; i < program->m_statements.size(); i++)
 		{
-			result = evaluate(program->m_statements[i]);
+			result = evaluate(program->m_statements[i], environment);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -247,9 +273,7 @@ namespace evaluator
 
 	object::Error* createError(std::string errorMessage)
 	{
-		std::ostringstream error;
-		error << "Evaluation Error: " << errorMessage;
-		return new object::Error(error.str());
+		return new object::Error(errorMessage);
 	}
 
 }
