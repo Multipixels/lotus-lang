@@ -176,6 +176,33 @@ TEST(EvaluatorTest, ReturnStatement)
 	}
 }
 
+TEST(EvaluatorTest, Error)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedError;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5 + true;", "Evaluation Error: 'integer + boolean' is not supported."},
+		{"5 + true; 5;", "Evaluation Error: 'integer + boolean' is not supported."},
+		{"5; 5 + true; 5;", "Evaluation Error: 'integer + boolean' is not supported."},
+		{"-true;", "Evaluation Error: '-boolean' is not supported."},
+		{"!'a';", "Evaluation Error: '!character' is not supported."},
+		{"true + true;", "Evaluation Error: 'boolean + boolean' is not supported."},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		ASSERT_EQ(evaluated->Type(), object::ERROR);
+		EXPECT_EQ(((object::Error*)evaluated)->m_error_message, tests[i].expectedError);
+	}
+}
+
 
 object::Object* testEvaluation(std::string* input)
 {

@@ -125,4 +125,21 @@ namespace object
 	{
 		return m_return_value->Inspect();
 	}
+
+	Error::Error(std::string error_message)
+		: m_error_message(error_message)
+	{
+	}
+
+	ObjectType Error::Type()
+	{
+		return ERROR;
+	}
+
+	std::string Error::Inspect()
+	{
+		std::ostringstream output;
+		output << "Evaluation Error: " << m_error_message;
+		return output.str();
+	}
 }

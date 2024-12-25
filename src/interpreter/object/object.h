@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 namespace object
 {
 	enum ObjectType
@@ -10,6 +12,18 @@ namespace object
 		CHARACTER,
 		NULL_TYPE,
 		RETURN,
+		ERROR,
+	};
+
+	const std::map<ObjectType, std::string> objectTypeToString =
+	{
+		{INTEGER, "integer"},
+		{FLOAT, "float"},
+		{BOOLEAN, "boolean"},
+		{CHARACTER, "character"},
+		{NULL_TYPE, "null"},
+		{RETURN, "RETURN"},
+		{ERROR, "ERROR"},
 	};
 
 	class Object
@@ -76,6 +90,16 @@ namespace object
 		std::string Inspect();
 		
 		Object* m_return_value;
+	};
+
+	class Error : public Object
+	{
+	public:
+		Error(std::string error_message);
+		ObjectType Type();
+		std::string Inspect();
+
+		std::string m_error_message;
 	};
 
 	extern Null NULL_OBJECT;

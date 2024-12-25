@@ -32,4 +32,6 @@ namespace evaluator
 	// Applies negative operator (prefix)
 	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression);
 
+	// Creates an error object with the provided error message
+	object::Error* createError(std::string errorMessage);
 }

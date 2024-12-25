@@ -1,4 +1,7 @@
+#include <sstream>
+
 #include "evaluator.h"
+
 
 namespace evaluator
 {
@@ -56,7 +59,7 @@ namespace evaluator
 		}
 		}
 
-		return &object::NULL_OBJECT;
+		return NULL;
 	}
 
 	object::Object* evaluateProgram(ast::Program* program)
@@ -72,6 +75,11 @@ namespace evaluator
 				object::Return* returnObj = (object::Return*)result;
 				return returnObj->m_return_value;
 			}
+
+			if (result != NULL && result->Type() == object::ERROR)
+			{
+				return result;
+			}
 		}
 
 		return result;
@@ -83,8 +91,9 @@ namespace evaluator
 		if (*prefixOperator == "!") return evalBangOperatorExpression(rightObject);
 		if (*prefixOperator == "-") return evalMinusPrefixOperatorExpression(rightObject);
 
-		// Temporary
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << *prefixOperator << object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evaluateInfixExpression(object::Object* leftObject, std::string* infixOperator, object::Object* rightObject)
@@ -120,7 +129,11 @@ namespace evaluator
 		}
 		}
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'" << object::objectTypeToString.at(leftObject->Type())
+			<< ' ' << *infixOperator << ' '
+			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evaluateIntegerInfixExpression(object::Integer* leftObject, std::string* infixOperator, object::Integer* rightObject)
@@ -137,7 +150,11 @@ namespace evaluator
 		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
 		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'" << object::objectTypeToString.at(leftObject->Type())
+			<< ' ' << *infixOperator << ' '
+			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evaluateFloatInfixExpression(object::Float* leftObject, std::string* infixOperator, object::Float* rightObject)
@@ -154,7 +171,11 @@ namespace evaluator
 		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
 		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'" << object::objectTypeToString.at(leftObject->Type())
+			<< ' ' << *infixOperator << ' '
+			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evaluateBooleanInfixExpression(object::Boolean* leftObject, std::string* infixOperator, object::Boolean* rightObject)
@@ -165,7 +186,11 @@ namespace evaluator
 		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
 		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'" << object::objectTypeToString.at(leftObject->Type())
+			<< ' ' << * infixOperator << ' '
+			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evalBangOperatorExpression(object::Object* expression)
@@ -192,7 +217,9 @@ namespace evaluator
 		}
 		}
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'!" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
+		return createError(error.str());
 	}
 
 	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression)
@@ -213,7 +240,16 @@ namespace evaluator
 		}
 		}
 
-		return &object::NULL_OBJECT;
+		std::ostringstream error;
+		error << "'-" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	object::Error* createError(std::string errorMessage)
+	{
+		std::ostringstream error;
+		error << "Evaluation Error: " << errorMessage;
+		return new object::Error(error.str());
 	}
 
 }
