@@ -193,6 +193,7 @@ TEST(EvaluatorTest, Error)
 		{"!'a';", "'!character' is not supported."},
 		{"true + true;", "'boolean + boolean' is not supported."},
 		{"undefinedIdentifier;", "'undefinedIdentifier' is not defined."},
+		{"integer a = true;", "'a' is of type `boolean', not 'integer'."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

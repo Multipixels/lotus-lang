@@ -74,6 +74,15 @@ namespace evaluator
 				return object;
 			}
 
+			if (declareVariableStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			{
+				std::ostringstream error;
+				error << "'" << declareVariableStatement->m_name.m_name
+					<< "' is of type `" << (object::objectTypeToString.at(object->Type()))
+					<< "', not '" << declareVariableStatement->m_token.m_literal << "'.";
+				return createError(error.str());
+			}
+
 			environment->setIdentifier(&declareVariableStatement->m_name.m_name, object);
 
 			return &object::NULL_OBJECT;
