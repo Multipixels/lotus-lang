@@ -49,6 +49,11 @@ namespace evaluator
 			object::Object* rightObject = evaluate(infixExpression->m_right_expression);
 			return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
 		}
+		case ast::RETURN_STATEMENT_NODE:
+		{
+			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;
+			return new object::Return(evaluate(returnStatement->m_returnValue));
+		}
 		}
 
 		return &object::NULL_OBJECT;
@@ -61,6 +66,12 @@ namespace evaluator
 		for (int i = 0; i < program->m_statements.size(); i++)
 		{
 			result = evaluate(program->m_statements[i]);
+
+			if (result != NULL && result->Type() == object::RETURN)
+			{
+				object::Return* returnObj = (object::Return*)result;
+				return returnObj->m_return_value;
+			}
 		}
 
 		return result;

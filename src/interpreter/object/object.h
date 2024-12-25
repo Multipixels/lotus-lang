@@ -9,6 +9,7 @@ namespace object
 		BOOLEAN,
 		CHARACTER,
 		NULL_TYPE,
+		RETURN,
 	};
 
 	class Object
@@ -55,6 +56,7 @@ namespace object
 		Character(char value);
 		ObjectType Type();
 		std::string Inspect();
+
 		char m_value;
 	};
 
@@ -64,6 +66,16 @@ namespace object
 		Null();
 		ObjectType Type();
 		std::string Inspect();
+	};
+
+	class Return : public Object
+	{
+	public:
+		Return(Object* return_value);
+		ObjectType Type();
+		std::string Inspect();
+		
+		Object* m_return_value;
 	};
 
 	extern Null NULL_OBJECT;

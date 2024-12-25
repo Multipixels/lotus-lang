@@ -110,4 +110,19 @@ namespace object
 	{
 		return "null";
 	}
+
+	Return::Return(Object* return_value)
+		: m_return_value(return_value)
+	{
+	}
+
+	ObjectType Return::Type()
+	{
+		return RETURN;
+	}
+
+	std::string Return::Inspect()
+	{
+		return m_return_value->Inspect();
+	}
 }

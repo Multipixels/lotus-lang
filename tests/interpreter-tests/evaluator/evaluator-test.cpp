@@ -152,6 +152,31 @@ TEST(EvaluatorTest, CharacterExpression)
 	}
 }
 
+TEST(EvaluatorTest, ReturnStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		int expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"return 5;", 5},
+		{"return 5 + 10;", 15},
+		{"return 5 + 10; 9;", 15},
+		{"9; return 5 + 10; 9;", 15},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testIntegerObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
