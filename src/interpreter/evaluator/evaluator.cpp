@@ -87,6 +87,22 @@ namespace evaluator
 
 			return &object::NULL_OBJECT;
 		}
+		case ast::DECLARE_FUNCTION_STATEMENT_NODE:
+		{
+			ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)node;
+
+			if (object::nodeTypeToObjectType.count(declareFunctionStatement->m_token.m_type) == 0)
+			{
+				std::ostringstream error;
+				error << "'" << declareFunctionStatement->m_token.m_literal
+					<< "' is not a valid function type.";
+				return createError(error.str());
+			}
+
+			object::ObjectType functionType = object::nodeTypeToObjectType.at(declareFunctionStatement->m_token.m_type);
+			object::Function* result = new object::Function(functionType, declareFunctionStatement, environment);
+			return result;
+		}
 		case ast::RETURN_STATEMENT_NODE:
 		{
 			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;

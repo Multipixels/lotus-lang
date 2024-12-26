@@ -229,6 +229,25 @@ TEST(EvaluatorTest, Declaration)
 	}
 }
 
+TEST(EvaluatorTest, Function)
+{
+	std::string input = "integer(integer x) myFunction { return x + 2; }";
+	
+	object::Object* evaluated = testEvaluation(&input);
+	
+	ASSERT_EQ(evaluated->Type(), object::FUNCTION);
+	object::Function* function = (object::Function*)evaluated;
+
+	EXPECT_EQ(function->m_function_type, object::INTEGER);
+
+	EXPECT_EQ(function->m_parameters.size(), 1);
+	EXPECT_EQ(function->m_parameters[0]->m_token.m_literal, "integer");
+	EXPECT_EQ(function->m_parameters[0]->m_name.m_name, "x");
+
+	EXPECT_EQ(function->m_function_name->m_name, "myFunction");
+	EXPECT_EQ(function->m_body->String(), "return (x + 2);\n");
+}
+
 
 object::Object* testEvaluation(std::string* input)
 {
