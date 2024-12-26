@@ -1,13 +1,32 @@
 #include <string>
 #include <sstream>
 
+#include "ast.h"
 #include "object.h"
+#include "token.h"
 
 namespace object
 {
 	Null NULL_OBJECT;
 	Boolean TRUE_OBJECT(true);
 	Boolean FALSE_OBJECT(false);
+
+	Environment::Environment() {}
+
+	object::Object* Environment::getIdentifier(std::string* identifier)
+	{
+		if (m_store.count(*identifier) > 0)
+		{
+			return m_store.at(*identifier);
+		}
+
+		return NULL;
+	}
+
+	void Environment::setIdentifier(std::string* identifier, Object* value)
+	{
+		m_store[*identifier] = value;
+	}
 
 	Integer::Integer()
 		: m_value(0)
@@ -126,6 +145,37 @@ namespace object
 		return m_return_value->Inspect();
 	}
 
+	Function::Function(ObjectType functionType, ast::DeclareFunctionStatement* functionDeclaration, Environment* environment)
+		: m_function_type(functionType)
+		, m_function_name(&functionDeclaration->m_name)
+		, m_body(functionDeclaration->m_body->m_body)
+		, m_environment(environment)
+	{
+		m_parameters = functionDeclaration->m_parameters;
+	}
+
+	ObjectType Function::Type()
+	{
+		return FUNCTION;
+	}
+
+	std::string Function::Inspect()
+	{
+		std::ostringstream output;
+
+		output << objectTypeToString.at(m_function_type) << "(";
+
+		for (int i = 0; i < m_parameters.size(); i++)
+		{
+			output << m_parameters[i]->String();
+			if (i != m_parameters.size() - 1) output << ", ";
+		}
+
+		output << ")" << std::endl << "{" << std::endl << m_body->String() << std::endl << "}";
+
+		return output.str();
+	}
+
 	Error::Error(std::string error_message)
 		: m_error_message(error_message)
 	{
@@ -141,23 +191,6 @@ namespace object
 		std::ostringstream output;
 		output << "Evaluation Error: " << m_error_message;
 		return output.str();
-	}
-
-	Environment::Environment() {}
-
-	object::Object* Environment::getIdentifier(std::string * identifier)
-	{
-		if (m_store.count(*identifier) > 0)
-		{
-			return m_store.at(*identifier);
-		}
-
-		return NULL;
-	}
-
-	void Environment::setIdentifier(std::string* identifier, Object* value)
-	{
-		m_store[*identifier] = value;
 	}
 
 }

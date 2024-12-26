@@ -12,6 +12,7 @@ namespace object
 		CHARACTER,
 		NULL_TYPE,
 		RETURN,
+		FUNCTION,
 		ERROR,
 	};
 
@@ -23,7 +24,16 @@ namespace object
 		{CHARACTER, "character"},
 		{NULL_TYPE, "null"},
 		{RETURN, "RETURN"},
+		{FUNCTION, "FUNCTION"},
 		{ERROR, "ERROR"},
+	};
+
+	const std::map<token::TokenType, ObjectType> nodeTypeToObjectType =
+	{
+		{token::INTEGER_TYPE, INTEGER},
+		{token::FLOAT_TYPE, FLOAT},
+		{token::BOOLEAN_TYPE, BOOLEAN},
+		{token::CHARACTER_TYPE, CHARACTER},
 	};
 
 	class Object
@@ -31,6 +41,17 @@ namespace object
 	public:
 		virtual ObjectType Type() = 0;
 		virtual std::string Inspect() = 0;
+	};
+
+	class Environment
+	{
+	public:
+		Environment();
+
+		object::Object* getIdentifier(std::string* identifier);
+		void setIdentifier(std::string* identifier, Object* value);
+	private:
+		std::map<std::string, Object*> m_store;
 	};
 
 	class Integer : public Object
@@ -92,6 +113,20 @@ namespace object
 		Object* m_return_value;
 	};
 
+	class Function : public Object
+	{
+	public:
+		Function(ObjectType functionType, ast::DeclareFunctionStatement* functionDeclaration, Environment* environment);
+		ObjectType Type();
+		std::string Inspect();
+
+		ObjectType m_function_type;
+		ast::Identifier* m_function_name;
+		std::vector<ast::DeclareVariableStatement*> m_parameters;
+		ast::BlockStatement* m_body;
+		Environment* m_environment;
+	};
+
 	class Error : public Object
 	{
 	public:
@@ -105,15 +140,4 @@ namespace object
 	extern Null NULL_OBJECT;
 	extern Boolean TRUE_OBJECT;
 	extern Boolean FALSE_OBJECT;
-
-	class Environment
-	{
-	public:
-		Environment();
-
-		object::Object* getIdentifier(std::string* identifier);
-		void setIdentifier(std::string* identifier, Object* value);
-	private:
-		std::map<std::string, Object*> m_store;
-	};
 }
