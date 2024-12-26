@@ -47,11 +47,13 @@ namespace object
 	{
 	public:
 		Environment();
+		Environment(Environment* m_outer);
 
 		object::Object* getIdentifier(std::string* identifier);
 		void setIdentifier(std::string* identifier, Object* value);
 	private:
 		std::map<std::string, Object*> m_store;
+		Environment* m_outer;
 	};
 
 	class Integer : public Object

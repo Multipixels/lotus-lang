@@ -11,13 +11,21 @@ namespace object
 	Boolean TRUE_OBJECT(true);
 	Boolean FALSE_OBJECT(false);
 
-	Environment::Environment() {}
+	Environment::Environment()
+		: m_outer(NULL) {}
+	Environment::Environment(Environment* outer)
+		: m_outer(outer) {}
 
 	object::Object* Environment::getIdentifier(std::string* identifier)
 	{
 		if (m_store.count(*identifier) > 0)
 		{
 			return m_store.at(*identifier);
+		}
+
+		if (m_outer != NULL)
+		{
+			return m_outer->getIdentifier(identifier);
 		}
 
 		return NULL;

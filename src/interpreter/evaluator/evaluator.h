@@ -11,6 +11,12 @@ namespace evaluator
 	// Evaluates a program
 	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment);
 
+	// Evaluates a block statement
+	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment);
+
+	// Evaluates a list of expressions
+	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment);
+
 	// Evaluates a prefix expression
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject);
 	
@@ -31,6 +37,15 @@ namespace evaluator
 
 	// Applies negative operator (prefix)
 	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression);
+
+	// Applies a function call to a function
+	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments);
+
+	// Helper function to extend a function's environment
+	object::Environment* extendFunctionEnvironment(object::Function* function, std::vector<object::Object*>* arguments);
+
+	// Unwraps return value
+	object::Object* unwrapReturnValue(object::Object* object);
 
 	// Creates an error object with the provided error message
 	object::Error* createError(std::string errorMessage);

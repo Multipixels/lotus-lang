@@ -232,11 +232,20 @@ TEST(EvaluatorTest, Declaration)
 TEST(EvaluatorTest, Function)
 {
 	std::string input = "integer(integer x) myFunction { return x + 2; }";
-	
-	object::Object* evaluated = testEvaluation(&input);
-	
-	ASSERT_EQ(evaluated->Type(), object::FUNCTION);
-	object::Function* function = (object::Function*)evaluated;
+
+	lexer::Lexer lexer = lexer::Lexer(&input);
+	parser::Parser parser = parser::Parser(lexer);
+	ast::Program* program = parser.ParseProgram();
+	object::Environment environment = new object::Environment();
+
+	object::Object* object = evaluator::evaluate(program, &environment);
+	ASSERT_EQ(object->Type(), object::NULL_TYPE);
+
+	std::string functionName = "myFunction";
+	object::Object* functionObj = environment.getIdentifier(&functionName);
+	ASSERT_EQ(functionObj->Type(), object::FUNCTION);
+
+	object::Function* function = (object::Function*)functionObj;
 
 	EXPECT_EQ(function->m_function_type, object::INTEGER);
 
@@ -248,13 +257,36 @@ TEST(EvaluatorTest, Function)
 	EXPECT_EQ(function->m_body->String(), "return (x + 2);\n");
 }
 
+TEST(EvaluatorTest, FunctionCall)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer() integerFunction { 5; }; integerFunction();", 5},
+		{"integer() integerFunction { return 5; }; integerFunction();", 5},
+		{"integer(integer x) integerFunction { x; }; integerFunction(6);", 6},
+		{"integer(integer x) integerFunction { return x; }; integerFunction(6);", 6},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
 
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
 	parser::Parser parser = parser::Parser(lexer);
 	ast::Program* program = parser.ParseProgram();
-	object::Environment environment;
+	object::Environment environment = new object::Environment();
 
 	return evaluator::evaluate(program, &environment);
 }

@@ -25,6 +25,11 @@ namespace evaluator
 
 			return result;
 		}
+		case ast::BLOCK_STATEMENT_NODE:
+		{
+			ast::BlockStatement* blockStatement = (ast::BlockStatement*)node;
+			return evaluateBlockStatement(blockStatement, environment);
+		}
 		case ast::EXPRESSION_STATEMENT_NODE:
 			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
 		case ast::INTEGER_LITERAL_NODE:
@@ -64,6 +69,28 @@ namespace evaluator
 			object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
 			return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
 		}
+		case ast::CALL_EXPRESSION_NODE:
+		{
+			ast::CallExpression* callExpression = (ast::CallExpression*)node;
+			object::Object* object = evaluate(callExpression->m_function, environment);
+
+			if (object->Type() == object::ERROR)
+			{
+				return object;
+			}
+
+			object::Function* function = (object::Function*)object;
+
+			std::vector<object::Object*> evaluatedArguments;
+			evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
+
+			if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
+			{
+				return evaluatedArguments[0];
+			}
+
+			return applyFunction(function, &evaluatedArguments);
+		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
 			ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)node;
@@ -101,7 +128,10 @@ namespace evaluator
 
 			object::ObjectType functionType = object::nodeTypeToObjectType.at(declareFunctionStatement->m_token.m_type);
 			object::Function* result = new object::Function(functionType, declareFunctionStatement, environment);
-			return result;
+
+			environment->setIdentifier(&declareFunctionStatement->m_name.m_name, result);
+
+			return &object::NULL_OBJECT;
 		}
 		case ast::RETURN_STATEMENT_NODE:
 		{
@@ -136,6 +166,45 @@ namespace evaluator
 		return result;
 	}
 
+	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment)
+	{
+		object::Object* result = &object::NULL_OBJECT;
+
+		for (int i = 0; i < blockStatements->m_statements.size(); i++)
+		{
+			result = evaluate(blockStatements->m_statements[i], environment);
+
+			if (result != NULL && result->Type() == object::RETURN)
+			{
+				return result;
+			}
+
+			if (result != NULL && result->Type() == object::ERROR)
+			{
+				return result;
+			}
+		}
+
+		return result;
+	}
+
+
+	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment)
+	{
+		for (int i = 0; i < source->size(); i++)
+		{
+			object::Object* evaluatedExpression = evaluate((*source)[i], environment);
+
+			if (evaluatedExpression->Type() == object::ERROR)
+			{
+				(*destination).clear();
+				(*destination).push_back(evaluatedExpression);
+				return;
+			}
+			(*destination).push_back(evaluatedExpression);
+		}
+	}
+
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
@@ -153,7 +222,7 @@ namespace evaluator
 		{
 		case object::INTEGER:
 		{
-			if (rightObject->Type() == object::INTEGER) 
+			if (rightObject->Type() == object::INTEGER)
 				return evaluateIntegerInfixExpression(
 					(object::Integer*)leftObject, infixOperator, (object::Integer*)rightObject);
 			if (rightObject->Type() == object::FLOAT)
@@ -239,7 +308,7 @@ namespace evaluator
 
 		std::ostringstream error;
 		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << * infixOperator << ' '
+			<< ' ' << *infixOperator << ' '
 			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
@@ -295,6 +364,37 @@ namespace evaluator
 		error << "'-" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
+
+	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments)
+	{
+		object::Environment* extendedEnvironment = extendFunctionEnvironment(function, arguments);
+		object::Object* evaluated = evaluate(function->m_body, extendedEnvironment);
+		return unwrapReturnValue(evaluated);
+	}
+
+	object::Environment* extendFunctionEnvironment(object::Function* function, std::vector<object::Object*>* arguments)
+	{
+		object::Environment* newEnvironment = new object::Environment(function->m_environment);
+
+		for (int i = 0; i < arguments->size(); i++)
+		{
+			newEnvironment->setIdentifier(&function->m_parameters[i]->m_name.m_name, (*arguments)[i]);
+		}
+
+		return newEnvironment;
+	}
+
+	object::Object* unwrapReturnValue(object::Object* object)
+	{
+		if (object->Type() == object::RETURN)
+		{
+			object::Return* returnObject = (object::Return*)object;
+			return returnObject->m_return_value;
+		}
+
+		return object;
+	}
+
 
 	object::Error* createError(std::string errorMessage)
 	{
