@@ -113,6 +113,13 @@ namespace evaluator
 
 			object::Object* output = applyFunction(function, &evaluatedArguments);
 			
+			if (output->Type() == object::NULL_TYPE)
+			{
+				std::ostringstream error;
+				error << "'" << function->m_function_name->String() << "' has no return value.";
+				return createError(error.str());
+			}
+
 			if (output->Type() != function->m_function_type)
 			{
 				std::ostringstream error;
@@ -218,7 +225,7 @@ namespace evaluator
 			}
 		}
 
-		return result;
+		return &object::NULL_OBJECT;
 	}
 
 

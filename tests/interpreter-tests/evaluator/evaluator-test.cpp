@@ -197,6 +197,7 @@ TEST(EvaluatorTest, Error)
 		{"float(integer x) integerFunction { return x; }; integerFunction();", "'integerFunction' was supplied with 0 argument(s) instead of 1."},
 		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
 		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
+		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -270,9 +271,7 @@ TEST(EvaluatorTest, FunctionCall)
 
 	TestCase tests[] =
 	{
-		{"integer() integerFunction { 5; }; integerFunction();", 5},
 		{"integer() integerFunction { return 5; }; integerFunction();", 5},
-		{"integer(integer x) integerFunction { x; }; integerFunction(6);", 6},
 		{"integer(integer x) integerFunction { return x; }; integerFunction(6);", 6},
 	};
 
