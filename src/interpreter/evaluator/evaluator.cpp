@@ -82,14 +82,47 @@ namespace evaluator
 			object::Function* function = (object::Function*)object;
 
 			std::vector<object::Object*> evaluatedArguments;
+
+			if (callExpression->m_parameters.size() != function->m_parameters.size())
+			{
+				std::ostringstream error;
+				error << "'" << function->m_function_name->String() << "' was supplied with "
+					<< callExpression->m_parameters.size() << " argument(s) instead of "
+					<< function->m_parameters.size() << ".";
+				return createError(error.str());
+			}
+
 			evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
 
 			if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
 			{
 				return evaluatedArguments[0];
 			}
+			for (int i = 0; i < function->m_parameters.size(); i++)
+			{
+				if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
+				{
+					std::ostringstream error;
+					error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
+						<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
+						<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
+						<< function->m_function_name->String() << "'.";
+					return createError(error.str());
+				}
+			}
 
-			return applyFunction(function, &evaluatedArguments);
+			object::Object* output = applyFunction(function, &evaluatedArguments);
+			
+			if (output->Type() != function->m_function_type)
+			{
+				std::ostringstream error;
+				error << "'" << node->String() << "\' produced a value of type '"
+					<< object::objectTypeToString.at(output->Type()) << "' instead of type '"
+					<< object::objectTypeToString.at(function->m_function_type) << "'.";
+				return createError(error.str());
+			}
+
+			return output;
 		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
@@ -105,7 +138,7 @@ namespace evaluator
 			{
 				std::ostringstream error;
 				error << "'" << declareVariableStatement->m_name.m_name
-					<< "' is of type `" << (object::objectTypeToString.at(object->Type()))
+					<< "' is of type '" << (object::objectTypeToString.at(object->Type()))
 					<< "', not '" << declareVariableStatement->m_token.m_literal << "'.";
 				return createError(error.str());
 			}
