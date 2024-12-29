@@ -157,6 +157,8 @@ namespace parser
 				return parseFunctionDeclaration();
 			}
 			return parseVariableDeclaration();
+		case token::COLLECTION_TYPE:
+			return parseCollectionDeclaration();
 		case token::RETURN:
 			return parseReturnStatement();
 		case token::IF:
@@ -178,6 +180,56 @@ namespace parser
 	{
 		ast::DeclareVariableStatement* statement = new ast::DeclareVariableStatement;
 		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::IDENTIFIER))
+		{
+			return NULL;
+		}
+
+		statement->m_name.m_token = m_currentToken;
+		statement->m_name.m_name = m_currentToken.m_literal;
+
+		// Declaration without assignment
+		if (peekTokenIs(token::SEMICOLON))
+		{
+			nextToken();
+			return statement;
+		}
+
+		// Declaration with assignment
+		if (!expectPeek(token::ASSIGN))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_value = parseExpression(LOWEST);
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	};
+
+	ast::DeclareCollectionStatement* Parser::parseCollectionDeclaration()
+	{
+		ast::DeclareCollectionStatement* statement = new ast::DeclareCollectionStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LCHEVRON))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_typeToken = m_currentToken;
+
+		if (!expectPeek(token::RCHEVRON))
+		{
+			return NULL;
+		}
 
 		if (!expectPeek(token::IDENTIFIER))
 		{

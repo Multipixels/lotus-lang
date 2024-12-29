@@ -88,6 +88,7 @@ namespace parser
 
 		ast::Statement* parseStatement();
 		ast::DeclareVariableStatement* parseVariableDeclaration();
+		ast::DeclareCollectionStatement* parseCollectionDeclaration();
 		ast::DeclareFunctionStatement* parseFunctionDeclaration();
 		ast::ReturnStatement* parseReturnStatement();
 		ast::ExpressionStatement* parseExpressionStatement();

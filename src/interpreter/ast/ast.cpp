@@ -203,6 +203,27 @@ namespace ast
 		return output.str();
 	}
 
+	std::string DeclareCollectionStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string DeclareCollectionStatement::String()
+	{
+		std::ostringstream output;
+
+		output << TokenLiteral() << "<"
+			<< m_typeToken.m_literal << "> " << m_name.String();
+
+		if (m_value != NULL)
+		{
+			output << " = " << m_value->String();
+		}
+
+		output << ";";
+
+		return output.str();
+	}
+
 	std::string DeclareFunctionStatement::TokenLiteral()
 	{
 		return m_token.m_literal;

@@ -184,6 +184,8 @@ TEST(ParserTest, DeclaringCharacterStatement)
 }
 
 
+
+
 TEST(ParserTest, ReturnStatement)
 {
 	typedef struct TestCase
@@ -390,51 +392,6 @@ TEST(ParserTest, CharacterLiteralExpression)
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
 		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
-	}
-}
-
-
-// collection<integer> myCollection = [2, 1, 6, 3, 8];
-TEST(ParserTest, CollectionLiteralExpression)
-{
-	typedef struct TestCase
-	{
-		std::string input;
-		std::vector<std::any> values;
-	} TestCase;
-
-	TestCase tests[] =
-	{
-		{"[1, 2, 3, 4, 5];", {1, 2, 3, 4, 5}},
-		{"[1.0f, 2.0f, 3.0f, 4.0f, 5f];", {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
-		{"[true, false];", {true, false}},
-		{"['h', 'e', 'l', 'l', 'o'];", {'h', 'e', 'l', 'l', 'o'}},
-	};
-
-	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
-	{
-		lexer::Lexer lexer(&tests[i].input);
-		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
-		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
-
-		ast::Statement* statement = program->m_statements[0];
-		ASSERT_EQ(program->m_statements.size(), 1)
-			<< "Test #" << i << std::endl;
-
-		// Test to see if this is an expression statement
-		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
-
-		// Test to see if this is a collection literal expression
-		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::COLLECTION_LITERAL_NODE);
-		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expressionStatement->m_expression;
-
-		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].values.size());
-		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
-		{
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].values[j], i));
-		}
 	}
 }
 
@@ -1098,6 +1055,108 @@ TEST(ParserTest, CallExpression)
 }
 
 
+TEST(ParserTest, CollectionLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::vector<std::any> values;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"[1, 2, 3, 4, 5];", {1, 2, 3, 4, 5}},
+		{"[1.0f, 2.0f, 3.0f, 4.0f, 5f];", {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
+		{"[true, false];", {true, false}},
+		{"['h', 'e', 'l', 'l', 'o'];", {'h', 'e', 'l', 'l', 'o'}},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		// Test to see if this is a collection literal expression
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::COLLECTION_LITERAL_NODE);
+		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expressionStatement->m_expression;
+
+		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].values.size());
+		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
+		{
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].values[j], i));
+		}
+	}
+}
+
+
+TEST(ParserTest, DeclaringCollectionStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedIdentifier;
+		token::TokenType expectedType;
+		std::vector<std::any> expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"collection<integer> myCollection = [1, 2, 3, 4, 5];", "myCollection", token::INTEGER_TYPE, {1, 2, 3, 4, 5}},
+		{"collection<float> myCollection = [1.0f, 2.0f, 3.0f, 4.0f, 5f];", "myCollection", token::FLOAT_TYPE, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
+		{"collection<boolean> myCollection = [true, false];", "myCollection", token::BOOLEAN_TYPE, {true, false}},
+		{"collection<character> myCollection = ['h', 'e', 'l', 'l', 'o'];", "myCollection", token::CHARACTER_TYPE, {'h', 'e', 'l', 'l', 'o'}},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		// Test declaration identifier literal and name
+		ASSERT_EQ(statement->Type(), ast::DECLARE_COLLECTIION_STATEMENT_NODE)
+			<< "Test #" << i << std::endl;
+		ast::DeclareCollectionStatement* declareCollectionStatement = (ast::DeclareCollectionStatement*)statement;
+
+		ASSERT_EQ(declareCollectionStatement->m_token.m_type, token::COLLECTION_TYPE)
+			<< "Test #" << i << std::endl;
+		ASSERT_EQ(declareCollectionStatement->m_typeToken.m_type, tests[i].expectedType)
+			<< "Test #" << i << std::endl;
+
+		EXPECT_EQ(declareCollectionStatement->m_name.m_name, tests[i].expectedIdentifier)
+			<< "Test #" << i << std::endl;
+		EXPECT_EQ(declareCollectionStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+			<< "Test #" << i << std::endl;
+
+		// Test to see if we're holding a collection
+		ASSERT_EQ(declareCollectionStatement->m_value->Type(), ast::COLLECTION_LITERAL_NODE);
+		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)declareCollectionStatement->m_value;
+
+		// Test collection value
+		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].expectedValue.size());
+		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
+		{
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].expectedValue[j], i));
+		}
+	}
+}
+
+
 TEST(ParserTest, ExampleLotus)
 {
 	std::string input =
@@ -1120,13 +1179,14 @@ float someFloat = 1f;
 float anotherFloat = 2.5f;
 character theLetterA = 'a';
 
--- TODO
 -- Collections and dictionaries
--- collection<integer> myCollection = [2, 1, 6, 3, 8];
+collection<integer> myCollection = [2, 1, 6, 3, 8];
+
+-- TODO
 -- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
 -- myCollection[2];
 -- string myString = "hello";
--- collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
+collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 -- Functions
 integer(integer a, boolean b) myFunction
@@ -1185,6 +1245,8 @@ integer _someInteger = 1;
 float someFloat = 1;
 float anotherFloat = 2.5;
 character theLetterA = 'a';
+collection<integer> myCollection = [2, 1, 6, 3, 8];
+collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 integer(integer a, boolean b) myFunction
 {
 integer c = 23;

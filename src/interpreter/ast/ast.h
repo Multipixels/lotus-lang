@@ -27,6 +27,7 @@ namespace ast
 		CALL_EXPRESSION_NODE,
 
 		DECLARE_VARIABLE_STATEMENT_NODE,
+		DECLARE_COLLECTIION_STATEMENT_NODE,
 		DECLARE_FUNCTION_STATEMENT_NODE,
 		RETURN_STATEMENT_NODE,
 		EXPRESSION_STATEMENT_NODE,
@@ -244,6 +245,22 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = DECLARE_VARIABLE_STATEMENT_NODE;
+	};
+
+	class DeclareCollectionStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		token::Token m_typeToken;
+		Identifier m_name;
+		Expression* m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = DECLARE_COLLECTIION_STATEMENT_NODE;
+
 	};
 
 	class DeclareFunctionStatement : public Statement
