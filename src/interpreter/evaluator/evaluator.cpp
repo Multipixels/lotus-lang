@@ -30,8 +30,6 @@ namespace evaluator
 			ast::BlockStatement* blockStatement = (ast::BlockStatement*)node;
 			return evaluateBlockStatement(blockStatement, environment);
 		}
-		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
 		case ast::INTEGER_LITERAL_NODE:
 		{
 			object::Integer* object = new object::Integer;
@@ -65,9 +63,41 @@ namespace evaluator
 		case ast::INFIX_EXPRESSION_NODE:
 		{
 			ast::InfixExpression* infixExpression = (ast::InfixExpression*)node;
-			object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
-			object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
-			return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
+
+			if (infixExpression->m_left_expression->Type() == ast::IDENTIFIER_NODE)
+			{
+				ast::Identifier* identifier = (ast::Identifier*)(infixExpression->m_left_expression);
+				object::Object* savedValue = environment->getIdentifier(&identifier->m_name);
+				if (savedValue == NULL)
+				{
+					std::ostringstream error;
+					error << "'" << identifier->m_name << "' is not defined.";
+					return createError(error.str());
+				}
+
+				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
+
+				if (rightObject->Type() == object::ERROR) return rightObject;
+
+				if (savedValue->Type() != rightObject->Type())
+				{
+					std::ostringstream error;
+					error << "Cannot assign '" << identifier->m_name << "' of type '"
+						<< object::objectTypeToString.at(savedValue->Type()) << "' a value of type '"
+						<< object::objectTypeToString.at(rightObject->Type()) << "'.";
+					return createError(error.str());
+				}
+
+				environment->reassignIdentifier(&identifier->m_name, rightObject);
+
+				return &object::NULL_OBJECT;
+			}
+			else
+			{
+				object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
+				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
+				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
+			}
 		}
 		case ast::CALL_EXPRESSION_NODE:
 		{
@@ -178,6 +208,40 @@ namespace evaluator
 			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;
 			return new object::Return(evaluate(returnStatement->m_returnValue, environment));
 		}
+		case ast::IF_STATEMENT_NODE:
+		{
+			ast::IfStatement* ifStatement = (ast::IfStatement*)node;
+
+			// Treat as else caluse
+			if (ifStatement->m_condition == NULL)
+			{
+				object::Environment* ifEnvironment = new object::Environment(environment);
+				return evaluate(ifStatement->m_consequence, ifEnvironment);
+			}
+
+			object::Object* evaluatedCondition = evaluate(ifStatement->m_condition, environment);
+
+			if (evaluatedCondition->Type() == object::ERROR)
+			{
+				return evaluatedCondition;
+			}
+
+			object::Object* truthy = isTruthy(evaluatedCondition);
+
+			if (truthy->Type() == object::ERROR)
+			{
+				return truthy;
+			}
+
+			object::Boolean* truthyBoolean = (object::Boolean*)truthy;
+			object::Environment* ifEnvironment = new object::Environment(environment);
+
+			if (truthyBoolean->m_value) return evaluate(ifStatement->m_consequence, ifEnvironment);
+			else if (ifStatement->m_alternative != NULL) return evaluate(ifStatement->m_alternative, ifEnvironment);
+			else return &object::NULL_OBJECT;
+		}
+		case ast::EXPRESSION_STATEMENT_NODE:
+			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
 		}
 
 		return NULL;
@@ -433,6 +497,37 @@ namespace evaluator
 		}
 
 		return object;
+	}
+
+	object::Object* isTruthy(object::Object* object)
+	{
+		switch (object->Type())
+		{
+		case object::BOOLEAN:
+		{
+			object::Boolean* boolean = (object::Boolean*)object;
+			if (boolean->m_value) return &object::TRUE_OBJECT;
+			else return &object::FALSE_OBJECT;
+		}
+		case object::INTEGER:
+		{
+			object::Integer* integer = (object::Integer*)object;
+			if (integer->m_value != 0) return &object::TRUE_OBJECT;
+			else return &object::FALSE_OBJECT;
+		}
+		case object::FLOAT:
+		{
+			object::Float* floatValue = (object::Float*)object;
+			if (floatValue->m_value != 0) return &object::TRUE_OBJECT;
+			else return &object::FALSE_OBJECT;
+		}
+		default:
+		{
+			std::ostringstream error;
+			error << "'" << object->Inspect() << "' is not a valid truthy value.";
+			return createError(error.str());
+		}
+		}
 	}
 
 

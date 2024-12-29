@@ -198,6 +198,8 @@ TEST(EvaluatorTest, Error)
 		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
 		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
 		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
+		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
+		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -282,6 +284,56 @@ TEST(EvaluatorTest, FunctionCall)
 	}
 }
 
+TEST(EvaluatorTest, Reassignment)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInt = 5; myInt = 6; myInt;", 6},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
+TEST(EvaluatorTest, IfStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInt = 5; if (true) { myInt = 6; } myInt;", 6},
+		{"integer myInt = 5; if (false) { myInt = 6; } myInt;", 5},
+		{"integer myInt = 5; if (true) { myInt = 6; } else { myInt = 7; } myInt;", 6},
+		{"integer myInt = 5; if (false) { myInt = 6; } else { myInt = 7; } myInt;", 7},
+		{"integer myInt = 5; if (true) { myInt = 6; } else if(true) { myInt = 7; } else { myInt = 8; } myInt;", 6},
+		{"integer myInt = 5; if (false) { myInt = 6; } else if(true) { myInt = 7; } else { myInt = 8; } myInt;", 7},
+		{"integer myInt = 5; if (false) { myInt = 6; } else if(false) { myInt = 7; } else { myInt = 8; } myInt;", 8},
+		{"integer myInt = 5; if (false) { myInt = 6; } else if(false) { myInt = 7; } myInt;", 5},
+		{"integer myInt = 5; if (0) { myInt = 6; } myInt;", 5},
+		{"integer myInt = 5; if (1) { myInt = 6; } myInt;", 6},
+		{"integer myInt = 5; if (0.0f) { myInt = 6; } myInt;", 5},
+		{"integer myInt = 5; if (-1.2f) { myInt = 6; } myInt;", 6},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
 
 object::Object* testEvaluation(std::string* input)
 {

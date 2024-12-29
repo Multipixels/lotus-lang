@@ -50,7 +50,12 @@ namespace object
 		Environment(Environment* m_outer);
 
 		object::Object* getIdentifier(std::string* identifier);
+
+		// Assigns value to identifier in this level of environment.
 		void setIdentifier(std::string* identifier, Object* value);
+
+		// Checks outer level for identifier for assignment.
+		void reassignIdentifier(std::string* identifier, Object* value);
 	private:
 		std::map<std::string, Object*> m_store;
 		Environment* m_outer;

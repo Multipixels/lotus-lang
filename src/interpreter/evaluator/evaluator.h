@@ -47,6 +47,9 @@ namespace evaluator
 	// Unwraps return value
 	object::Object* unwrapReturnValue(object::Object* object);
 
+	// Checks value of a truthy object
+	object::Object* isTruthy(object::Object* object);
+
 	// Creates an error object with the provided error message
 	object::Error* createError(std::string errorMessage);
 }

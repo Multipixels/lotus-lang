@@ -36,6 +36,21 @@ namespace object
 		m_store[*identifier] = value;
 	}
 
+	void Environment::reassignIdentifier(std::string* identifier, Object* value)
+	{
+		if (m_store.count(*identifier) > 0)
+		{
+			m_store[*identifier] = value;
+		}
+		else
+		{
+			if(m_outer != NULL)
+			{
+				m_outer->reassignIdentifier(identifier, value);
+			}
+		}
+	}
+
 	Integer::Integer()
 		: m_value(0)
 	{
