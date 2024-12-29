@@ -31,6 +31,16 @@ namespace object
 		return NULL;
 	}
 
+	object::Object* Environment::getLocalIdentifier(std::string* identifier)
+	{
+		if (m_store.count(*identifier) > 0)
+		{
+			return m_store.at(*identifier);
+		}
+
+		return NULL;
+	}
+
 	void Environment::setIdentifier(std::string* identifier, Object* value)
 	{
 		m_store[*identifier] = value;

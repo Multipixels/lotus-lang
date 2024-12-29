@@ -200,6 +200,7 @@ TEST(EvaluatorTest, Error)
 		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
 		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
 		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
+		{"integer myInt = 5; integer myInt = 6;", "Redefinition of 'myInt'."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -296,9 +297,9 @@ TEST(EvaluatorTest, Reassignment)
 	{
 		{"integer myInt = 5; myInt = 6; myInt;", 6},
 		{"integer myInt = 5; if (true) { myInt = 6; } myInt;", 6},
-		{"integer myInt = 5; if (true) { integer myInt = 5; myInt = 6; } myInt;", 5},
+		{"integer myInt = 5; if (true) { integer myInt = 6; myInt = 7; } myInt;", 5},
 		{"integer myInt = 5; integer() integerFunction { myInt = 6; return 5; }; integerFunction(); myInt;", 6},
-		{"integer myInt = 5; integer() integerFunction { integer myInt = 5; myInt = 6; return 5; }; integerFunction(); myInt;", 5},
+		{"integer myInt = 5; integer() integerFunction { integer myInt = 6; myInt = 7; return 5; }; integerFunction(); myInt;", 5},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

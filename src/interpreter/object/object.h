@@ -49,7 +49,11 @@ namespace object
 		Environment();
 		Environment(Environment* m_outer);
 
+		// Gets value of identifier, looking through outer layers as welll.
 		object::Object* getIdentifier(std::string* identifier);
+
+		// Gets value of identifier only in the current level of environment.
+		object::Object* getLocalIdentifier(std::string* identifier);
 
 		// Assigns value to identifier in this level of environment.
 		void setIdentifier(std::string* identifier, Object* value);

@@ -164,6 +164,14 @@ namespace evaluator
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
 			ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)node;
+
+			if (environment->getLocalIdentifier(&declareVariableStatement->m_name.m_name) != NULL)
+			{
+				std::ostringstream error;
+				error << "Redefinition of '" << declareVariableStatement->m_name.m_name << "'.";
+				return createError(error.str());
+			}
+
 			object::Object* object = evaluate(declareVariableStatement->m_value, environment);
 
 			if (object->Type() == object::ERROR)
