@@ -57,7 +57,17 @@ namespace repl
 			ast::Program* program = parser.ParseProgram();
 			object::Environment environment;
 
-			std::cout << evaluator::evaluate(program, &environment)->Inspect() << std::endl;
+			for (int i = 0; i < parser.m_errors.size(); i++)
+			{
+				std::cout << "Parser error: " << parser.m_errors[i] << std::endl;
+			}
+			if (parser.m_errors.size() > 0);
+
+			object::Object* output = evaluator::evaluate(program, &environment);
+			if (output->Type() != object::NULL_TYPE)
+			{
+				std::cout << output->Inspect() << std::endl;
+			}
 			file.close();
 		}
 		else
