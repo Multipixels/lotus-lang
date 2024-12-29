@@ -183,8 +183,8 @@ namespace evaluator
 			{
 				std::ostringstream error;
 				error << "'" << declareVariableStatement->m_name.m_name
-					<< "' is of type '" << (object::objectTypeToString.at(object->Type()))
-					<< "', not '" << declareVariableStatement->m_token.m_literal << "'.";
+					<< "' is defined as type '" << declareVariableStatement->m_token.m_literal
+					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
 				return createError(error.str());
 			}
 

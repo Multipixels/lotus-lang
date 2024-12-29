@@ -193,7 +193,7 @@ TEST(EvaluatorTest, Error)
 		{"!'a';", "'!character' is not supported."},
 		{"true + true;", "'boolean + boolean' is not supported."},
 		{"undefinedIdentifier;", "'undefinedIdentifier' is not defined."},
-		{"integer a = true;", "'a' is of type 'boolean', not 'integer'."},
+		{"integer a = true;", "'a' is defined as type 'integer', not 'boolean'."},
 		{"float(integer x) integerFunction { return x; }; integerFunction();", "'integerFunction' was supplied with 0 argument(s) instead of 1."},
 		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
 		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
