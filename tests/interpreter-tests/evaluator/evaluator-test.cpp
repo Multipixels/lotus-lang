@@ -216,6 +216,7 @@ TEST(EvaluatorTest, Declaration)
 		{"float b = 4.5f; b;", 4.5f},
 		{"boolean c = false; c;", false},
 		{"character d = 'e'; d;", 'e'},
+		{"collection<integer> e = [6, 4]; e;", new std::vector<std::any>({6, 4}) },
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -424,7 +425,9 @@ TEST(EvaluatorTest, Error)
 		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
 		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
 		{"integer myInt = 5; integer myInt = 6;", "Redefinition of 'myInt'."},
-		{"[2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."}
+		{"[2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."},
+		{"collection<integer> myCollection = [2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."},
+		{"collection<integer> myCollection = ['a'];", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -466,6 +469,9 @@ void testLiteralObject(object::Object* object, std::any expectedValue)
 		return;
 	case object::CHARACTER:
 		EXPECT_NO_FATAL_FAILURE(testCharacterObject(object, std::any_cast<char>(expectedValue)));
+		return;
+	case object::COLLECTION:
+		EXPECT_NO_FATAL_FAILURE(testCollectionObject(object, std::any_cast<std::vector<std::any>*>(expectedValue), object::INTEGER));
 		return;
 	}
 

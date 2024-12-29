@@ -1131,7 +1131,7 @@ TEST(ParserTest, DeclaringCollectionStatement)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
-		ASSERT_EQ(statement->Type(), ast::DECLARE_COLLECTIION_STATEMENT_NODE)
+		ASSERT_EQ(statement->Type(), ast::DECLARE_COLLECTION_STATEMENT_NODE)
 			<< "Test #" << i << std::endl;
 		ast::DeclareCollectionStatement* declareCollectionStatement = (ast::DeclareCollectionStatement*)statement;
 

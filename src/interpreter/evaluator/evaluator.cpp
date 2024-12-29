@@ -229,6 +229,48 @@ namespace evaluator
 
 			return &object::NULL_OBJECT;
 		}
+		case ast::DECLARE_COLLECTION_STATEMENT_NODE:
+		{
+			ast::DeclareCollectionStatement* declareCollectionStatement = (ast::DeclareCollectionStatement*)node;
+
+			if (environment->getLocalIdentifier(&declareCollectionStatement->m_name.m_name) != NULL)
+			{
+				std::ostringstream error;
+				error << "Redefinition of '" << declareCollectionStatement->m_name.m_name << "'.";
+				return createError(error.str());
+			}
+
+			object::Object* object = evaluate(declareCollectionStatement->m_value, environment);
+
+			if (object->Type() == object::ERROR)
+			{
+				return object;
+			}
+
+			if (declareCollectionStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			{
+				std::ostringstream error;
+				error << "'" << declareCollectionStatement->m_name.m_name
+					<< "' is defined as type '" << declareCollectionStatement->m_token.m_literal
+					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
+				return createError(error.str());
+			}
+
+			object::Collection* collection = (object::Collection*)object;
+
+			if (collection->m_collection_type != object::NULL_TYPE && declareCollectionStatement->m_typeToken.m_literal != object::objectTypeToString.at(collection->m_collection_type))
+			{
+				std::ostringstream error;
+				error << "'" << declareCollectionStatement->m_name.m_name
+					<< "' is a collection of '" << declareCollectionStatement->m_typeToken.m_literal 
+					<< "'s, but got a collection of type '" << object::objectTypeToString.at(collection->m_collection_type) << "'s.";
+				return createError(error.str());
+			}
+
+			environment->setIdentifier(&declareCollectionStatement->m_name.m_name, object);
+
+			return &object::NULL_OBJECT;
+		}
 		case ast::DECLARE_FUNCTION_STATEMENT_NODE:
 		{
 			ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)node;
