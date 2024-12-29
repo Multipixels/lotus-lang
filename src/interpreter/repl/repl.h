@@ -2,5 +2,9 @@
 
 namespace repl 
 {
+	// Starts an interactive terminal.
 	int Start();
+
+	// Runs a file.
+	int Run(const char* fileName);
 }
