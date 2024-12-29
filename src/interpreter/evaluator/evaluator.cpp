@@ -64,7 +64,7 @@ namespace evaluator
 		{
 			ast::InfixExpression* infixExpression = (ast::InfixExpression*)node;
 
-			if (infixExpression->m_left_expression->Type() == ast::IDENTIFIER_NODE)
+			if (infixExpression->m_left_expression->Type() == ast::IDENTIFIER_NODE && infixExpression->m_operator == "=")
 			{
 				ast::Identifier* identifier = (ast::Identifier*)(infixExpression->m_left_expression);
 				object::Object* savedValue = environment->getIdentifier(&identifier->m_name);
@@ -216,6 +216,8 @@ namespace evaluator
 			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;
 			return new object::Return(evaluate(returnStatement->m_returnValue, environment));
 		}
+		case ast::EXPRESSION_STATEMENT_NODE:
+			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
 		case ast::IF_STATEMENT_NODE:
 		{
 			ast::IfStatement* ifStatement = (ast::IfStatement*)node;
@@ -248,8 +250,62 @@ namespace evaluator
 			else if (ifStatement->m_alternative != NULL) return evaluate(ifStatement->m_alternative, ifEnvironment);
 			else return &object::NULL_OBJECT;
 		}
-		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
+		case ast::WHILE_STATEMENT_NODE:
+		{
+			ast::WhileStatement* whileStatement = (ast::WhileStatement*)node;
+			object::Environment* whileEnvironment = new object::Environment(environment);
+
+			while (true)
+			{
+				object::Object* evaluatedCondition = evaluate(whileStatement->m_condition, environment);
+				if (evaluatedCondition->Type() == object::ERROR)
+				{
+					return evaluatedCondition;
+				}
+
+				object::Object* truthy = isTruthy(evaluatedCondition);
+				if (truthy->Type() == object::ERROR)
+				{
+					return truthy;
+				}
+
+				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
+				
+				if (truthyBoolean->m_value) evaluate(whileStatement->m_consequence, whileEnvironment);
+				else break;
+			}
+			
+			return &object::NULL_OBJECT;
+		}
+		case ast::DO_WHILE_STATEMENT_NODE:
+		{
+			ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)node;
+			object::Environment* doWhileEnvironment = new object::Environment(environment);
+
+			evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+			while (true)
+			{
+				object::Object* evaluatedCondition = evaluate(doWhileStatement->m_condition, environment);
+				if (evaluatedCondition->Type() == object::ERROR)
+				{
+					return evaluatedCondition;
+				}
+
+				object::Object* truthy = isTruthy(evaluatedCondition);
+				if (truthy->Type() == object::ERROR)
+				{
+					return truthy;
+				}
+
+				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
+
+				if (truthyBoolean->m_value) evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+				else break;
+			}
+
+			return &object::NULL_OBJECT;
+
+		}
 		}
 
 		return NULL;

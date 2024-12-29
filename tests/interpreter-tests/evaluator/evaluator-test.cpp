@@ -340,6 +340,52 @@ TEST(EvaluatorTest, IfStatement)
 	}
 }
 
+TEST(EvaluatorTest, WhileLoop)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer i = 0; integer myInt = 5; while(false) { myInt = myInt + 1; } myInt;", 5},
+		{"integer i = 0; integer myInt = 5; while( myInt < 10 ) { myInt = myInt + 1; } myInt;", 10},
+		{"integer i = 0; integer myInt = 5; while( i < 5 ) { i = i + 1; myInt = myInt + 1; } myInt;", 10},
+		{"integer i = 0; integer myInt = 5; while( i > 5 ) { i = i + 1; myInt = myInt + 1; } myInt;", 5},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
+TEST(EvaluatorTest, DoWhileLoop)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer i = 0; integer myInt = 5; do { myInt = myInt + 1; } while(false); myInt;", 6},
+		{"integer i = 0; integer myInt = 5; do { myInt = myInt + 1; } while( myInt < 10 ); myInt;", 10},
+		{"integer i = 0; integer myInt = 5; do { i = i + 1; myInt = myInt + 1; } while( i < 5 ); myInt;", 10},
+		{"integer i = 0; integer myInt = 5; do { i = i + 1; myInt = myInt + 1; } while( i > 5 ); myInt;", 6},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
