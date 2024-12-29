@@ -26,7 +26,17 @@ namespace repl
 			parser::Parser parser = parser::Parser(lexer);
 			ast::Program* program = parser.ParseProgram();
 
-			std::cout << evaluator::evaluate(program, &environment)->Inspect() << std::endl;
+			for(int i = 0; i < parser.m_errors.size(); i++)
+			{
+				std::cout << "Parser error: " << parser.m_errors[i] << std::endl;
+			}
+			if (parser.m_errors.size() > 0) continue;
+
+			object::Object* output = evaluator::evaluate(program, &environment);
+			if (output->Type() != object::NULL_TYPE)
+			{
+				std::cout << output->Inspect() << std::endl;
+			}
 		}
 
 		return 0;
