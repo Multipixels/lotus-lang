@@ -152,6 +152,32 @@ TEST(EvaluatorTest, CharacterExpression)
 	}
 }
 
+TEST(EvaluatorTest, CollectionExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::vector<std::any> expectedValue;
+		object::ObjectType objectType;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"[];", {}, object::NULL_TYPE},
+		{"[1, 2, 3, 4, 5];", {1, 2, 3, 4, 5}, object::INTEGER},
+		{"[1.0f, 2.0f, 3.0f, 4.0f, 5f];", {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}, object::FLOAT},
+		{"[true, false];", {true, false}, object::BOOLEAN},
+		{"['h', 'e', 'l', 'l', 'o'];", {'h', 'e', 'l', 'l', 'o'}, object::CHARACTER},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testCollectionObject(evaluated, &tests[i].expectedValue, tests[i].objectType));
+	}
+}
+
 TEST(EvaluatorTest, ReturnStatement)
 {
 	typedef struct TestCase
@@ -173,42 +199,6 @@ TEST(EvaluatorTest, ReturnStatement)
 		object::Object* evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testIntegerObject(evaluated, tests[i].expectedValue));
-	}
-}
-
-TEST(EvaluatorTest, Error)
-{
-	typedef struct TestCase
-	{
-		std::string input;
-		std::string expectedError;
-	} TestCase;
-
-	TestCase tests[] =
-	{
-		{"5 + true;", "'integer + boolean' is not supported."},
-		{"5 + true; 5;", "'integer + boolean' is not supported."},
-		{"5; 5 + true; 5;", "'integer + boolean' is not supported."},
-		{"-true;", "'-boolean' is not supported."},
-		{"!'a';", "'!character' is not supported."},
-		{"true + true;", "'boolean + boolean' is not supported."},
-		{"undefinedIdentifier;", "'undefinedIdentifier' is not defined."},
-		{"integer a = true;", "'a' is defined as type 'integer', not 'boolean'."},
-		{"float(integer x) integerFunction { return x; }; integerFunction();", "'integerFunction' was supplied with 0 argument(s) instead of 1."},
-		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
-		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
-		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
-		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
-		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
-		{"integer myInt = 5; integer myInt = 6;", "Redefinition of 'myInt'."},
-	};
-
-	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
-	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
-
-		ASSERT_EQ(evaluated->Type(), object::ERROR);
-		EXPECT_EQ(((object::Error*)evaluated)->m_error_message, tests[i].expectedError);
 	}
 }
 
@@ -409,6 +399,43 @@ TEST(EvaluatorTest, ForLoop)
 	}
 }
 
+TEST(EvaluatorTest, Error)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedError;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5 + true;", "'integer + boolean' is not supported."},
+		{"5 + true; 5;", "'integer + boolean' is not supported."},
+		{"5; 5 + true; 5;", "'integer + boolean' is not supported."},
+		{"-true;", "'-boolean' is not supported."},
+		{"!'a';", "'!character' is not supported."},
+		{"true + true;", "'boolean + boolean' is not supported."},
+		{"undefinedIdentifier;", "'undefinedIdentifier' is not defined."},
+		{"integer a = true;", "'a' is defined as type 'integer', not 'boolean'."},
+		{"float(integer x) integerFunction { return x; }; integerFunction();", "'integerFunction' was supplied with 0 argument(s) instead of 1."},
+		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
+		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
+		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
+		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
+		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
+		{"integer myInt = 5; integer myInt = 6;", "Redefinition of 'myInt'."},
+		{"[2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."}
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		ASSERT_EQ(evaluated->Type(), object::ERROR);
+		EXPECT_EQ(((object::Error*)evaluated)->m_error_message, tests[i].expectedError);
+	}
+}
+
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
@@ -475,4 +502,18 @@ void testCharacterObject(object::Object* object, char expectedValue)
 	object::Character* character = (object::Character*)object;
 
 	EXPECT_EQ(character->m_value, expectedValue);
+}
+
+void testCollectionObject(object::Object* object, std::vector<std::any>* expectedValue, object::ObjectType expectedType)
+{
+	ASSERT_EQ(object->Type(), object::COLLECTION);
+	object::Collection* collection = (object::Collection*)object;
+
+	ASSERT_EQ(collection->m_collection_type, expectedType);
+
+	for (int i = 0; i < collection->m_values.size(); i++)
+	{
+		ASSERT_EQ(collection->m_values[i]->Type(), expectedType);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(collection->m_values[i], (*expectedValue)[i]));
+	}
 }

@@ -151,6 +151,36 @@ namespace object
 		return output.str();
 	}
 
+	Collection::Collection()
+		: m_collection_type(NULL_TYPE)
+	{
+	}
+
+	Collection::Collection(ObjectType collection_type, std::vector<Object*> value)
+		: m_collection_type(collection_type), m_values(value)
+	{
+	}
+
+	ObjectType Collection::Type()
+	{
+		return COLLECTION;
+	}
+
+	std::string Collection::Inspect()
+	{
+		std::ostringstream output;
+		output << "[";
+
+		for (int i = 0; i < m_values.size(); i++)
+		{
+			output << m_values[i]->Inspect();
+			if (i != m_values.size() - 1) output << ", ";
+		}
+		output << "]";
+
+		return output.str();
+	}
+
 	Null::Null() {};
 
 	ObjectType Null::Type()

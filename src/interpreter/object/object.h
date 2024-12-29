@@ -10,6 +10,7 @@ namespace object
 		FLOAT,
 		BOOLEAN,
 		CHARACTER,
+		COLLECTION,
 		NULL_TYPE,
 		RETURN,
 		FUNCTION,
@@ -22,6 +23,7 @@ namespace object
 		{FLOAT, "float"},
 		{BOOLEAN, "boolean"},
 		{CHARACTER, "character"},
+		{COLLECTION, "collection"},
 		{NULL_TYPE, "null"},
 		{RETURN, "RETURN"},
 		{FUNCTION, "FUNCTION"},
@@ -34,6 +36,7 @@ namespace object
 		{token::FLOAT_TYPE, FLOAT},
 		{token::BOOLEAN_TYPE, BOOLEAN},
 		{token::CHARACTER_TYPE, CHARACTER},
+		{token::COLLECTION_TYPE, COLLECTION},
 	};
 
 	class Object
@@ -104,6 +107,18 @@ namespace object
 		std::string Inspect();
 
 		char m_value;
+	};
+
+	class Collection : public Object
+	{
+	public:
+		Collection();
+		Collection(ObjectType collection_type, std::vector<Object*> value);
+		ObjectType Type();
+		std::string Inspect();
+
+		ObjectType m_collection_type;
+		std::vector<Object*> m_values;
 	};
 
 	class Null : public Object

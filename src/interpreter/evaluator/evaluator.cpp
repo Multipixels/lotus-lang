@@ -54,6 +54,36 @@ namespace evaluator
 			object->m_value = ((ast::CharacterLiteral*)node)->m_value;
 			return object;
 		}
+		case ast::COLLECTION_LITERAL_NODE:
+		{
+			ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)node;
+
+			if (collectionLiteral->m_values.size() == 0)
+			{
+				return new object::Collection(object::NULL_TYPE, {});
+			}
+
+			object::Collection* object = new object::Collection;
+			
+			for (int i = 0; i < collectionLiteral->m_values.size(); i++)
+			{
+				object::Object* evaluatedItem = evaluate(collectionLiteral->m_values[i], environment);
+
+				if (evaluatedItem->Type() == object::ERROR) return evaluatedItem;
+
+				if (object->m_collection_type != object::NULL_TYPE && evaluatedItem->Type() != object->m_collection_type)
+				{
+					std::ostringstream error;
+					error << "The collection " << node->String() << " must have uniform typing of elements.";
+					return createError(error.str());
+				}
+
+				if (object->m_collection_type == object::NULL_TYPE) object->m_collection_type = evaluatedItem->Type();
+				object->m_values.push_back(evaluatedItem);
+			}
+			
+			return object;
+		}
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;

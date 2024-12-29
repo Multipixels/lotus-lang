@@ -21,3 +21,6 @@ void testBooleanObject(object::Object* object, bool expectedValue);
 
 // Tests object to see if they are character with expected value
 void testCharacterObject(object::Object* object, char expectedValue);
+
+// Tests collection object to see if they match expected values
+void testCollectionObject(object::Object* object, std::vector<std::any>* expectedValue, object::ObjectType expectedType);

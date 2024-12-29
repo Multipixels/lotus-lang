@@ -1065,6 +1065,7 @@ TEST(ParserTest, CollectionLiteralExpression)
 
 	TestCase tests[] =
 	{
+		{"[];", {}},
 		{"[1, 2, 3, 4, 5];", {1, 2, 3, 4, 5}},
 		{"[1.0f, 2.0f, 3.0f, 4.0f, 5f];", {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
 		{"[true, false];", {true, false}},
@@ -1111,6 +1112,7 @@ TEST(ParserTest, DeclaringCollectionStatement)
 
 	TestCase tests[] =
 	{
+		{"collection<integer> myCollection = [];", "myCollection", token::INTEGER_TYPE, {}},
 		{"collection<integer> myCollection = [1, 2, 3, 4, 5];", "myCollection", token::INTEGER_TYPE, {1, 2, 3, 4, 5}},
 		{"collection<float> myCollection = [1.0f, 2.0f, 3.0f, 4.0f, 5f];", "myCollection", token::FLOAT_TYPE, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
 		{"collection<boolean> myCollection = [true, false];", "myCollection", token::BOOLEAN_TYPE, {true, false}},
