@@ -91,6 +91,29 @@ namespace ast
 		return charToString;
 	}
 
+	std::string CollectionLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
+	std::string CollectionLiteral::String()
+	{
+		std::ostringstream outputString;
+
+		outputString << "[";
+
+		for (int i = 0; i < m_values.size(); i++)
+		{
+			outputString << m_values[i]->String();
+
+			if (i != m_values.size() - 1) outputString << ", ";
+		}
+		
+		outputString << "]";
+
+		return outputString.str();
+	}
+
 	std::string FunctionLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

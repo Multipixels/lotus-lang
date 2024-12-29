@@ -109,6 +109,7 @@ namespace parser
 		ast::Expression* parseFloatLiteral();
 		ast::Expression* parseBooleanLiteral();
 		ast::Expression* parseCharacterLiteral();
+		ast::Expression* parseCollectionLiteral();
 		ast::Expression* parseIdentifier();
 		ast::Expression* parseCallExpression(ast::Expression* leftExpression);
 
@@ -122,6 +123,7 @@ namespace parser
 	
 		void parseParameters(std::vector<ast::DeclareVariableStatement*> *parameters);
 
-		void parseCallParameters(std::vector<ast::Expression*>* parameters);
+		// Parses a list of literals, with given separator token and end token.
+		void parseLiterals(std::vector<ast::Expression*>* destination, token::TokenType separator, token::TokenType ender);
 	};
 }

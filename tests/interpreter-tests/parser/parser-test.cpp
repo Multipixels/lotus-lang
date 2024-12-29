@@ -394,6 +394,51 @@ TEST(ParserTest, CharacterLiteralExpression)
 }
 
 
+// collection<integer> myCollection = [2, 1, 6, 3, 8];
+TEST(ParserTest, CollectionLiteralExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::vector<std::any> values;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"[1, 2, 3, 4, 5];", {1, 2, 3, 4, 5}},
+		{"[1.0f, 2.0f, 3.0f, 4.0f, 5f];", {1.0f, 2.0f, 3.0f, 4.0f, 5.0f}},
+		{"[true, false];", {true, false}},
+		{"['h', 'e', 'l', 'l', 'o'];", {'h', 'e', 'l', 'l', 'o'}},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		// Test to see if this is a collection literal expression
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::COLLECTION_LITERAL_NODE);
+		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expressionStatement->m_expression;
+
+		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].values.size());
+		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
+		{
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].values[j], i));
+		}
+	}
+}
+
+
 TEST(ParserTest, PrefixExpression)
 {
 	typedef struct TestCase

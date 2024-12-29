@@ -20,6 +20,7 @@ namespace ast
 		FLOAT_LITERAL_NODE,
 		BOOLEAN_LITERAL_NODE,
 		CHARACTER_LITERAL_NODE,
+		COLLECTION_LITERAL_NODE,
 		FUNCTION_LITERAL_NODE,
 		PREFIX_EXPRESSION_NODE,
 		INFIX_EXPRESSION_NODE,
@@ -158,6 +159,19 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = CHARACTER_LITERAL_NODE;
+	};
+
+	class CollectionLiteral : public Expression
+	{
+	public:
+		token::Token m_token; // '['
+		std::vector<Expression*> m_values;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = COLLECTION_LITERAL_NODE;
 	};
 
 	class FunctionLiteral : public Expression

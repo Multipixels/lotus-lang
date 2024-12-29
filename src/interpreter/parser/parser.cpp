@@ -17,6 +17,7 @@ namespace parser
 		registerPrefixFunction(token::TRUE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::FALSE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
+		registerPrefixFunction(token::LBRACKET, &Parser::parseCollectionLiteral);
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::LPARENTHESIS, &Parser::parseGroupedExpression);
@@ -599,6 +600,14 @@ namespace parser
 		return expression;
 	}
 
+	ast::Expression* Parser::parseCollectionLiteral()
+	{
+		ast::CollectionLiteral* expression = new ast::CollectionLiteral;
+		expression->m_token = m_currentToken;
+		parseLiterals(&expression->m_values, token::COMMA, token::RBRACKET);
+		return expression;
+	}
+
 	ast::Expression* Parser::parseIdentifier()
 	{
 		ast::Identifier* expression = new ast::Identifier;
@@ -612,7 +621,7 @@ namespace parser
 		ast::CallExpression* expression = new ast::CallExpression;
 		expression->m_token = m_currentToken;
 		expression->m_function = leftExpression;
-		parseCallParameters(&expression->m_parameters);
+		parseLiterals(&expression->m_parameters, token::COMMA, token::RPARENTHESIS);
 
 		return expression;
 	}
@@ -654,20 +663,20 @@ namespace parser
 		}
 	}
 
-	void Parser::parseCallParameters(std::vector<ast::Expression*>* parameters)
+	void Parser::parseLiterals(std::vector<ast::Expression*>* destination, token::TokenType separator, token::TokenType ender)
 	{
-		while (!peekTokenIs(token::RPARENTHESIS))
+		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
 		{
 			nextToken();
 
 			ast::Expression* statement = parseExpression(LOWEST);
 
-			if (peekTokenIs(token::COMMA))
+			if (peekTokenIs(separator))
 			{
 				nextToken();
 			}
 
-			parameters->push_back(statement);
+			destination->push_back(statement);
 		}
 		nextToken();
 	}
