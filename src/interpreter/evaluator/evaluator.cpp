@@ -270,9 +270,13 @@ namespace evaluator
 				}
 
 				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
-				
-				if (truthyBoolean->m_value) evaluate(whileStatement->m_consequence, whileEnvironment);
-				else break;
+				if (!truthyBoolean->m_value) break;
+
+				object::Object* evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR)
+				{
+					return evaluatedConsequence;
+				}
 			}
 			
 			return &object::NULL_OBJECT;
@@ -282,7 +286,12 @@ namespace evaluator
 			ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)node;
 			object::Environment* doWhileEnvironment = new object::Environment(environment);
 
-			evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+			object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+			if (evaluatedConsequence->Type() == object::ERROR)
+			{
+				return evaluatedConsequence;
+			}
+
 			while (true)
 			{
 				object::Object* evaluatedCondition = evaluate(doWhileStatement->m_condition, environment);
@@ -298,13 +307,60 @@ namespace evaluator
 				}
 
 				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
+				if (!truthyBoolean->m_value) break;
 
-				if (truthyBoolean->m_value) evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
-				else break;
+				object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR)
+				{
+					return evaluatedConsequence;
+				}
 			}
 
 			return &object::NULL_OBJECT;
+		}
+		case ast::FOR_STATEMENT_NODE:
+		{
+			ast::ForStatement* forStatement = (ast::ForStatement*)node;
+			object::Environment* forConditionEnvironment = new object::Environment(environment);
+			object::Environment* forEnvironment = new object::Environment(forConditionEnvironment);
 
+			object::Object* evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment);
+			if (evaluatedInitialization->Type() == object::ERROR)
+			{
+				return evaluatedInitialization;
+			}
+
+			while (true)
+			{
+				object::Object* evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment);
+				if (evaluatedCondition->Type() == object::ERROR)
+				{
+					return evaluatedCondition;
+				}
+
+				object::Object* truthy = isTruthy(evaluatedCondition);
+				if (truthy->Type() == object::ERROR)
+				{
+					return truthy;
+				}
+
+				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
+				if (!truthyBoolean->m_value) break;
+
+				object::Object* evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR)
+				{
+					return evaluatedConsequence;
+				}
+
+				object::Object* evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment);
+				if (evaluatedUpdation->Type() == object::ERROR)
+				{
+					return evaluatedUpdation;
+				}
+			}
+			
+			return &object::NULL_OBJECT;
 		}
 		}
 

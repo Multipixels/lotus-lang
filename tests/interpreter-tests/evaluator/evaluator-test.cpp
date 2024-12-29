@@ -386,6 +386,29 @@ TEST(EvaluatorTest, DoWhileLoop)
 	}
 }
 
+TEST(EvaluatorTest, ForLoop)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInt = 5; for(integer i = 0; i < 5; i = i + 1;) { myInt = myInt + 1; } myInt;", 10},
+		{"integer myInt = 5; for(; myInt < 5; myInt = myInt + 1;) { myInt = myInt + 1; } myInt;", 5},
+		{"integer myInt = 5; for(; myInt < 10; myInt = myInt + 1;) { myInt = myInt + 1; } myInt;", 11},
+		{"integer myInt = 5; for(; myInt < 10; ;) { myInt = myInt + 1; } myInt;", 10},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
 object::Object* testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
