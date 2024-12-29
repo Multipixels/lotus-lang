@@ -57,7 +57,10 @@ namespace evaluator
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;
+
 			object::Object* rightObject = evaluate(prefixExpression->m_right_expression, environment);
+			if (rightObject->Type() == object::ERROR) return rightObject;
+
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
 		}
 		case ast::INFIX_EXPRESSION_NODE:
@@ -95,7 +98,11 @@ namespace evaluator
 			else
 			{
 				object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
+				if (leftObject->Type() == object::ERROR) return leftObject;
+
 				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
+				if (rightObject->Type() == object::ERROR) return rightObject;
+
 				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
 			}
 		}
