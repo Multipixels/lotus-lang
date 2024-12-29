@@ -295,6 +295,10 @@ TEST(EvaluatorTest, Reassignment)
 	TestCase tests[] =
 	{
 		{"integer myInt = 5; myInt = 6; myInt;", 6},
+		{"integer myInt = 5; if (true) { myInt = 6; } myInt;", 6},
+		{"integer myInt = 5; if (true) { integer myInt = 5; myInt = 6; } myInt;", 5},
+		{"integer myInt = 5; integer() integerFunction { myInt = 6; return 5; }; integerFunction(); myInt;", 6},
+		{"integer myInt = 5; integer() integerFunction { integer myInt = 5; myInt = 6; return 5; }; integerFunction(); myInt;", 5},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
