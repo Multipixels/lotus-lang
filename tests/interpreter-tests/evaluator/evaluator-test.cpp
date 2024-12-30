@@ -178,6 +178,30 @@ TEST(EvaluatorTest, CollectionExpression)
 	}
 }
 
+TEST(EvaluatorTest, CollectionIndexing)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"[1,2,3][0];", 1},
+		{"[1,2,3][1];", 2},
+		{"[1,2,3][2];", 3},
+		{"collection<integer> myCollection = [1,2,3]; myCollection[2];", 3},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
 TEST(EvaluatorTest, ReturnStatement)
 {
 	typedef struct TestCase

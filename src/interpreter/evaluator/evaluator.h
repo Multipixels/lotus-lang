@@ -33,10 +33,16 @@ namespace evaluator
 	object::Object* evaluateFloatInfixExpression(object::Float* leftObject, std::string* infixOperator, object::Float* rightObject);
 
 	// Applies bang operator
-	object::Object* evalBangOperatorExpression(object::Object* expression);
+	object::Object* evaluateBangOperatorExpression(object::Object* expression);
 
 	// Applies negative operator (prefix)
-	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression);
+	object::Object* evaluateMinusPrefixOperatorExpression(object::Object* expression);
+
+	// Evaluates a function call
+	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment);
+
+	// Evaluates a function call
+	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment);
 
 	// Applies a function call to a function
 	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments);

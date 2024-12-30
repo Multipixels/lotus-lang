@@ -139,64 +139,12 @@ namespace evaluator
 		case ast::CALL_EXPRESSION_NODE:
 		{
 			ast::CallExpression* callExpression = (ast::CallExpression*)node;
-			object::Object* object = evaluate(callExpression->m_function, environment);
-
-			if (object->Type() == object::ERROR)
-			{
-				return object;
-			}
-
-			object::Function* function = (object::Function*)object;
-
-			std::vector<object::Object*> evaluatedArguments;
-
-			if (callExpression->m_parameters.size() != function->m_parameters.size())
-			{
-				std::ostringstream error;
-				error << "'" << function->m_function_name->String() << "' was supplied with "
-					<< callExpression->m_parameters.size() << " argument(s) instead of "
-					<< function->m_parameters.size() << ".";
-				return createError(error.str());
-			}
-
-			evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
-
-			if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
-			{
-				return evaluatedArguments[0];
-			}
-			for (int i = 0; i < function->m_parameters.size(); i++)
-			{
-				if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
-				{
-					std::ostringstream error;
-					error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
-						<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
-						<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
-						<< function->m_function_name->String() << "'.";
-					return createError(error.str());
-				}
-			}
-
-			object::Object* output = applyFunction(function, &evaluatedArguments);
-			
-			if (output->Type() == object::NULL_TYPE)
-			{
-				std::ostringstream error;
-				error << "'" << function->m_function_name->String() << "' has no return value.";
-				return createError(error.str());
-			}
-
-			if (output->Type() != function->m_function_type)
-			{
-				std::ostringstream error;
-				error << "'" << node->String() << "\' produced a value of type '"
-					<< object::objectTypeToString.at(output->Type()) << "' instead of type '"
-					<< object::objectTypeToString.at(function->m_function_type) << "'.";
-				return createError(error.str());
-			}
-
-			return output;
+			return evaluateCallExpression(callExpression, environment);
+		}
+		case ast::INDEX_EXPRESSION_NODE:
+		{
+			ast::IndexExpression* indexExpression = (ast::IndexExpression*)node;
+			return evaluateIndexExpression(indexExpression, environment);
 		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
@@ -511,8 +459,8 @@ namespace evaluator
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*prefixOperator == "!") return evalBangOperatorExpression(rightObject);
-		if (*prefixOperator == "-") return evalMinusPrefixOperatorExpression(rightObject);
+		if (*prefixOperator == "!") return evaluateBangOperatorExpression(rightObject);
+		if (*prefixOperator == "-") return evaluateMinusPrefixOperatorExpression(rightObject);
 
 		std::ostringstream error;
 		error << *prefixOperator << object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
@@ -616,7 +564,7 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	object::Object* evalBangOperatorExpression(object::Object* expression)
+	object::Object* evaluateBangOperatorExpression(object::Object* expression)
 	{
 		switch (expression->Type())
 		{
@@ -645,7 +593,7 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	object::Object* evalMinusPrefixOperatorExpression(object::Object* expression)
+	object::Object* evaluateMinusPrefixOperatorExpression(object::Object* expression)
 	{
 		switch (expression->Type())
 		{
@@ -666,6 +614,101 @@ namespace evaluator
 		std::ostringstream error;
 		error << "'-" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
 		return createError(error.str());
+	}
+
+	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment)
+	{
+		object::Object* expression = evaluate(callExpression->m_function, environment);
+		if (expression->Type() == object::ERROR)
+		{
+			return expression;
+		}
+
+		object::Function* function = (object::Function*)expression;
+
+		std::vector<object::Object*> evaluatedArguments;
+
+		if (callExpression->m_parameters.size() != function->m_parameters.size())
+		{
+			std::ostringstream error;
+			error << "'" << function->m_function_name->String() << "' was supplied with "
+				<< callExpression->m_parameters.size() << " argument(s) instead of "
+				<< function->m_parameters.size() << ".";
+			return createError(error.str());
+		}
+
+		evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
+
+		if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
+		{
+			return evaluatedArguments[0];
+		}
+		for (int i = 0; i < function->m_parameters.size(); i++)
+		{
+			if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
+			{
+				std::ostringstream error;
+				error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
+					<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
+					<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
+					<< function->m_function_name->String() << "'.";
+				return createError(error.str());
+			}
+		}
+
+		object::Object* output = applyFunction(function, &evaluatedArguments);
+
+		if (output->Type() == object::NULL_TYPE)
+		{
+			std::ostringstream error;
+			error << "'" << function->m_function_name->String() << "' has no return value.";
+			return createError(error.str());
+		}
+
+		if (output->Type() != function->m_function_type)
+		{
+			std::ostringstream error;
+			error << "'" << callExpression->String() << "\' produced a value of type '"
+				<< object::objectTypeToString.at(output->Type()) << "' instead of type '"
+				<< object::objectTypeToString.at(function->m_function_type) << "'.";
+			return createError(error.str());
+		}
+
+		return output;
+	}
+
+	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment)
+	{
+		object::Object* expression = evaluate(indexExpression->m_collection, environment);
+		if (expression->Type() == object::ERROR) return expression;
+		if (expression->Type() != object::COLLECTION)
+		{
+			std::ostringstream error;
+			error << "'" << expression->Inspect() << "' is not an indexable value.";
+			return createError(error.str());
+		}
+		object::Collection* collection = (object::Collection*)expression;
+
+		expression = evaluate(indexExpression->m_index, environment);
+		if (expression->Type() == object::ERROR) return expression;
+		if (expression->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << expression->Inspect() << "'";
+			return createError(error.str());
+		}
+		object::Integer* index = (object::Integer*)expression;
+
+		if(index->m_value < 0)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << expression->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		if (index->m_value >= collection->m_values.size()) return createError("Index out of bounds.");
+
+		return collection->m_values[index->m_value];
 	}
 
 	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments)
