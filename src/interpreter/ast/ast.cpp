@@ -189,8 +189,8 @@ namespace ast
 	std::string IndexExpression::String()
 	{
 		std::ostringstream outputString;
-		outputString << m_collection->String()
-			<< "[" << m_index->String() << "]";
+		outputString << "(" << m_collection->String()
+			<< "[" << m_index->String() << "])";
 
 		return outputString.str();
 	}

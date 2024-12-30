@@ -521,6 +521,7 @@ TEST(ParserTest, OperatorPrecedence)
 		{"a + (b + c);", "(a + (b + c));"},
 		{"(5 + 6) * 7;", "((5 + 6) * 7);"},
 		{"(24+7) * -3 + (100/3);", "(((24 + 7) * (-3)) + (100 / 3));"},
+		{"24 * [1,2,3,4][2];", "(24 * ([1, 2, 3, 4][2]));"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -1222,11 +1223,9 @@ character theLetterA = 'a';
 
 -- Collections and dictionaries
 collection<integer> myCollection = [2, 1, 6, 3, 8];
-
--- TODO
--- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
--- myCollection[2];
--- string myString = "hello";
+-- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2}; -- TODO
+myCollection[2];
+-- string myString = "hello"; -- TODO
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 -- Functions
@@ -1287,6 +1286,7 @@ float someFloat = 1;
 float anotherFloat = 2.5;
 character theLetterA = 'a';
 collection<integer> myCollection = [2, 1, 6, 3, 8];
+(myCollection[2]);
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 integer(integer a, boolean b) myFunction
 {
