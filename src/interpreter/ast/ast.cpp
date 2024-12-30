@@ -182,6 +182,19 @@ namespace ast
 		return outputString.str();
 	}
 
+	std::string IndexExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string IndexExpression::String()
+	{
+		std::ostringstream outputString;
+		outputString << m_collection->String()
+			<< "[" << m_index->String() << "]";
+
+		return outputString.str();
+	}
+
 	std::string DeclareVariableStatement::TokenLiteral()
 	{
 		return m_token.m_literal;

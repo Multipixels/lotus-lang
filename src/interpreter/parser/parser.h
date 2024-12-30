@@ -37,6 +37,7 @@ namespace parser
 			PRODUCT,		// a * b
 			PREFIX,			// -X or !x
 			CALL,			// function call
+			INDEX,			// collection indexing
 		} Precedence;
 
 		const std::map<token::TokenType, Precedence> precedenceOfTokenType =
@@ -55,6 +56,7 @@ namespace parser
 			{token::SLASH, PRODUCT},
 			{token::AND, PRODUCT},
 			{token::LPARENTHESIS, CALL},
+			{token::LBRACKET, INDEX},
 		};
 
 		// Cycles through to the next token in the lexer
@@ -113,6 +115,7 @@ namespace parser
 		ast::Expression* parseCollectionLiteral();
 		ast::Expression* parseIdentifier();
 		ast::Expression* parseCallExpression(ast::Expression* leftExpression);
+		ast::Expression* parseIndexExpression(ast::Expression* leftExpression);
 
 		// HELPERS
 

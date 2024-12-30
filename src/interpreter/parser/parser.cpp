@@ -36,6 +36,7 @@ namespace parser
 		registerInfixFunction(token::OR, &Parser::parseInfixExpression);
 		registerInfixFunction(token::ASSIGN, &Parser::parseInfixExpression);
 		registerInfixFunction(token::LPARENTHESIS, &Parser::parseCallExpression);
+		registerInfixFunction(token::LBRACKET, &Parser::parseIndexExpression);
 	}
 
 	ast::Program* Parser::ParseProgram()
@@ -674,6 +675,23 @@ namespace parser
 		expression->m_token = m_currentToken;
 		expression->m_function = leftExpression;
 		parseLiterals(&expression->m_parameters, token::COMMA, token::RPARENTHESIS);
+
+		return expression;
+	}
+
+	ast::Expression* Parser::parseIndexExpression(ast::Expression* leftExpression)
+	{
+		ast::IndexExpression* expression = new ast::IndexExpression;
+		expression->m_token = m_currentToken;
+		expression->m_collection = leftExpression;
+
+		nextToken();
+		expression->m_index = parseExpression(LOWEST);
+
+		if (!expectPeek(token::RBRACKET))
+		{
+			return NULL;
+		}
 
 		return expression;
 	}

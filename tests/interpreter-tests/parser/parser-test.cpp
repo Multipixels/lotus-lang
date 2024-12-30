@@ -1159,6 +1159,45 @@ TEST(ParserTest, DeclaringCollectionStatement)
 }
 
 
+TEST(ParserTest, CollectionIndexing)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		ast::NodeType expectedLeft;
+		ast::NodeType expectedRight;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"[1,2,3,4,5][2];", ast::COLLECTION_LITERAL_NODE, ast::INTEGER_LITERAL_NODE},
+		{"[1,2,3,4,5][2+1];", ast::COLLECTION_LITERAL_NODE, ast::INFIX_EXPRESSION_NODE},
+		{"myCollection[1];", ast::IDENTIFIER_NODE, ast::INTEGER_LITERAL_NODE},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::INDEX_EXPRESSION_NODE);
+		ast::IndexExpression* indexExpression = (ast::IndexExpression*)expressionStatement->m_expression;
+
+		EXPECT_EQ(indexExpression->m_collection->Type(), tests[i].expectedLeft);
+		EXPECT_EQ(indexExpression->m_index->Type(), tests[i].expectedRight);
+	}
+}
+
+
 TEST(ParserTest, ExampleLotus)
 {
 	std::string input =

@@ -25,6 +25,7 @@ namespace ast
 		PREFIX_EXPRESSION_NODE,
 		INFIX_EXPRESSION_NODE,
 		CALL_EXPRESSION_NODE,
+		INDEX_EXPRESSION_NODE,
 
 		DECLARE_VARIABLE_STATEMENT_NODE,
 		DECLARE_COLLECTION_STATEMENT_NODE,
@@ -229,6 +230,20 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = CALL_EXPRESSION_NODE;
+	};
+
+	class IndexExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		ast::Expression* m_collection; // Either an identifier or collection literal
+		ast::Expression* m_index;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = INDEX_EXPRESSION_NODE;
 	};
 
 	// STATEMENTS
