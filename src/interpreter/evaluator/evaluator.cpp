@@ -389,6 +389,32 @@ namespace evaluator
 			
 			return &object::NULL_OBJECT;
 		}
+		case ast::ITERATE_STATEMENT_NODE:
+		{
+			ast::IterateStatement* iterateStatement = (ast::IterateStatement*)node;
+			object::Environment* iterateEnvironment = new object::Environment(environment);
+
+			object::Object* evaluatedCollection = evaluate(iterateStatement->m_collection, environment);
+			if (evaluatedCollection->Type() == object::ERROR) return evaluatedCollection;
+			if(evaluatedCollection->Type() != object::COLLECTION) 
+			{
+				std::ostringstream error;
+				error << "Expected to see a collection to iterate over. Instead got a(n) '"
+					<< object::objectTypeToString.at(evaluatedCollection->Type()) << "'.";
+				return createError(error.str());
+			}
+			object::Collection* collection = (object::Collection*)evaluatedCollection;
+
+			for (object::Object* value : collection->m_values)
+			{
+				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
+				
+				object::Object* evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+			}
+
+			return &object::NULL_OBJECT;
+		}
 		}
 
 		return NULL;

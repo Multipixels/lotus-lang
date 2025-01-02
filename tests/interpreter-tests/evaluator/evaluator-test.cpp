@@ -424,6 +424,29 @@ TEST(EvaluatorTest, ForLoop)
 	}
 }
 
+TEST(EvaluatorTest, IterateLoop)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInt = 0; collection<integer> myCollection = [1, 2, 3, 4]; iterate(value : myCollection) { myInt = myInt + 1; } myInt;", 4},
+		{"integer myInt = 0; collection<integer> myCollection = [1, 2, 3, 4]; iterate(value : myCollection) { myInt = myInt + value; } myInt;", 10},
+		{"integer myInt = 0; iterate(value : [1, 2, 3, 4]) { myInt = myInt + 1; } myInt;", 4},
+		{"integer myInt = 0; iterate(value : [1, 2, 3, 4]) { myInt = myInt + value; } myInt;", 10},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
 TEST(EvaluatorTest, Error)
 {
 	typedef struct TestCase
@@ -452,6 +475,8 @@ TEST(EvaluatorTest, Error)
 		{"[2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."},
 		{"collection<integer> myCollection = [2, 3, 4, 5.5f];", "The collection [2, 3, 4, 5.5] must have uniform typing of elements."},
 		{"collection<integer> myCollection = ['a'];", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
+		{"integer myInt = 0; iterate(value : [1, 'a', 3]) { myInt = myInt + value; } myInt;", "The collection [1, 'a', 3] must have uniform typing of elements."},
+		{"integer myInt = 0; iterate(value : ['a', 'b', 'c']) { myInt = myInt + value; } myInt;", "'integer + character' is not supported."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
