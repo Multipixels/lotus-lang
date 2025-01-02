@@ -25,6 +25,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <ProjectName>lotus-interpreter-tests</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -33,22 +34,22 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\lotus-interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\lotus-interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\lotus-interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\tests\lotus-interpreter-tests;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
@@ -68,7 +69,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -87,7 +88,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -107,7 +108,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -127,7 +128,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
