@@ -5,6 +5,13 @@
 
 <br />
 <div align="center">
+  <a href="https://github.com/Multipixels/lotus-lang" >
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="repo/white-lotus.svg" width=130px>
+      <source media="(prefers-color-scheme: light)" srcset="repo/lotus.svg" width=130px>
+      <img src="repo/lotus.svg">
+  </picture>
+  </a>
   <h3 align="center">Lotus</h3>
   <p align="center">
     A statically-typed, procedural programming language with an interpreter built in C++.
