@@ -7,7 +7,7 @@
 <div align="center">
   <h3 align="center">Lotus</h3>
   <p align="center">
-    A statically-typed, C-like programming language with an interpreter built in C++.
+    A statically-typed, procedural programming language with an interpreter built in C++.
   </p>
 </div>
 
@@ -36,7 +36,7 @@
 
 ## About The Project
 
-Lotus is a programming language I developed to explore the principles of statically-typed languages, test-driven development, and software testing. With Lotus, you can write programs using familiar constructs like collections, dictionaries, and control structures, all parsed and interpreted through an interpreter written in C++.
+Lotus is a programming language I developed to explore the principles of statically-typed procedural languages, test-driven development, and software testing. With Lotus, you can write programs using familiar constructs like collections, dictionaries, and control structures, all parsed and interpreted through an interpreter written in C++.
 
 ### Built With
 
