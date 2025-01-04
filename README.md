@@ -14,7 +14,7 @@
   </a>
   <h3 align="center">Lotus</h3>
   <p align="center">
-    A statically-typed, procedural programming language with an interpreter built in C++.
+    A statically-typed procedural programming language with an interpreter built in C++.
   </p>
 </div>
 
