@@ -114,6 +114,27 @@ namespace ast
 		return outputString.str();
 	}
 
+	std::string StringLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
+	std::string StringLiteral::String()
+	{
+		std::ostringstream outputString;
+
+		outputString << '"';
+
+		for (int i = 0; i < m_stringCollection->m_values.size(); i++)
+		{
+			outputString << m_stringCollection->m_values[i]->String()[1];
+		}
+
+		outputString << '"';
+
+		return outputString.str();
+	}
+
 	std::string FunctionLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

@@ -113,6 +113,7 @@ namespace parser
 		ast::Expression* parseBooleanLiteral();
 		ast::Expression* parseCharacterLiteral();
 		ast::Expression* parseCollectionLiteral();
+		ast::Expression* parseStringLiteral();
 		ast::Expression* parseIdentifier();
 		ast::Expression* parseCallExpression(ast::Expression* leftExpression);
 		ast::Expression* parseIndexExpression(ast::Expression* leftExpression);

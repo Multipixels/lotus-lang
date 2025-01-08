@@ -1088,15 +1088,7 @@ TEST(ParserTest, CollectionLiteralExpression)
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
 		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
 
-		// Test to see if this is a collection literal expression
-		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::COLLECTION_LITERAL_NODE);
-		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expressionStatement->m_expression;
-
-		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].values.size());
-		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
-		{
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].values[j], i));
-		}
+		EXPECT_NO_FATAL_FAILURE(testCollectionLiteral(expressionStatement->m_expression, &tests[i].values, 0));
 	}
 }
 
@@ -1195,6 +1187,38 @@ TEST(ParserTest, CollectionIndexing)
 
 		EXPECT_EQ(indexExpression->m_collection->Type(), tests[i].expectedLeft);
 		EXPECT_EQ(indexExpression->m_index->Type(), tests[i].expectedRight);
+	}
+}
+
+
+TEST(ParserTest, StringLiteral)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"("someString";)", "someString"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testStringLiteral(expressionStatement->m_expression, &tests[i].expectedValue, i);
 	}
 }
 
@@ -1434,6 +1458,32 @@ void testCharacterLiteral(ast::Expression* expression, char expectedValue, int t
 		<< "Test #" << testNumber << std::endl;
 	EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
 		<< "Test #" << testNumber << std::endl;
+}
+
+void testCollectionLiteral(ast::Expression* expression, std::vector<std::any>* expectedValue, int testNumber)
+{
+	// Test to see if this is a collection literal expression
+	ASSERT_EQ(expression->Type(), ast::COLLECTION_LITERAL_NODE);
+	ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expression;
+
+	ASSERT_EQ(collectionLiteral->m_values.size(), expectedValue->size());
+	for (int j = 0; j < collectionLiteral->m_values.size(); j++)
+	{
+		EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], (*expectedValue)[j], testNumber));
+	}
+}
+
+void testStringLiteral(ast::Expression* expression, std::string* expectedValue, int testNumber)
+{
+	ASSERT_EQ(expression->Type(), ast::STRING_LITERAL_NODE)
+		<< "Test #" << testNumber << std::endl;
+
+	ast::StringLiteral* stringLiteral = (ast::StringLiteral*)expression;
+
+	std::stringstream expected;
+	expected << '"' << *expectedValue << '"';
+
+	EXPECT_EQ(stringLiteral->String(), expected.str());
 }
 
 void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber)

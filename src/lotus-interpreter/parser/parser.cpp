@@ -17,6 +17,7 @@ namespace parser
 		registerPrefixFunction(token::TRUE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::FALSE_LITERAL, &Parser::parseBooleanLiteral);
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
+		registerPrefixFunction(token::STRING_LITERAL, &Parser::parseStringLiteral);
 		registerPrefixFunction(token::LBRACKET, &Parser::parseCollectionLiteral);
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
@@ -659,6 +660,26 @@ namespace parser
 		expression->m_token = m_currentToken;
 		parseLiterals(&expression->m_values, token::COMMA, token::RBRACKET);
 		return expression;
+	}
+
+	ast::Expression* Parser::parseStringLiteral()
+	{
+		ast::StringLiteral* stringLiteral = new ast::StringLiteral;
+		stringLiteral->m_token = m_currentToken;
+		stringLiteral->m_stringCollection = new ast::CollectionLiteral;
+
+		for (int i = 0; i < m_currentToken.m_literal.size(); i++)
+		{
+			ast::CharacterLiteral* expression = new ast::CharacterLiteral;
+
+			expression->m_token.m_type = token::CHARACTER_LITERAL;
+			expression->m_token.m_literal = m_currentToken.m_literal[i];
+			expression->m_value = m_currentToken.m_literal[i];
+
+			stringLiteral->m_stringCollection->m_values.push_back(expression);
+		}
+
+		return stringLiteral;
 	}
 
 	ast::Expression* Parser::parseIdentifier()
