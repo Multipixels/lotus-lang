@@ -720,36 +720,46 @@ namespace evaluator
 
 	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment)
 	{
+		// Get index
+		object::Object* indexObject = evaluate(indexExpression->m_index, environment);
+		if (indexObject->Type() == object::ERROR) return indexObject;
+		if (indexObject->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << indexObject->Inspect() << "'";
+			return createError(error.str());
+		}
+		object::Integer* index = (object::Integer*)indexObject;
+
+		if (index->m_value < 0)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << index->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		// Evaluate expression and apply index to it
 		object::Object* expression = evaluate(indexExpression->m_collection, environment);
-		if (expression->Type() == object::ERROR) return expression;
-		if (expression->Type() != object::COLLECTION)
-		{
-			std::ostringstream error;
-			error << "'" << expression->Inspect() << "' is not an indexable value.";
-			return createError(error.str());
-		}
-		object::Collection* collection = (object::Collection*)expression;
 
-		expression = evaluate(indexExpression->m_index, environment);
-		if (expression->Type() == object::ERROR) return expression;
-		if (expression->Type() != object::INTEGER)
+		switch (expression->Type())
 		{
-			std::ostringstream error;
-			error << "Invalid index: '" << expression->Inspect() << "'";
-			return createError(error.str());
+		case object::ERROR:
+			return expression;
+		case object::COLLECTION:
+			if (index->m_value >= ((object::Collection*)expression)->m_values.size()) return createError("Index out of bounds.");
+			return ((object::Collection*)expression)->m_values[index->m_value];
+		case object::STRING:
+		{
+			if (index->m_value >= ((object::String*)expression)->m_value.size()) return createError("Index out of bounds.");
+			char value = ((object::String*)expression)->m_value[index->m_value];
+			return new object::Character(value);
 		}
-		object::Integer* index = (object::Integer*)expression;
-
-		if(index->m_value < 0)
-		{
-			std::ostringstream error;
-			error << "Invalid index: '" << expression->Inspect() << "'";
-			return createError(error.str());
 		}
 
-		if (index->m_value >= collection->m_values.size()) return createError("Index out of bounds.");
-
-		return collection->m_values[index->m_value];
+		// Error for unsupported types.
+		std::ostringstream error;
+		error << "'" << expression->Inspect() << "' is not an indexable value.";
+		return createError(error.str());
 	}
 
 	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments)

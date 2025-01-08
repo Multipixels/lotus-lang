@@ -228,6 +228,28 @@ TEST(EvaluatorTest, CollectionIndexing)
 	}
 }
 
+TEST(EvaluatorTest, StringIndexing)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		char expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"("someString"[3];)", 'e'},
+		{R"("someString"[4];)", 'S'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
 TEST(EvaluatorTest, ReturnStatement)
 {
 	typedef struct TestCase
