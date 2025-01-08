@@ -1202,6 +1202,8 @@ TEST(ParserTest, StringLiteral)
 	TestCase tests[] =
 	{
 		{R"("someString";)", "someString"},
+		{R"("";)", ""},
+		{R"("this is a longer STRING! 7";)", "this is a longer STRING! 7"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

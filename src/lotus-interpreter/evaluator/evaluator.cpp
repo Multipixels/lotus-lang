@@ -84,6 +84,21 @@ namespace evaluator
 			
 			return object;
 		}
+		case ast::STRING_LITERAL_NODE:
+		{
+			std::stringstream value;
+
+			for (int i = 0; i < ((ast::StringLiteral*)node)->m_stringCollection->m_values.size(); i++)
+			{
+				// Take expressoin from string collection and cast to character literal pointer
+				ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)((ast::StringLiteral*)node)->m_stringCollection->m_values[i];
+				value << characterLiteral->m_value;
+			}
+
+			std::string valueStr = value.str();
+			object::String* object = new object::String(&valueStr);
+			return object;
+		}
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;

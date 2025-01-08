@@ -11,6 +11,7 @@ namespace object
 		BOOLEAN,
 		CHARACTER,
 		COLLECTION,
+		STRING,
 		NULL_TYPE,
 		RETURN,
 		FUNCTION,
@@ -24,6 +25,7 @@ namespace object
 		{BOOLEAN, "boolean"},
 		{CHARACTER, "character"},
 		{COLLECTION, "collection"},
+		{STRING, "string"},
 		{NULL_TYPE, "null"},
 		{RETURN, "RETURN"},
 		{FUNCTION, "FUNCTION"},
@@ -37,6 +39,7 @@ namespace object
 		{token::BOOLEAN_TYPE, BOOLEAN},
 		{token::CHARACTER_TYPE, CHARACTER},
 		{token::COLLECTION_TYPE, COLLECTION},
+		{token::STRING_TYPE, STRING},
 	};
 
 	class Object
@@ -119,6 +122,17 @@ namespace object
 
 		ObjectType m_collection_type;
 		std::vector<Object*> m_values;
+	};
+
+	class String : public Object
+	{
+	public:
+		String();
+		String(std::string* value);
+		ObjectType Type();
+		std::string Inspect();
+
+		std::string m_value;
 	};
 
 	class Null : public Object

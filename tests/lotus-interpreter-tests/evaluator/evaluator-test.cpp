@@ -178,6 +178,32 @@ TEST(EvaluatorTest, CollectionExpression)
 	}
 }
 
+TEST(EvaluatorTest, StringExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"("someString";)", "someString"},
+		{R"("";)", ""},
+		{R"("this is a longer STRING! 7";)", "this is a longer STRING! 7"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		ASSERT_EQ(evaluated->Type(), object::STRING);
+		object::String* string = (object::String*)evaluated;
+
+		EXPECT_NO_FATAL_FAILURE(testStringObject(string, &tests[i].expectedValue));
+	}
+}
+
 TEST(EvaluatorTest, CollectionIndexing)
 {
 	typedef struct TestCase
@@ -571,4 +597,12 @@ void testCollectionObject(object::Object* object, std::vector<std::any>* expecte
 		ASSERT_EQ(collection->m_values[i]->Type(), expectedType);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(collection->m_values[i], (*expectedValue)[i]));
 	}
+}
+
+void testStringObject(object::Object* object, std::string* expectedValue)
+{
+	ASSERT_EQ(object->Type(), object::STRING);
+	object::String* string = (object::String*)object;
+
+	EXPECT_EQ(string->m_value, *expectedValue);
 }

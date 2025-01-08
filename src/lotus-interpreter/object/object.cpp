@@ -181,6 +181,26 @@ namespace object
 		return output.str();
 	}
 
+	String::String()
+		: m_value("")
+	{
+	}
+
+	String::String(std::string *value)
+		: m_value(*value)
+	{
+	}
+
+	ObjectType String::Type()
+	{
+		return STRING;
+	}
+
+	std::string String::Inspect()
+	{
+		return m_value;
+	}
+
 	Null::Null() {};
 
 	ObjectType Null::Type()
