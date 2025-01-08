@@ -289,13 +289,13 @@ TEST(EvaluatorTest, Declaration)
 		{"boolean c = false; c;", false},
 		{"character d = 'e'; d;", 'e'},
 		{"collection<integer> e = [6, 4]; e;", new std::vector<std::any>({6, 4}) },
+		{R"(string f = "Hello, World!"; f;)", "Hello, World!" },
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
 		testLiteralObject(evaluated, tests[i].expectedValue);
-		
 	}
 }
 
@@ -570,6 +570,12 @@ void testLiteralObject(object::Object* object, std::any expectedValue)
 	case object::COLLECTION:
 		EXPECT_NO_FATAL_FAILURE(testCollectionObject(object, std::any_cast<std::vector<std::any>*>(expectedValue), object::INTEGER));
 		return;
+	case object::STRING:
+	{
+		std::string expectedString = std::any_cast<const char*>(expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testStringObject(object, &expectedString));
+		return;
+	}
 	}
 
 	FAIL();
