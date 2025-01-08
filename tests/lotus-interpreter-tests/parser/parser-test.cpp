@@ -1249,7 +1249,7 @@ character theLetterA = 'a';
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 -- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2}; -- TODO
 myCollection[2];
--- string myString = "hello"; -- TODO
+string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
 -- Functions
@@ -1291,7 +1291,7 @@ iterate(var : myCollection) {
 }
 
 -- Built in functions
---log("Hello World!");  TODO
+log("Hello World!");
 length(myCollection);
 
 -- Operators
@@ -1311,6 +1311,7 @@ float anotherFloat = 2.5;
 character theLetterA = 'a';
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 (myCollection[2]);
+string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 integer(integer a, boolean b) myFunction
 {
@@ -1338,6 +1339,7 @@ for (integer i = 0; (i < 10); (i = (i + 1));)
 iterate (var : myCollection)
 {
 }
+log("Hello World!");
 length(myCollection);
 (a == b);
 (a != b);

@@ -159,6 +159,12 @@ namespace parser
 				return parseFunctionDeclaration();
 			}
 			return parseVariableDeclaration();
+		case token::STRING_TYPE:
+			if (peekTokenIs(token::LPARENTHESIS))
+			{
+				return parseFunctionDeclaration();
+			}
+			return parseVariableDeclaration();
 		case token::COLLECTION_TYPE:
 			return parseCollectionDeclaration();
 		case token::RETURN:
