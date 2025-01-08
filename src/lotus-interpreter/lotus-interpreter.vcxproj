@@ -73,22 +73,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</OutDir>
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator</IncludePath>
+    <IncludePath>$(ProjectDir)ast;$(ProjectDir)lexer;$(ProjectDir)token;$(ProjectDir)repl;$(ProjectDir)parser;$(ProjectDir)object;$(ProjectDir)evaluator;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</OutDir>
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator</IncludePath>
+    <IncludePath>$(ProjectDir)ast;$(ProjectDir)lexer;$(ProjectDir)token;$(ProjectDir)repl;$(ProjectDir)parser;$(ProjectDir)object;$(ProjectDir)evaluator;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</OutDir>
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator</IncludePath>
+    <IncludePath>$(ProjectDir)ast;$(ProjectDir)lexer;$(ProjectDir)token;$(ProjectDir)repl;$(ProjectDir)parser;$(ProjectDir)object;$(ProjectDir)evaluator;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</OutDir>
-    <IncludePath>C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\ast;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\token;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\repl;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\parser;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\object;C:\Users\RIC\Documents\Projects\lotus-lang\src\lotus-interpreter\evaluator</IncludePath>
+    <IncludePath>$(ProjectDir)ast;$(ProjectDir)lexer;$(ProjectDir)token;$(ProjectDir)repl;$(ProjectDir)parser;$(ProjectDir)object;$(ProjectDir)evaluator;$(IncludePath)</IncludePath>
     <IntDir>$(SolutionDir)..\out\$(ProjectName)\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
