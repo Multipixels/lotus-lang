@@ -112,7 +112,7 @@ Run the program:
 - [X] Control Structures
 - [X] Collections
 - [ ] Dictionaries
-- [ ] Strings
+- [X] Strings
 - [ ] Error Reporting Improvements
 - [ ] Garbage Collection
 - [ ] Standard Library Functions
