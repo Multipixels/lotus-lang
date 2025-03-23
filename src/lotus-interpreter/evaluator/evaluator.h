@@ -17,6 +17,9 @@ namespace evaluator
 	// Evaluates a list of expressions
 	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment);
 
+	// Evaluates an identifier
+	object::Object* evaluateIdentifier(ast::Identifier* identifier, object::Environment* environment);
+
 	// Evaluates a prefix expression
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject);
 	
@@ -45,7 +48,7 @@ namespace evaluator
 	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment);
 
 	// Applies a function call to a function
-	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments);
+	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments);
 
 	// Helper function to extend a function's environment
 	object::Environment* extendFunctionEnvironment(object::Function* function, std::vector<object::Object*>* arguments);

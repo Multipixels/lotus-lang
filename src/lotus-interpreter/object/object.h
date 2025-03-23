@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include "ast.h"
 
 namespace object
 {
@@ -16,6 +16,7 @@ namespace object
 		RETURN,
 		FUNCTION,
 		ERROR,
+		BUILTIN_FUNCTION,
 	};
 
 	const std::map<ObjectType, std::string> objectTypeToString =
@@ -30,6 +31,7 @@ namespace object
 		{RETURN, "RETURN"},
 		{FUNCTION, "FUNCTION"},
 		{ERROR, "ERROR"},
+		{BUILTIN_FUNCTION, "BUILTIN_FUNCTION"},
 	};
 
 	const std::map<token::TokenType, ObjectType> nodeTypeToObjectType =
@@ -175,6 +177,18 @@ namespace object
 		std::string Inspect();
 
 		std::string m_error_message;
+	};
+
+	class Builtin : public Object
+	{
+	public:
+		typedef object::Object* (*BuiltinFunctionPointer) (std::vector<object::Object*>*);
+
+		Builtin(BuiltinFunctionPointer fn);
+		ObjectType Type();
+		std::string Inspect();
+
+		BuiltinFunctionPointer m_function;
 	};
 
 	extern Null NULL_OBJECT;

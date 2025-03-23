@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "builtinFunctions.h"
 #include "evaluator.h"
 
 
@@ -15,15 +16,7 @@ namespace evaluator
 			return evaluateProgram((ast::Program*)node, environment);
 		case ast::IDENTIFIER_NODE:
 		{
-			object::Object* result = environment->getIdentifier(&((ast::Identifier*)node)->m_name);
-			if (result == NULL)
-			{
-				std::ostringstream error;
-				error << "'" << ((ast::Identifier*)node)->m_name << "' is not defined.";
-				return createError(error.str());
-			}
-
-			return result;
+			return evaluateIdentifier((ast::Identifier*)node, environment);
 		}
 		case ast::BLOCK_STATEMENT_NODE:
 		{
@@ -64,7 +57,7 @@ namespace evaluator
 			}
 
 			object::Collection* object = new object::Collection;
-			
+
 			for (int i = 0; i < collectionLiteral->m_values.size(); i++)
 			{
 				object::Object* evaluatedItem = evaluate(collectionLiteral->m_values[i], environment);
@@ -81,7 +74,7 @@ namespace evaluator
 				if (object->m_collection_type == object::NULL_TYPE) object->m_collection_type = evaluatedItem->Type();
 				object->m_values.push_back(evaluatedItem);
 			}
-			
+
 			return object;
 		}
 		case ast::STRING_LITERAL_NODE:
@@ -225,7 +218,7 @@ namespace evaluator
 			{
 				std::ostringstream error;
 				error << "'" << declareCollectionStatement->m_name.m_name
-					<< "' is a collection of '" << declareCollectionStatement->m_typeToken.m_literal 
+					<< "' is a collection of '" << declareCollectionStatement->m_typeToken.m_literal
 					<< "'s, but got a collection of type '" << object::objectTypeToString.at(collection->m_collection_type) << "'s.";
 				return createError(error.str());
 			}
@@ -320,7 +313,7 @@ namespace evaluator
 					return evaluatedConsequence;
 				}
 			}
-			
+
 			return &object::NULL_OBJECT;
 		}
 		case ast::DO_WHILE_STATEMENT_NODE:
@@ -401,7 +394,7 @@ namespace evaluator
 					return evaluatedUpdation;
 				}
 			}
-			
+
 			return &object::NULL_OBJECT;
 		}
 		case ast::ITERATE_STATEMENT_NODE:
@@ -411,7 +404,7 @@ namespace evaluator
 
 			object::Object* evaluatedCollection = evaluate(iterateStatement->m_collection, environment);
 			if (evaluatedCollection->Type() == object::ERROR) return evaluatedCollection;
-			if(evaluatedCollection->Type() != object::COLLECTION) 
+			if (evaluatedCollection->Type() != object::COLLECTION)
 			{
 				std::ostringstream error;
 				error << "Expected to see a collection to iterate over. Instead got a(n) '"
@@ -423,7 +416,7 @@ namespace evaluator
 			for (object::Object* value : collection->m_values)
 			{
 				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
-				
+
 				object::Object* evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 			}
@@ -495,6 +488,22 @@ namespace evaluator
 			}
 			(*destination).push_back(evaluatedExpression);
 		}
+	}
+
+	object::Object* evaluateIdentifier(ast::Identifier* identifier, object::Environment* environment) {
+		object::Object* result = environment->getIdentifier(&(identifier->m_name));
+		if (result != NULL)
+		{
+			return result;
+		}
+
+		if (builtins.find(identifier->m_name) != builtins.end()) {
+			return builtins.at(identifier->m_name);
+		}
+
+		std::ostringstream error;
+		error << "'" << identifier->m_name << "' is not defined.";
+		return createError(error.str());
 	}
 
 	object::Object* evaluatePrefixExpression(std::string* prefixOperator, object::Object* rightObject)
@@ -665,53 +674,68 @@ namespace evaluator
 			return expression;
 		}
 
-		object::Function* function = (object::Function*)expression;
-
 		std::vector<object::Object*> evaluatedArguments;
-
-		if (callExpression->m_parameters.size() != function->m_parameters.size())
-		{
-			std::ostringstream error;
-			error << "'" << function->m_function_name->String() << "' was supplied with "
-				<< callExpression->m_parameters.size() << " argument(s) instead of "
-				<< function->m_parameters.size() << ".";
-			return createError(error.str());
-		}
-
 		evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
 
 		if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
 		{
 			return evaluatedArguments[0];
 		}
-		for (int i = 0; i < function->m_parameters.size(); i++)
-		{
-			if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
+
+		if(expression->Type() == object::FUNCTION)
+		{ 
+			object::Function* function = (object::Function*)expression;
+
+			if (callExpression->m_parameters.size() != function->m_parameters.size())
 			{
 				std::ostringstream error;
-				error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
-					<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
-					<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
-					<< function->m_function_name->String() << "'.";
+				error << "'" << function->m_function_name->String() << "' was supplied with "
+					<< callExpression->m_parameters.size() << " argument(s) instead of "
+					<< function->m_parameters.size() << ".";
 				return createError(error.str());
 			}
+
+			for (int i = 0; i < evaluatedArguments.size(); i++)
+			{
+				if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
+				{
+					std::ostringstream error;
+					error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
+						<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
+						<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
+						<< function->m_function_name->String() << "'.";
+					return createError(error.str());
+				}
+			}
 		}
-
-		object::Object* output = applyFunction(function, &evaluatedArguments);
-
-		if (output->Type() == object::NULL_TYPE)
+		else if (expression->Type() == object::BUILTIN_FUNCTION) 
+		{
+			// do nothing, checks handled by function itself
+		}
+		else
 		{
 			std::ostringstream error;
-			error << "'" << function->m_function_name->String() << "' has no return value.";
+			error << "'" << callExpression->m_function->String() << "' is not a function.";
 			return createError(error.str());
 		}
 
-		if (output->Type() != function->m_function_type)
+		object::Object* output = applyFunction(expression, &evaluatedArguments);
+
+		// YOU WERE HERE
+
+		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
+		{
+			std::ostringstream error;
+			error << "'" << ((object::Function*)expression)->m_function_name->String() << "' has no return value.";
+			return createError(error.str());
+		}
+
+		if (expression->Type() == object::FUNCTION && output->Type() != ((object::Function*)expression)->m_function_type)
 		{
 			std::ostringstream error;
 			error << "'" << callExpression->String() << "\' produced a value of type '"
 				<< object::objectTypeToString.at(output->Type()) << "' instead of type '"
-				<< object::objectTypeToString.at(function->m_function_type) << "'.";
+				<< object::objectTypeToString.at(((object::Function*)expression)->m_function_type) << "'.";
 			return createError(error.str());
 		}
 
@@ -762,11 +786,27 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	object::Object* applyFunction(object::Function* function, std::vector<object::Object*>* arguments)
+	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments)
 	{
-		object::Environment* extendedEnvironment = extendFunctionEnvironment(function, arguments);
-		object::Object* evaluated = evaluate(function->m_body, extendedEnvironment);
-		return unwrapReturnValue(evaluated);
+		switch (function->Type())
+		{
+		case object::BUILTIN_FUNCTION:
+		{
+			object::Object* evaluated = ((object::Builtin*)function)->m_function(arguments);
+			return unwrapReturnValue(evaluated);
+		}
+		case object::FUNCTION:
+		{
+			object::Environment* extendedEnvironment = extendFunctionEnvironment((object::Function*)function, arguments);
+			object::Object* evaluated = evaluate(((object::Function*)function)->m_body, extendedEnvironment);
+			return unwrapReturnValue(evaluated);
+		}
+		}
+
+		// Error for unsupported types.
+		std::ostringstream error;
+		error << "'" << function->Inspect() << "' is not a callable function.";
+		return createError(error.str());
 	}
 
 	object::Environment* extendFunctionEnvironment(object::Function* function, std::vector<object::Object*>* arguments)

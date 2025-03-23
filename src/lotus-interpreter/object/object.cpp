@@ -276,4 +276,21 @@ namespace object
 		return output.str();
 	}
 
+
+	Builtin::Builtin(Builtin::BuiltinFunctionPointer fn)
+		: m_function(fn)
+	{
+	}
+
+	ObjectType Builtin::Type()
+	{
+		return BUILTIN_FUNCTION;
+	}
+
+	std::string Builtin::Inspect()
+	{
+		std::ostringstream output;
+		output << "builtin function";
+		return output.str();
+	}
 }

@@ -70,7 +70,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -89,7 +89,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,7 +109,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

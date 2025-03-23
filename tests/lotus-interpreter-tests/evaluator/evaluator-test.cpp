@@ -495,6 +495,28 @@ TEST(EvaluatorTest, IterateLoop)
 	}
 }
 
+TEST(EvaluatorTest, BuiltInFunctions)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"(log("Hello, World!");)", "Hello, World!"},
+		{R"(string myString = "Hello, World!"; log(myString);)", "Hello, World!"},
+		{R"(integer x = 7 - 5; log(x);)", "2"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		testLiteralObject(evaluated, tests[i].expectedValue);
+	}
+}
+
 TEST(EvaluatorTest, Error)
 {
 	typedef struct TestCase
