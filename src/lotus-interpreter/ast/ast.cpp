@@ -114,6 +114,31 @@ namespace ast
 		return outputString.str();
 	}
 
+	std::string DictionaryLiteral::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+
+	std::string DictionaryLiteral::String()
+	{
+		std::ostringstream outputString;
+
+		outputString << "{";
+
+		std::map<Expression*, Expression*>::iterator it;
+		for (it = m_map.begin(); it != m_map.end(); it++)
+		{
+			outputString << it->first << ": "
+				<< it->second;
+
+			if (it != m_map.end()) outputString << ", ";
+		}
+
+		outputString << "}";
+
+		return outputString.str();
+	}
+
 	std::string StringLiteral::TokenLiteral()
 	{
 		return m_token.m_literal;

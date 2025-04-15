@@ -181,6 +181,44 @@ namespace object
 		return output.str();
 	}
 
+	Dictionary::Dictionary()
+		: m_key_type(NULL_TYPE), m_value_type(NULL_TYPE)
+	{
+	}
+
+	Dictionary::Dictionary(ObjectType keyType, ObjectType valueType, std::vector<Object*> keys, std::vector<Object*> values)
+		: m_key_type(keyType), m_value_type(valueType)
+	{
+		for (int i = 0; i < keys.size(); i++)
+		{
+			m_map.emplace(keys.at(i), values.at(i));
+		}
+	}
+
+	ObjectType Dictionary::Type()
+	{
+		return DICTIONARY;
+	}
+
+	std::string Dictionary::Inspect()
+	{
+		std::ostringstream output;
+		output << "{";
+
+		std::map<Object*, Object*>::iterator it;
+		for (it = m_map.begin(); it != m_map.end(); it++)
+		{
+			output << it->first->Inspect() << ": "
+				<< it->second->Inspect();
+
+			if (it != m_map.end()) output << ", ";
+		}
+
+		output << "}";
+
+		return output.str();
+	}
+
 	String::String()
 		: m_value("")
 	{

@@ -21,6 +21,7 @@ namespace ast
 		BOOLEAN_LITERAL_NODE,
 		CHARACTER_LITERAL_NODE,
 		COLLECTION_LITERAL_NODE,
+		DICTIONARY_LITERAL_NODE,
 		STRING_LITERAL_NODE,
 		FUNCTION_LITERAL_NODE,
 		PREFIX_EXPRESSION_NODE,
@@ -175,6 +176,19 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = COLLECTION_LITERAL_NODE;
+	};
+
+	class DictionaryLiteral : public Expression
+	{
+	public:
+		token::Token m_token; // '{'
+		std::map<Expression*, Expression*> m_map;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = DICTIONARY_LITERAL_NODE;
 	};
 
 	class StringLiteral : public Expression

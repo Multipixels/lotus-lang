@@ -11,6 +11,7 @@ namespace object
 		BOOLEAN,
 		CHARACTER,
 		COLLECTION,
+		DICTIONARY,
 		STRING,
 		NULL_TYPE,
 		RETURN,
@@ -26,6 +27,7 @@ namespace object
 		{BOOLEAN, "boolean"},
 		{CHARACTER, "character"},
 		{COLLECTION, "collection"},
+		{DICTIONARY, "dictionary"},
 		{STRING, "string"},
 		{NULL_TYPE, "null"},
 		{RETURN, "RETURN"},
@@ -41,6 +43,7 @@ namespace object
 		{token::BOOLEAN_TYPE, BOOLEAN},
 		{token::CHARACTER_TYPE, CHARACTER},
 		{token::COLLECTION_TYPE, COLLECTION},
+		{token::DICTIONARY_TYPE, DICTIONARY},
 		{token::STRING_TYPE, STRING},
 	};
 
@@ -124,6 +127,19 @@ namespace object
 
 		ObjectType m_collection_type;
 		std::vector<Object*> m_values;
+	};
+
+	class Dictionary : public Object
+	{
+	public:
+		Dictionary();
+		Dictionary(ObjectType keyType, ObjectType valueType, std::vector<Object*> keys, std::vector<Object*> values);
+		ObjectType Type();
+		std::string Inspect();
+
+		ObjectType m_key_type;
+		ObjectType m_value_type;
+		std::map<Object*, Object*> m_map;
 	};
 
 	class String : public Object
