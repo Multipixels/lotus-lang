@@ -113,8 +113,6 @@ Run the program:
 - [X] Collections
 - [ ] Dictionaries
 - [X] Strings
-- [ ] Error Reporting Improvements
-- [ ] Garbage Collection
 - [ ] Standard Library Functions
 
 ## Contact
