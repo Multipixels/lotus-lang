@@ -113,7 +113,7 @@ Run the program:
 - [X] Collections
 - [ ] Dictionaries
 - [X] Strings
-- [ ] Standard Library Functions
+- [X] Standard Library Functions
 
 ## Contact
 

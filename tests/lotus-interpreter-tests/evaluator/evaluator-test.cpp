@@ -508,6 +508,10 @@ TEST(EvaluatorTest, BuiltInFunctions)
 		{R"(log("Hello, World!");)", "Hello, World!"},
 		{R"(string myString = "Hello, World!"; log(myString);)", "Hello, World!"},
 		{R"(integer x = 7 - 5; log(x);)", "2"},
+		{R"(size("Hello, World!");)", 13},
+		{R"(string myString = "Hello, World!"; size(myString);)", 13},
+		{R"(string myString = ""; size(myString);)", 0},
+		{R"(collection<integer> myCollection = [1, 2, 3, 4]; size(myCollection);)", 4},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -547,6 +551,7 @@ TEST(EvaluatorTest, Error)
 		{"collection<integer> myCollection = ['a'];", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
 		{"integer myInt = 0; iterate(value : [1, 'a', 3]) { myInt = myInt + value; } myInt;", "The collection [1, 'a', 3] must have uniform typing of elements."},
 		{"integer myInt = 0; iterate(value : ['a', 'b', 'c']) { myInt = myInt + value; } myInt;", "'integer + character' is not supported."},
+		{"integer myInt = 26; size(myInt);", "Argument to `size` not supported, got integer."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

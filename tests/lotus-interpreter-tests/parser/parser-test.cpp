@@ -1294,7 +1294,7 @@ iterate(var : myCollection) {
 
 -- Built in functions
 log("Hello World!");
-length(myCollection);
+size(myCollection);
 
 -- Operators
 a == b;
@@ -1342,7 +1342,7 @@ iterate (var : myCollection)
 {
 }
 log("Hello World!");
-length(myCollection);
+size(myCollection);
 (a == b);
 (a != b);
 (a < b);
