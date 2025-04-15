@@ -19,6 +19,7 @@ namespace parser
 		registerPrefixFunction(token::CHARACTER_LITERAL, &Parser::parseCharacterLiteral);
 		registerPrefixFunction(token::STRING_LITERAL, &Parser::parseStringLiteral);
 		registerPrefixFunction(token::LBRACKET, &Parser::parseCollectionLiteral);
+		registerPrefixFunction(token::LBRACE, &Parser::parseDictionaryLiteral);
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::LPARENTHESIS, &Parser::parseGroupedExpression);
@@ -794,8 +795,9 @@ namespace parser
 
 			ast::Expression* key = parseExpression(LOWEST);
 
-			if (peekTokenIs(token::SEMICOLON))
+			if (peekTokenIs(token::COLON))
 			{
+				nextToken();
 				nextToken();
 			}
 

@@ -3,6 +3,7 @@
 #include <any> // Testing suite uses C++ 17 for this
 #include <map>
 #include <sstream>
+#include <string>
 
 #include "parser-test.h"
 
@@ -1225,6 +1226,41 @@ TEST(ParserTest, StringLiteral)
 }
 
 
+TEST(ParserTest, DictionaryLiteral)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::map<std::string, std::any> expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"({};)", {}},
+		{R"({3: 5};)", {{"3", 5}}},
+		{R"({3: 5, 8: 8};)", {{"3", 5} , {"8", 8}}},
+		{R"({'a': 0, 'b': 1};)", {{"a", 0} , {"b", 1}}},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+
+		testDictionaryLiteral(expressionStatement->m_expression, &tests[i].expectedValue, i);
+	}
+}
+
+
 TEST(ParserTest, ExampleLotus)
 {
 	std::string input =
@@ -1474,6 +1510,51 @@ void testCollectionLiteral(ast::Expression* expression, std::vector<std::any>* e
 	for (int j = 0; j < collectionLiteral->m_values.size(); j++)
 	{
 		EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], (*expectedValue)[j], testNumber));
+	}
+}
+
+void testDictionaryLiteral(ast::Expression* expression, std::map<std::string, std::any>* expectedValue, int testNumber)
+{
+	// Test to see if this is a dictionary literal expression
+	ASSERT_EQ(expression->Type(), ast::DICTIONARY_LITERAL_NODE);
+	ast::DictionaryLiteral* dictionaryLiteral = (ast::DictionaryLiteral*)expression;
+
+	ASSERT_EQ(dictionaryLiteral->m_map.size(), expectedValue->size());
+	std::map<ast::Expression*, ast::Expression*>::iterator it;
+
+	for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
+	{
+		switch (it->first->Type()) {
+		case ast::INTEGER_LITERAL_NODE: 
+		{
+			ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
+			break;
+		}
+		case ast::FLOAT_LITERAL_NODE:
+		{
+			ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
+			break;
+		}
+		case ast::BOOLEAN_LITERAL_NODE:
+		{
+			ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
+			break;
+		}
+		case ast::CHARACTER_LITERAL_NODE:
+		{
+			ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
+			break;
+		}
+		default:
+		{
+			FAIL() << "Unexpected type found in dictionary.";
+			break;
+		}
+		}
 	}
 }
 

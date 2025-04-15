@@ -11,6 +11,7 @@ void testFloatLiteral(ast::Expression* expression, float expectedValue, int test
 void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber = -1);
 void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber = -1);
 void testCollectionLiteral(ast::Expression* expression, std::vector<std::any>* expectedValue, int testNumber = -1);
+void testDictionaryLiteral(ast::Expression* expression, std::map<std::string, std::any>* expectedValue, int testNumber = -1);
 void testStringLiteral(ast::Expression* expression, std::string* expectedValue, int testNumber = -1);
 void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber = -1);
 
