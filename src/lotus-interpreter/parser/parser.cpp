@@ -668,6 +668,14 @@ namespace parser
 		return expression;
 	}
 
+	ast::Expression* Parser::parseDictionaryLiteral()
+	{
+		ast::DictionaryLiteral* expression = new ast::DictionaryLiteral;
+		expression->m_token = m_currentToken;
+		parseKeyValuePairs(&expression->m_map, token::COMMA, token::RBRACE);
+		return expression;
+	}
+
 	ast::Expression* Parser::parseStringLiteral()
 	{
 		ast::StringLiteral* stringLiteral = new ast::StringLiteral;
@@ -774,6 +782,31 @@ namespace parser
 			}
 
 			destination->push_back(statement);
+		}
+		nextToken();
+	}
+
+	void Parser::parseKeyValuePairs(std::map<ast::Expression*, ast::Expression*>* destination, token::TokenType separator, token::TokenType ender)
+	{
+		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
+		{
+			nextToken();
+
+			ast::Expression* key = parseExpression(LOWEST);
+
+			if (peekTokenIs(token::SEMICOLON))
+			{
+				nextToken();
+			}
+
+			ast::Expression* value = parseExpression(LOWEST);
+
+			if (peekTokenIs(separator))
+			{
+				nextToken();
+			}
+
+			destination->emplace(key, value);
 		}
 		nextToken();
 	}
