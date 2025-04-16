@@ -851,39 +851,67 @@ namespace evaluator
 
 	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment)
 	{
+		// Evaluate expression and apply index to it
+		object::Object* expression = evaluate(indexExpression->m_collection, environment);
+
 		// Get index
 		object::Object* indexObject = evaluate(indexExpression->m_index, environment);
 		if (indexObject->Type() == object::ERROR) return indexObject;
-		if (indexObject->Type() != object::INTEGER)
+
+		if (expression->Type() != object::DICTIONARY && indexObject->Type() != object::INTEGER)
 		{
 			std::ostringstream error;
 			error << "Invalid index: '" << indexObject->Inspect() << "'";
 			return createError(error.str());
 		}
-		object::Integer* index = (object::Integer*)indexObject;
-
-		if (index->m_value < 0)
+		else if (expression->Type() == object::DICTIONARY &&
+			(indexObject->Type() != ((object::Dictionary*)expression)->m_key_type))
 		{
 			std::ostringstream error;
-			error << "Invalid index: '" << index->Inspect() << "'";
+			error << "Dictionary has keys of type: '" << 
+				object::objectTypeToString.at(((object::Dictionary*)expression)->m_key_type) <<
+				"'. Got type: '" << object::objectTypeToString.at(indexObject->Type()) << "'";
 			return createError(error.str());
 		}
 
-		// Evaluate expression and apply index to it
-		object::Object* expression = evaluate(indexExpression->m_collection, environment);
 
 		switch (expression->Type())
 		{
 		case object::ERROR:
 			return expression;
 		case object::COLLECTION:
+		{
+			object::Integer* index = (object::Integer*)indexObject;
+
+			if (index->m_value < 0)
+			{
+				std::ostringstream error;
+				error << "Invalid index: '" << index->Inspect() << "'";
+				return createError(error.str());
+			}
+
 			if (index->m_value >= ((object::Collection*)expression)->m_values.size()) return createError("Index out of bounds.");
 			return ((object::Collection*)expression)->m_values[index->m_value];
+		}
 		case object::STRING:
 		{
+			object::Integer* index = (object::Integer*)indexObject;
+
+			if (index->m_value < 0)
+			{
+				std::ostringstream error;
+				error << "Invalid index: '" << index->Inspect() << "'";
+				return createError(error.str());
+			}
+
 			if (index->m_value >= ((object::String*)expression)->m_value.size()) return createError("Index out of bounds.");
 			char value = ((object::String*)expression)->m_value[index->m_value];
 			return new object::Character(value);
+		}
+		case object::DICTIONARY:
+		{
+			if (((object::Dictionary*)expression)->m_map.find(indexObject) == ((object::Dictionary*)expression)->m_map.end()) return createError("Index not in dictionary.");
+			return ((object::Dictionary*)expression)->m_map.at(indexObject);
 		}
 		}
 

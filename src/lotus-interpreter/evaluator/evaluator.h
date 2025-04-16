@@ -44,7 +44,7 @@ namespace evaluator
 	// Evaluates a function call
 	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment);
 
-	// Evaluates a function call
+	// Evaluates an indexing on collections, strings, or dictionaries
 	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment);
 
 	// Applies a function call to a function

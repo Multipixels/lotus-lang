@@ -251,6 +251,28 @@ TEST(EvaluatorTest, CollectionIndexing)
 	}
 }
 
+TEST(EvaluatorTest, DictionaryIndexing)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"{1: 2, 2: 3, 3: 4}[2];", 3},
+		{"dictionary<character, float> myDictionary = {'a': 0.0f, 'b': 1.0f, 'c': 1.5f}; myDictionary['b'];", 1.0f},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
 TEST(EvaluatorTest, StringIndexing)
 {
 	typedef struct TestCase
@@ -580,6 +602,8 @@ TEST(EvaluatorTest, Error)
 		{R"({1: 2, 2: 3, 3: 'a'};)", "Dictionary has mismatching value types."},
 		{R"({1: 2, 2: 3, 1: 1};)", "Dictionary initialized with duplicate key."},
 		{R"({"hello": 2};)", "Invalid dictionary key type. string is not a hashable type."},
+		{"{1: 2, 2: 3, 3: 4}[4];", "Index not in dictionary."},
+		{"{1: 2, 2: 3, 3: 4}['a'];", "Dictionary has keys of type: 'integer'. Got type: 'character'"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
