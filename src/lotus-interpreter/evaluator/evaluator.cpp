@@ -655,6 +655,13 @@ namespace evaluator
 					(object::Boolean*)leftObject, infixOperator, (object::Boolean*)rightObject);
 			break;
 		}
+		case object::CHARACTER:
+		{
+			if (rightObject->Type() == object::CHARACTER)
+				return evaluateCharacterInfixExpression(
+					(object::Character*)leftObject, infixOperator, (object::Character*)rightObject);
+			break;
+		}
 		}
 
 		std::ostringstream error;
@@ -711,6 +718,19 @@ namespace evaluator
 		// TODO: Change operator to an enum for performance gain
 		if (*infixOperator == "&&") return new object::Boolean(leftObject->m_value && rightObject->m_value);
 		if (*infixOperator == "||") return new object::Boolean(leftObject->m_value || rightObject->m_value);
+		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
+		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
+
+		std::ostringstream error;
+		error << "'" << object::objectTypeToString.at(leftObject->Type())
+			<< ' ' << *infixOperator << ' '
+			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	object::Object* evaluateCharacterInfixExpression(object::Character* leftObject, std::string* infixOperator, object::Character* rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
 		if (*infixOperator == "==") return new object::Boolean(leftObject->m_value == rightObject->m_value);
 		if (*infixOperator == "!=") return new object::Boolean(leftObject->m_value != rightObject->m_value);
 

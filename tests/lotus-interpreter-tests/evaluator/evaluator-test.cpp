@@ -120,6 +120,10 @@ TEST(EvaluatorTest, BooleanExpression)
 		{"true || false;", true},
 		{"false || false;", false},
 		{"(3 > 5) || (3 > 1 + 1);", true},
+		{"'a' == 'a';", true},
+		{"'a' == 'b';", false},
+		{"'a' != 'a';", false},
+		{"'a' != 'b';", true},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

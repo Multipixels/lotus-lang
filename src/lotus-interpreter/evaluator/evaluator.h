@@ -31,6 +31,9 @@ namespace evaluator
 	
 	// Evaluates a boolean infix expression
 	object::Object* evaluateBooleanInfixExpression(object::Boolean* leftObject, std::string* infixOperator, object::Boolean* rightObject);
+
+	// Evaluates a character infix expression
+	object::Object* evaluateCharacterInfixExpression(object::Character* leftObject, std::string* infixOperator, object::Character* rightObject);
 	
 	// Evaluates an integer infix expression
 	object::Object* evaluateFloatInfixExpression(object::Float* leftObject, std::string* infixOperator, object::Float* rightObject);
