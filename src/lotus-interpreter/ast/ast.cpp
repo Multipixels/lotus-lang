@@ -282,6 +282,27 @@ namespace ast
 
 		return output.str();
 	}
+	
+	std::string DeclareDictionaryStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string DeclareDictionaryStatement::String()
+	{
+		std::ostringstream output;
+
+		output << TokenLiteral() << "<"
+			<< m_keyTypeToken.m_literal << ", " << m_valueTypeToken.m_literal << "> " << m_name.String();
+
+		if (m_value != NULL)
+		{
+			output << " = " << m_value->String();
+		}
+
+		output << ";";
+
+		return output.str();
+	}
 
 	std::string DeclareFunctionStatement::TokenLiteral()
 	{

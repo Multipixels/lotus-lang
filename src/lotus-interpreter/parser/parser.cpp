@@ -168,6 +168,8 @@ namespace parser
 			return parseVariableDeclaration();
 		case token::COLLECTION_TYPE:
 			return parseCollectionDeclaration();
+		case token::DICTIONARY_TYPE:
+			return parseDictionaryDeclaration();
 		case token::RETURN:
 			return parseReturnStatement();
 		case token::IF:
@@ -234,6 +236,64 @@ namespace parser
 		nextToken();
 
 		statement->m_typeToken = m_currentToken;
+
+		if (!expectPeek(token::RCHEVRON))
+		{
+			return NULL;
+		}
+
+		if (!expectPeek(token::IDENTIFIER))
+		{
+			return NULL;
+		}
+
+		statement->m_name.m_token = m_currentToken;
+		statement->m_name.m_name = m_currentToken.m_literal;
+
+		// Declaration without assignment
+		if (peekTokenIs(token::SEMICOLON))
+		{
+			nextToken();
+			return statement;
+		}
+
+		// Declaration with assignment
+		if (!expectPeek(token::ASSIGN))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_value = parseExpression(LOWEST);
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	};
+
+	ast::DeclareDictionaryStatement* Parser::parseDictionaryDeclaration()
+	{
+		ast::DeclareDictionaryStatement* statement = new ast::DeclareDictionaryStatement;
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::LCHEVRON))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_keyTypeToken = m_currentToken;
+
+		if (!expectPeek(token::COMMA))
+		{
+			return NULL;
+		}
+		nextToken();
+
+		statement->m_valueTypeToken = m_currentToken;
 
 		if (!expectPeek(token::RCHEVRON))
 		{

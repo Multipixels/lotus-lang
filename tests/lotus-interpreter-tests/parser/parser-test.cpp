@@ -1145,10 +1145,7 @@ TEST(ParserTest, DeclaringCollectionStatement)
 
 		// Test collection value
 		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].expectedValue.size());
-		for (int j = 0; j < collectionLiteral->m_values.size(); j++)
-		{
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], tests[i].expectedValue[j], i));
-		}
+		EXPECT_NO_FATAL_FAILURE(testCollectionLiteral(collectionLiteral, &tests[i].expectedValue, i));
 	}
 }
 
@@ -1259,6 +1256,64 @@ TEST(ParserTest, DictionaryLiteral)
 		testDictionaryLiteral(expressionStatement->m_expression, &tests[i].expectedValue, i);
 	}
 }
+
+
+
+TEST(ParserTest, DeclaringDictionaryStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::string expectedIdentifier;
+		token::TokenType expectedKeyType;
+		token::TokenType expectedValueType;
+		std::map<std::string, std::any> expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"dictionary<integer, integer> myDictionary = {};", "myDictionary", token::INTEGER_TYPE, token::INTEGER_TYPE, {}},
+		{"dictionary<integer, character> myDictionary = {1: 'a', 2: 'b', 3: 'c'};", "myDictionary", token::INTEGER_TYPE, token::CHARACTER_TYPE, {{"1", 'a'}, {"2", 'b'}, {"3", 'c'}}},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		ast::Program* program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		ast::Statement* statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		// Test declaration identifier literal and name
+		ASSERT_EQ(statement->Type(), ast::DECLARE_DICTIONARY_STATEMENT_NODE)
+			<< "Test #" << i << std::endl;
+		ast::DeclareDictionaryStatement* declareDictionaryStatement = (ast::DeclareDictionaryStatement*)statement;
+
+		ASSERT_EQ(declareDictionaryStatement->m_token.m_type, token::DICTIONARY_TYPE)
+			<< "Test #" << i << std::endl;
+		ASSERT_EQ(declareDictionaryStatement->m_keyTypeToken.m_type, tests[i].expectedKeyType)
+			<< "Test #" << i << std::endl;
+		ASSERT_EQ(declareDictionaryStatement->m_valueTypeToken.m_type, tests[i].expectedValueType)
+			<< "Test #" << i << std::endl;
+
+		EXPECT_EQ(declareDictionaryStatement->m_name.m_name, tests[i].expectedIdentifier)
+			<< "Test #" << i << std::endl;
+		EXPECT_EQ(declareDictionaryStatement->m_name.TokenLiteral(), tests[i].expectedIdentifier)
+			<< "Test #" << i << std::endl;
+
+		// Test to see if we're holding a collection
+		ASSERT_EQ(declareDictionaryStatement->m_value->Type(), ast::DICTIONARY_LITERAL_NODE);
+		ast::DictionaryLiteral* dictionaryLiteral = (ast::DictionaryLiteral*)declareDictionaryStatement->m_value;
+
+		// Test collection value
+		ASSERT_EQ(dictionaryLiteral->m_map.size(), tests[i].expectedValue.size());
+		EXPECT_NO_FATAL_FAILURE(testDictionaryLiteral(dictionaryLiteral, &tests[i].expectedValue, i));
+	}
+}
+
 
 
 TEST(ParserTest, ExampleLotus)

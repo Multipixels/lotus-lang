@@ -289,6 +289,51 @@ namespace evaluator
 
 			return &object::NULL_OBJECT;
 		}
+		case ast::DECLARE_DICTIONARY_STATEMENT_NODE:
+		{
+			ast::DeclareDictionaryStatement* declareDictionaryStatement = (ast::DeclareDictionaryStatement*)node;
+
+			if (environment->getLocalIdentifier(&declareDictionaryStatement->m_name.m_name) != NULL)
+			{
+				std::ostringstream error;
+				error << "Redefinition of '" << declareDictionaryStatement->m_name.m_name << "'.";
+				return createError(error.str());
+			}
+
+			object::Object* object = evaluate(declareDictionaryStatement->m_value, environment);
+
+			if (object->Type() == object::ERROR)
+			{
+				return object;
+			}
+
+			if (declareDictionaryStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			{
+				std::ostringstream error;
+				error << "'" << declareDictionaryStatement->m_name.m_name
+					<< "' is defined as type '" << declareDictionaryStatement->m_token.m_literal
+					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
+				return createError(error.str());
+			}
+
+			object::Dictionary* dictionary = (object::Dictionary*)object;
+
+			if (dictionary->m_key_type != object::NULL_TYPE && 
+				(declareDictionaryStatement->m_keyTypeToken.m_literal != object::objectTypeToString.at(dictionary->m_key_type) || 
+				 declareDictionaryStatement->m_valueTypeToken.m_literal != object::objectTypeToString.at(dictionary->m_value_type)))
+			{
+				std::ostringstream error;
+				error << "'" << declareDictionaryStatement->m_name.m_name
+					<< "' is a dictionary of <" << declareDictionaryStatement->m_keyTypeToken.m_literal << ", " << declareDictionaryStatement->m_valueTypeToken.m_literal
+					<< "> pairs, but got a dictionary of type <" 
+					<< object::objectTypeToString.at(dictionary->m_key_type) << ", " << object::objectTypeToString.at(dictionary->m_value_type) << "> pairs.";
+				return createError(error.str());
+			}
+
+			environment->setIdentifier(&declareDictionaryStatement->m_name.m_name, object);
+
+			return &object::NULL_OBJECT;
+		}
 		case ast::DECLARE_FUNCTION_STATEMENT_NODE:
 		{
 			ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)node;

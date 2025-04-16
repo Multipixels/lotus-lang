@@ -312,7 +312,8 @@ TEST(EvaluatorTest, Declaration)
 		{"boolean c = false; c;", false},
 		{"character d = 'e'; d;", 'e'},
 		{"collection<integer> e = [6, 4]; e;", new std::vector<std::any>({6, 4}) },
-		{R"(string f = "Hello, World!"; f;)", "Hello, World!" },
+		{R"(dictionary<integer, string> f = {0: "", 1: "a", 2: "aa"}; f;)", new std::map<std::string, std::any>({{"0", ""}, {"1", "a"}, {"2", "aa"}})},
+		{R"(string g = "Hello, World!"; g;)", "Hello, World!" },
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -623,6 +624,9 @@ void testLiteralObject(object::Object* object, std::any expectedValue)
 		return;
 	case object::COLLECTION:
 		EXPECT_NO_FATAL_FAILURE(testCollectionObject(object, std::any_cast<std::vector<std::any>*>(expectedValue), object::INTEGER));
+		return;
+	case object::DICTIONARY:
+		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(object, std::any_cast<std::map<std::string, std::any>*>(expectedValue), object::INTEGER, object::STRING));
 		return;
 	case object::STRING:
 	{

@@ -31,6 +31,7 @@ namespace ast
 
 		DECLARE_VARIABLE_STATEMENT_NODE,
 		DECLARE_COLLECTION_STATEMENT_NODE,
+		DECLARE_DICTIONARY_STATEMENT_NODE,
 		DECLARE_FUNCTION_STATEMENT_NODE,
 		RETURN_STATEMENT_NODE,
 		EXPRESSION_STATEMENT_NODE,
@@ -303,7 +304,22 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = DECLARE_COLLECTION_STATEMENT_NODE;
+	};
 
+	class DeclareDictionaryStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+		token::Token m_keyTypeToken;
+		token::Token m_valueTypeToken;
+		Identifier m_name;
+		Expression* m_value;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = DECLARE_DICTIONARY_STATEMENT_NODE;
 	};
 
 	class DeclareFunctionStatement : public Statement
