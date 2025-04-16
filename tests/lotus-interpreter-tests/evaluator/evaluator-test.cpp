@@ -178,6 +178,29 @@ TEST(EvaluatorTest, CollectionExpression)
 	}
 }
 
+TEST(EvaluatorTest, DictionaryExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::map<std::string, std::any> expectedValue;
+		object::ObjectType expectedKeyType;
+		object::ObjectType expectedValueType;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"({};)", {}, object::NULL_TYPE, object::NULL_TYPE},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);;
+
+		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(evaluated, &tests[i].expectedValue, tests[i].expectedKeyType, tests[i].expectedValueType));
+	}
+}
+
 TEST(EvaluatorTest, StringExpression)
 {
 	typedef struct TestCase
@@ -295,7 +318,7 @@ TEST(EvaluatorTest, Declaration)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -344,7 +367,7 @@ TEST(EvaluatorTest, FunctionCall)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -368,7 +391,7 @@ TEST(EvaluatorTest, Reassignment)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -399,7 +422,7 @@ TEST(EvaluatorTest, IfStatement)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -422,7 +445,7 @@ TEST(EvaluatorTest, WhileLoop)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -445,7 +468,7 @@ TEST(EvaluatorTest, DoWhileLoop)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -468,7 +491,7 @@ TEST(EvaluatorTest, ForLoop)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -491,7 +514,7 @@ TEST(EvaluatorTest, IterateLoop)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -517,7 +540,7 @@ TEST(EvaluatorTest, BuiltInFunctions)
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		object::Object* evaluated = testEvaluation(&tests[i].input);
-		testLiteralObject(evaluated, tests[i].expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
 
@@ -552,6 +575,10 @@ TEST(EvaluatorTest, Error)
 		{"integer myInt = 0; iterate(value : [1, 'a', 3]) { myInt = myInt + value; } myInt;", "The collection [1, 'a', 3] must have uniform typing of elements."},
 		{"integer myInt = 0; iterate(value : ['a', 'b', 'c']) { myInt = myInt + value; } myInt;", "'integer + character' is not supported."},
 		{"integer myInt = 26; size(myInt);", "Argument to `size` not supported, got integer."},
+		{R"({1: 2, 2: 3, 'a': 4};)", "Dictionary has mismatching key types."},
+		{R"({1: 2, 2: 3, 3: 'a'};)", "Dictionary has mismatching value types."},
+		{R"({1: 2, 2: 3, 1: 1};)", "Dictionary initialized with duplicate key."},
+		{R"({"hello": 2};)", "Invalid dictionary key type. string is not a hashable type."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -651,6 +678,54 @@ void testCollectionObject(object::Object* object, std::vector<std::any>* expecte
 	{
 		ASSERT_EQ(collection->m_values[i]->Type(), expectedType);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(collection->m_values[i], (*expectedValue)[i]));
+	}
+}
+
+void testDictionaryObject(object::Object* object, std::map<std::string, std::any>* expectedValue, object::ObjectType expectedKeyType, object::ObjectType expectedValueType)
+{
+	ASSERT_EQ(object->Type(), object::DICTIONARY);
+	object::Dictionary* dictionary = (object::Dictionary*)object;
+
+	ASSERT_EQ(dictionary->m_key_type, expectedKeyType);
+	ASSERT_EQ(dictionary->m_value_type, expectedValueType);
+
+	std::map<object::Object*, object::Object*>::iterator it;
+	for (it = dictionary->m_map.begin(); it != dictionary->m_map.end(); it++)
+	{
+		ASSERT_EQ(it->first->Type(), expectedKeyType);
+		ASSERT_EQ(it->second->Type(), expectedValueType);
+
+		switch (it->first->Type()) {
+		case object::INTEGER:
+		{
+			object::Integer* integerLiteral = (object::Integer*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
+			break;
+		}
+		case object::FLOAT:
+		{
+			object::Float* floatLiteral = (object::Float*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
+			break;
+		}
+		case object::BOOLEAN:
+		{
+			object::Boolean* booleanLiteral = (object::Boolean*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
+			break;
+		}
+		case object::CHARACTER:
+		{
+			object::Character* characterLiteral = (object::Character*)it->first;
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
+			break;
+		}
+		default:
+		{
+			FAIL() << "Unexpected type found in dictionary.";
+			break;
+		}
+		}
 	}
 }
 

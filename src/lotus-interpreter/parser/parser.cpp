@@ -655,6 +655,16 @@ namespace parser
 
 	ast::Expression* Parser::parseCharacterLiteral()
 	{
+		if (m_currentToken.m_literal.size() != 1) {
+			std::ostringstream error;
+
+			error << "Expected to see a single character. Got " 
+				<< m_currentToken.m_literal.size()
+				<< " instead.";
+
+			m_errors.push_back(error.str());
+		}
+
 		ast::CharacterLiteral* expression = new ast::CharacterLiteral;
 		expression->m_token = m_currentToken;
 		expression->m_value = m_currentToken.m_literal[0];
@@ -795,9 +805,8 @@ namespace parser
 
 			ast::Expression* key = parseExpression(LOWEST);
 
-			if (peekTokenIs(token::COLON))
+			if (expectPeek(token::COLON))
 			{
-				nextToken();
 				nextToken();
 			}
 

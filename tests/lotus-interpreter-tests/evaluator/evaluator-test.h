@@ -25,5 +25,8 @@ void testCharacterObject(object::Object* object, char expectedValue);
 // Tests collection object to see if they match expected values
 void testCollectionObject(object::Object* object, std::vector<std::any>* expectedValue, object::ObjectType expectedType);
 
+// Tests dictionary object to see if they match expected values
+void testDictionaryObject(object::Object* object, std::map<std::string, std::any>* expectedValue, object::ObjectType expectedKeyType, object::ObjectType expectedValueType);
+
 // Tests object to see if they are string with expected value
 void testStringObject(object::Object* object, std::string* expectedValue);

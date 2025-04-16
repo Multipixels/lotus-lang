@@ -181,6 +181,48 @@ namespace object
 		return output.str();
 	}
 
+	bool Dictionary::ObjCmp::operator()(object::Object* lhs, object::Object* rhs) const
+	{
+		switch (lhs->Type()) {
+		case object::INTEGER:
+		{
+			if (rhs->Type() != object::INTEGER) return true;
+			object::Integer* lhsI = (object::Integer*) lhs;
+			object::Integer* rhsI = (object::Integer*) rhs;
+
+			return lhsI->m_value < rhsI->m_value;
+		}
+		case object::FLOAT:
+		{
+			if (rhs->Type() != object::FLOAT) return true;
+			object::Float* lhsF = (object::Float*)lhs;
+			object::Float* rhsF = (object::Float*)rhs;
+
+			return lhsF->m_value < rhsF->m_value;
+		}
+		case object::BOOLEAN:
+		{
+			if (rhs->Type() != object::BOOLEAN) return true;
+			object::Boolean* lhsB = (object::Boolean*)lhs;
+			object::Boolean* rhsB = (object::Boolean*)rhs;
+
+			return lhsB->m_value < rhsB->m_value;
+		}
+		case object::CHARACTER:
+		{
+			if (rhs->Type() != object::CHARACTER) return true;
+			object::Character* lhsC = (object::Character*)lhs;
+			object::Character* rhsC = (object::Character*)rhs;
+
+			return lhsC->m_value < rhsC->m_value;
+		}
+		default:
+		{
+			return true;
+		}
+		}
+	}
+
 	Dictionary::Dictionary()
 		: m_key_type(NULL_TYPE), m_value_type(NULL_TYPE)
 	{
@@ -191,6 +233,7 @@ namespace object
 	{
 		for (int i = 0; i < keys.size(); i++)
 		{
+			// https://en.cppreference.com/w/cpp/utility/functional/less
 			m_map.emplace(keys.at(i), values.at(i));
 		}
 	}
@@ -211,7 +254,7 @@ namespace object
 			output << it->first->Inspect() << ": "
 				<< it->second->Inspect();
 
-			if (it != m_map.end()) output << ", ";
+			if (std::next(it) != m_map.end()) output << ", ";
 		}
 
 		output << "}";

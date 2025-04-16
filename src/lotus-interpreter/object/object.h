@@ -131,6 +131,10 @@ namespace object
 
 	class Dictionary : public Object
 	{
+	private:
+		struct ObjCmp {
+			bool operator()(object::Object* lhs, object::Object* rhs) const;
+		};
 	public:
 		Dictionary();
 		Dictionary(ObjectType keyType, ObjectType valueType, std::vector<Object*> keys, std::vector<Object*> values);
@@ -139,7 +143,7 @@ namespace object
 
 		ObjectType m_key_type;
 		ObjectType m_value_type;
-		std::map<Object*, Object*> m_map;
+		std::map<Object*, Object*, ObjCmp> m_map;
 	};
 
 	class String : public Object

@@ -128,10 +128,10 @@ namespace ast
 		std::map<Expression*, Expression*>::iterator it;
 		for (it = m_map.begin(); it != m_map.end(); it++)
 		{
-			outputString << it->first << ": "
-				<< it->second;
+			outputString << it->first->String() << ": "
+				<< it->second->String();
 
-			if (it != m_map.end()) outputString << ", ";
+			if (std::next(it) != m_map.end()) outputString << ", ";
 		}
 
 		outputString << "}";

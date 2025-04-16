@@ -1,3 +1,4 @@
+#include <set>
 #include <sstream>
 
 #include "builtinFunctions.h"
@@ -73,6 +74,67 @@ namespace evaluator
 
 				if (object->m_collection_type == object::NULL_TYPE) object->m_collection_type = evaluatedItem->Type();
 				object->m_values.push_back(evaluatedItem);
+			}
+
+			return object;
+		}
+		case ast::DICTIONARY_LITERAL_NODE:
+		{
+			ast::DictionaryLiteral* dictionaryLiteral = (ast::DictionaryLiteral*)node;
+
+			if (dictionaryLiteral->m_map.size() == 0)
+			{
+				return new object::Dictionary;
+			}
+
+			object::Dictionary* object = new object::Dictionary;
+		
+			std::map<ast::Expression*, ast::Expression*>::iterator it;
+			for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
+			{
+				// Checking the key
+				object::Object* evaluatedKey = evaluate(it->first, environment);
+				if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
+
+				if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
+					evaluatedKey->Type() != object::BOOLEAN && evaluatedKey->Type() != object::CHARACTER)
+				{
+					std::ostringstream error;
+					error << "Invalid dictionary key type. " << 
+						object::objectTypeToString.at(evaluatedKey->Type()) << " is not a hashable type.";
+					return createError(error.str());
+				}
+
+				if (object->m_key_type != object::NULL_TYPE && evaluatedKey->Type() != object->m_key_type)
+				{
+					std::ostringstream error;
+					error << "Dictionary has mismatching key types.";
+					return createError(error.str());
+				}
+
+				if (object->m_key_type == object::NULL_TYPE) object->m_key_type = evaluatedKey->Type();
+				if (object->m_map.find(evaluatedKey) != object->m_map.end())
+				{
+					std::ostringstream error;
+					error << "Dictionary initialized with duplicate key.";
+					return createError(error.str());
+				}
+
+				// Checking the value
+				object::Object* evaluatedValue = evaluate(it->second, environment);
+				if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
+
+				if (object->m_value_type != object::NULL_TYPE && evaluatedValue->Type() != object->m_value_type)
+				{
+					std::ostringstream error;
+					error << "Dictionary has mismatching value types.";
+					return createError(error.str());
+				}
+
+				if (object->m_value_type == object::NULL_TYPE) object->m_value_type = evaluatedValue->Type();
+
+				// Storing key value pair
+				object->m_map.emplace(evaluatedKey, evaluatedValue);
 			}
 
 			return object;
