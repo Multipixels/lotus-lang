@@ -50,6 +50,12 @@ namespace evaluator
 	// Evaluates an indexing on collections, strings, or dictionaries
 	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment);
 
+	// Reassigns value in a collection
+	object::Object* collectionValueReassignment(object::Collection* collection, object::Object* indexObject, object::Object* valueObject);
+
+	// Reassigns value in a dictionary
+	object::Object* dictionaryValueReassignment(object::Dictionary* dictionary, object::Object* keyObject, object::Object* valueObject);
+
 	// Applies a function call to a function
 	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments);
 

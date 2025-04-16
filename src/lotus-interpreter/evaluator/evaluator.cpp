@@ -195,6 +195,42 @@ namespace evaluator
 
 				return &object::NULL_OBJECT;
 			}
+			else if (infixExpression->m_left_expression->Type() == ast::INDEX_EXPRESSION_NODE && infixExpression->m_operator == "=")
+			{
+				ast::IndexExpression* indexExpression = (ast::IndexExpression*)(infixExpression->m_left_expression);
+				
+				object::Object* object = evaluate(indexExpression->m_collection, environment);
+				if (object->Type() == object::ERROR) return object;
+
+				object::Object* indexObject = evaluate(indexExpression->m_index, environment);
+				if (indexObject->Type() == object::ERROR) return indexObject;
+
+				object::Object* valueObject = evaluate(infixExpression->m_right_expression, environment);
+				if (valueObject->Type() == object::ERROR) return valueObject;
+
+				switch (object->Type()) {
+				case object::COLLECTION:
+				{
+					return collectionValueReassignment((object::Collection*)object, indexObject, valueObject);
+				}
+				case object::DICTIONARY:
+				{
+					return dictionaryValueReassignment((object::Dictionary*)object, indexObject, valueObject);
+				}
+				case object::STRING:
+				{
+					std::ostringstream error;
+					error << "Strings are immutable.";
+					return createError(error.str());
+				}
+				default:
+				{
+					std::ostringstream error;
+					error << "This should be unreachable.";
+					return createError(error.str());
+				}
+				}
+			}
 			else
 			{
 				object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
@@ -939,6 +975,54 @@ namespace evaluator
 		std::ostringstream error;
 		error << "'" << expression->Inspect() << "' is not an indexable value.";
 		return createError(error.str());
+	}
+
+
+	object::Object* collectionValueReassignment(object::Collection* collection, object::Object* indexObject, object::Object* valueObject)
+	{
+		if (indexObject->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << indexObject->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		object::Integer* index = (object::Integer*)indexObject;
+
+		if (index->m_value < 0)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << index->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		if (index->m_value >= (collection->m_values.size())) return createError("Index out of bounds.");
+
+		if (valueObject->Type() != collection->m_collection_type)
+		{
+			std::ostringstream error;
+			error << "'The collection has values of type '" << object::objectTypeToString.at(collection->m_collection_type)
+				<< "'. Got value of type '" << object::objectTypeToString.at(valueObject->Type()) << "'.";
+			return createError(error.str());
+		}
+
+		collection->m_values[index->m_value] = valueObject;
+		return &object::NULL_OBJECT;
+	}
+
+	object::Object* dictionaryValueReassignment(object::Dictionary* dictionary, object::Object* keyObject, object::Object* valueObject)
+	{
+		if (keyObject->Type() != dictionary->m_key_type)
+		{
+			std::ostringstream error;
+			error << "Dictionary has keys of type: '" <<
+				object::objectTypeToString.at(dictionary->m_key_type) <<
+				"'. Got type: '" << object::objectTypeToString.at(keyObject->Type()) << "'";
+			return createError(error.str());
+		}
+
+		dictionary->m_map[keyObject] = valueObject;
+		return &object::NULL_OBJECT;
 	}
 
 	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments)

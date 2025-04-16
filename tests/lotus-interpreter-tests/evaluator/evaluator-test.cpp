@@ -422,6 +422,47 @@ TEST(EvaluatorTest, Reassignment)
 	}
 }
 
+TEST(EvaluatorTest, CollectionReassignment)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"collection<integer> myCollection = [5, 3, 7]; myCollection[1] = 6; myCollection[1];", 6},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+TEST(EvaluatorTest, DictionaryReassignment)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"dictionary<integer, character> myDictionary = {5: 'a', 3: 'c', 7: 'c'}; myDictionary[5] = 'c'; myDictionary[5];", 'c'},
+		{"dictionary<integer, character> myDictionary = {5: 'a', 3: 'c', 7: 'c'}; myDictionary[6] = 'c'; myDictionary[6];", 'c'},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		object::Object* evaluated = testEvaluation(&tests[i].input);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
 TEST(EvaluatorTest, IfStatement)
 {
 	typedef struct TestCase
