@@ -5,16 +5,8 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -40,16 +32,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir);$(SolutionDir)lotus-interpreter\repl;$(SolutionDir)lotus-interpreter\lexer;$(SolutionDir)lotus-interpreter\token;$(SolutionDir)lotus-interpreter\parser;$(SolutionDir)lotus-interpreter\object;$(SolutionDir)lotus-interpreter\evaluator;$(SolutionDir)lotus-interpreter\ast;%(AdditionalIncludeDirectories);C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\lexer;C:\Users\RIC\Documents\Projects\lotus-lang\src\interpreter\token;$(IncludePath);$(IncludePath)</IncludePath>
-    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir);$(SolutionDir)lotus-interpreter\repl;$(SolutionDir)lotus-interpreter\lexer;$(SolutionDir)lotus-interpreter\token;$(SolutionDir)lotus-interpreter\parser;$(SolutionDir)lotus-interpreter\object;$(SolutionDir)lotus-interpreter\evaluator;$(SolutionDir)lotus-interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(IncludePath)</IncludePath>
-    <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
-    <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir);$(SolutionDir)lotus-interpreter\repl;$(SolutionDir)lotus-interpreter\lexer;$(SolutionDir)lotus-interpreter\token;$(SolutionDir)lotus-interpreter\parser;$(SolutionDir)lotus-interpreter\object;$(SolutionDir)lotus-interpreter\evaluator;$(SolutionDir)lotus-interpreter\ast;%(AdditionalIncludeDirectories);$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</OutDir>
     <IntDir>$(ProjectDir)..\out\$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
@@ -92,46 +74,6 @@
       <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PreprocessorDefinitions>X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>C:\Users\RIC\Documents\Projects\lotus-lang\out\lotus-interpreter\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>token;lexer;parser;ast;evaluator;object;builtinFunctions;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ast\ast-test.h" />
     <ClInclude Include="evaluator\evaluator-test.h" />
@@ -146,9 +88,7 @@
     <ClCompile Include="parser\parser-test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

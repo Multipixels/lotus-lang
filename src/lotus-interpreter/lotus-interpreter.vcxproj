@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ast\ast.cpp" />
+    <ClCompile Include="bindings.cpp" />
     <ClCompile Include="evaluator\builtinFunctions.cpp" />
     <ClCompile Include="evaluator\evaluator.cpp" />
     <ClCompile Include="lexer\lexer.cpp" />
