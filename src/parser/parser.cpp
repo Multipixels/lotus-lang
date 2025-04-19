@@ -473,7 +473,9 @@ namespace parser
 			return NULL;
 		}
 
+		statement->m_condition = NULL;
 		statement->m_consequence = parseBlockStatement();
+		statement->m_alternative = NULL;
 
 		return statement;
 	}
@@ -829,6 +831,7 @@ namespace parser
 
 			statement->m_name.m_token = m_currentToken;
 			statement->m_name.m_name = m_currentToken.m_literal;
+			statement->m_value = NULL;
 
 			if (peekTokenIs(token::COMMA))
 			{

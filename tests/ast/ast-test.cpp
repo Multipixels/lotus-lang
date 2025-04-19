@@ -1,4 +1,4 @@
-#include "pch.h"
+#include <gtest/gtest.h>
 
 #include "ast.h"
 #include "ast-test.h"
