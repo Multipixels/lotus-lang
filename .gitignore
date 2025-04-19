@@ -1,8 +1,6 @@
 out/
+build/
+bin/
 .vs/
-x64/
-x86/
-*.user
-Debug/
-Release/
-packages/
+.idea/
+CMakeSettings.json
