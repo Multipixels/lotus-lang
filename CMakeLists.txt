@@ -131,3 +131,37 @@ if(NOT ${RELEASE_BUILD})
     gtest_discover_tests(LotusTests)
 endif()
 
+
+## WEB BUILD
+
+message(${CMAKE_SYSTEM_NAME})
+if(${RELEASE_BUILD} AND CMAKE_SYSTEM_NAME STREQUAL Emscripten)
+    project("LotusLangWeb")
+    add_executable("LotusLangWeb" 
+        "src/bindings.cpp"
+        "src/ast/ast.cpp"
+        "src/evaluator/builtinFunctions.cpp"
+        "src/evaluator/evaluator.cpp"
+        "src/lexer/lexer.cpp"
+        "src/object/object.cpp"
+        "src/parser/parser.cpp"
+        "src/repl/repl.cpp"
+        "src/token/token.cpp"
+    )
+
+    target_include_directories(LotusLangWeb PUBLIC 
+        "src/ast"
+        "src/evaluator"
+        "src/lexer"
+        "src/object"
+        "src/parser"
+        "src/repl"
+        "src/token"
+    )
+
+    set_target_properties(LotusLangWeb PROPERTIES 
+        SUFFIX ".mjs"
+        COMPILE_FLAGS "-Os"
+        LINK_FLAGS "-lembind -Os -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s EXPORTED_RUNTIME_METHODS=['run']"
+    )
+endif()
