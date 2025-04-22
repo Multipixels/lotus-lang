@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include "emscripten/bind.h"
 #include "repl.h"
@@ -6,7 +7,7 @@
 
 using namespace emscripten;
 
-void run(std::string input) {
+void run(std::string input, int timeout = 0) {
     lexer::Lexer lexer = lexer::Lexer(&input);
     parser::Parser parser = parser::Parser(lexer);
     ast::Program* program = parser.ParseProgram();
@@ -18,7 +19,8 @@ void run(std::string input) {
     }
     if (parser.m_errors.size() > 0) return;
 
-    object::Object* output = evaluator::evaluate(program, &environment);
+    std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout);
+    object::Object* output = evaluator::evaluate(program, &environment, timeoutValue);
 
     // Output only if you get an error
     if (output->Type() == object::ERROR)

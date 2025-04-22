@@ -4,17 +4,23 @@
 #include "builtinFunctions.h"
 #include "evaluator.h"
 
-
 namespace evaluator
 {
-	object::Object* evaluate(ast::Node* node, object::Environment* environment)
+	object::Object* evaluate(ast::Node* node, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
+		if (timeout != std::chrono::steady_clock::time_point() && timeout < std::chrono::steady_clock::now())
+		{
+			std::ostringstream error;
+			error << "Evaluation of the program timed out.";
+			return createError(error.str());
+		}
+
 		if (node == NULL) return &object::NULL_OBJECT;
 
 		switch (node->Type())
 		{
 		case ast::PROGRAM_NODE:
-			return evaluateProgram((ast::Program*)node, environment);
+			return evaluateProgram((ast::Program*)node, environment, timeout);
 		case ast::IDENTIFIER_NODE:
 		{
 			return evaluateIdentifier((ast::Identifier*)node, environment);
@@ -22,7 +28,7 @@ namespace evaluator
 		case ast::BLOCK_STATEMENT_NODE:
 		{
 			ast::BlockStatement* blockStatement = (ast::BlockStatement*)node;
-			return evaluateBlockStatement(blockStatement, environment);
+			return evaluateBlockStatement(blockStatement, environment, timeout);
 		}
 		case ast::INTEGER_LITERAL_NODE:
 		{
@@ -61,7 +67,7 @@ namespace evaluator
 
 			for (int i = 0; i < collectionLiteral->m_values.size(); i++)
 			{
-				object::Object* evaluatedItem = evaluate(collectionLiteral->m_values[i], environment);
+				object::Object* evaluatedItem = evaluate(collectionLiteral->m_values[i], environment, timeout);
 
 				if (evaluatedItem->Type() == object::ERROR) return evaluatedItem;
 
@@ -93,7 +99,7 @@ namespace evaluator
 			for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
 			{
 				// Checking the key
-				object::Object* evaluatedKey = evaluate(it->first, environment);
+				object::Object* evaluatedKey = evaluate(it->first, environment, timeout);
 				if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
 
 				if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
@@ -121,7 +127,7 @@ namespace evaluator
 				}
 
 				// Checking the value
-				object::Object* evaluatedValue = evaluate(it->second, environment);
+				object::Object* evaluatedValue = evaluate(it->second, environment, timeout);
 				if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
 
 				if (object->m_value_type != object::NULL_TYPE && evaluatedValue->Type() != object->m_value_type)
@@ -158,7 +164,7 @@ namespace evaluator
 		{
 			ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)node;
 
-			object::Object* rightObject = evaluate(prefixExpression->m_right_expression, environment);
+			object::Object* rightObject = evaluate(prefixExpression->m_right_expression, environment, timeout);
 			if (rightObject->Type() == object::ERROR) return rightObject;
 
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
@@ -178,7 +184,7 @@ namespace evaluator
 					return createError(error.str());
 				}
 
-				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
+				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment, timeout);
 
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
@@ -199,13 +205,13 @@ namespace evaluator
 			{
 				ast::IndexExpression* indexExpression = (ast::IndexExpression*)(infixExpression->m_left_expression);
 				
-				object::Object* object = evaluate(indexExpression->m_collection, environment);
+				object::Object* object = evaluate(indexExpression->m_collection, environment, timeout);
 				if (object->Type() == object::ERROR) return object;
 
-				object::Object* indexObject = evaluate(indexExpression->m_index, environment);
+				object::Object* indexObject = evaluate(indexExpression->m_index, environment, timeout);
 				if (indexObject->Type() == object::ERROR) return indexObject;
 
-				object::Object* valueObject = evaluate(infixExpression->m_right_expression, environment);
+				object::Object* valueObject = evaluate(infixExpression->m_right_expression, environment, timeout);
 				if (valueObject->Type() == object::ERROR) return valueObject;
 
 				switch (object->Type()) {
@@ -233,10 +239,10 @@ namespace evaluator
 			}
 			else
 			{
-				object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment);
+				object::Object* leftObject = evaluate(infixExpression->m_left_expression, environment, timeout);
 				if (leftObject->Type() == object::ERROR) return leftObject;
 
-				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment);
+				object::Object* rightObject = evaluate(infixExpression->m_right_expression, environment, timeout);
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
 				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
@@ -245,12 +251,12 @@ namespace evaluator
 		case ast::CALL_EXPRESSION_NODE:
 		{
 			ast::CallExpression* callExpression = (ast::CallExpression*)node;
-			return evaluateCallExpression(callExpression, environment);
+			return evaluateCallExpression(callExpression, environment, timeout);
 		}
 		case ast::INDEX_EXPRESSION_NODE:
 		{
 			ast::IndexExpression* indexExpression = (ast::IndexExpression*)node;
-			return evaluateIndexExpression(indexExpression, environment);
+			return evaluateIndexExpression(indexExpression, environment, timeout);
 		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
@@ -263,7 +269,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			object::Object* object = evaluate(declareVariableStatement->m_value, environment);
+			object::Object* object = evaluate(declareVariableStatement->m_value, environment, timeout);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -294,7 +300,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			object::Object* object = evaluate(declareCollectionStatement->m_value, environment);
+			object::Object* object = evaluate(declareCollectionStatement->m_value, environment, timeout);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -336,7 +342,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			object::Object* object = evaluate(declareDictionaryStatement->m_value, environment);
+			object::Object* object = evaluate(declareDictionaryStatement->m_value, environment, timeout);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -392,10 +398,10 @@ namespace evaluator
 		case ast::RETURN_STATEMENT_NODE:
 		{
 			ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)node;
-			return new object::Return(evaluate(returnStatement->m_returnValue, environment));
+			return new object::Return(evaluate(returnStatement->m_returnValue, environment, timeout));
 		}
 		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment);
+			return evaluate(((ast::ExpressionStatement*)node)->m_expression, environment, timeout);
 		case ast::IF_STATEMENT_NODE:
 		{
 			ast::IfStatement* ifStatement = (ast::IfStatement*)node;
@@ -404,10 +410,10 @@ namespace evaluator
 			if (ifStatement->m_condition == NULL)
 			{
 				object::Environment* ifEnvironment = new object::Environment(environment);
-				return evaluate(ifStatement->m_consequence, ifEnvironment);
+				return evaluate(ifStatement->m_consequence, ifEnvironment, timeout);
 			}
 
-			object::Object* evaluatedCondition = evaluate(ifStatement->m_condition, environment);
+			object::Object* evaluatedCondition = evaluate(ifStatement->m_condition, environment, timeout);
 
 			if (evaluatedCondition->Type() == object::ERROR)
 			{
@@ -424,8 +430,8 @@ namespace evaluator
 			object::Boolean* truthyBoolean = (object::Boolean*)truthy;
 			object::Environment* ifEnvironment = new object::Environment(environment);
 
-			if (truthyBoolean->m_value) return evaluate(ifStatement->m_consequence, ifEnvironment);
-			else if (ifStatement->m_alternative != NULL) return evaluate(ifStatement->m_alternative, ifEnvironment);
+			if (truthyBoolean->m_value) return evaluate(ifStatement->m_consequence, ifEnvironment, timeout);
+			else if (ifStatement->m_alternative != NULL) return evaluate(ifStatement->m_alternative, ifEnvironment, timeout);
 			else return &object::NULL_OBJECT;
 		}
 		case ast::WHILE_STATEMENT_NODE:
@@ -435,7 +441,7 @@ namespace evaluator
 
 			while (true)
 			{
-				object::Object* evaluatedCondition = evaluate(whileStatement->m_condition, environment);
+				object::Object* evaluatedCondition = evaluate(whileStatement->m_condition, environment, timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -450,7 +456,7 @@ namespace evaluator
 				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
 				if (!truthyBoolean->m_value) break;
 
-				object::Object* evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment);
+				object::Object* evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment, timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -464,7 +470,7 @@ namespace evaluator
 			ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)node;
 			object::Environment* doWhileEnvironment = new object::Environment(environment);
 
-			object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+			object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, timeout);
 			if (evaluatedConsequence->Type() == object::ERROR)
 			{
 				return evaluatedConsequence;
@@ -472,7 +478,7 @@ namespace evaluator
 
 			while (true)
 			{
-				object::Object* evaluatedCondition = evaluate(doWhileStatement->m_condition, environment);
+				object::Object* evaluatedCondition = evaluate(doWhileStatement->m_condition, environment, timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -487,7 +493,7 @@ namespace evaluator
 				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
 				if (!truthyBoolean->m_value) break;
 
-				object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
+				object::Object* evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -502,7 +508,7 @@ namespace evaluator
 			object::Environment* forConditionEnvironment = new object::Environment(environment);
 			object::Environment* forEnvironment = new object::Environment(forConditionEnvironment);
 
-			object::Object* evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment);
+			object::Object* evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment, timeout);
 			if (evaluatedInitialization->Type() == object::ERROR)
 			{
 				return evaluatedInitialization;
@@ -510,7 +516,7 @@ namespace evaluator
 
 			while (true)
 			{
-				object::Object* evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment);
+				object::Object* evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment, timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -525,13 +531,13 @@ namespace evaluator
 				object::Boolean* truthyBoolean = (object::Boolean*)truthy;
 				if (!truthyBoolean->m_value) break;
 
-				object::Object* evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment);
+				object::Object* evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment, timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
 				}
 
-				object::Object* evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment);
+				object::Object* evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment, timeout);
 				if (evaluatedUpdation->Type() == object::ERROR)
 				{
 					return evaluatedUpdation;
@@ -545,7 +551,7 @@ namespace evaluator
 			ast::IterateStatement* iterateStatement = (ast::IterateStatement*)node;
 			object::Environment* iterateEnvironment = new object::Environment(environment);
 
-			object::Object* evaluatedCollection = evaluate(iterateStatement->m_collection, environment);
+			object::Object* evaluatedCollection = evaluate(iterateStatement->m_collection, environment, timeout);
 			if (evaluatedCollection->Type() == object::ERROR) return evaluatedCollection;
 			if (evaluatedCollection->Type() != object::COLLECTION)
 			{
@@ -560,7 +566,7 @@ namespace evaluator
 			{
 				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
 
-				object::Object* evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment);
+				object::Object* evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment, timeout);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 			}
 
@@ -571,13 +577,13 @@ namespace evaluator
 		return NULL;
 	}
 
-	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment)
+	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
 		object::Object* result = &object::NULL_OBJECT;
 
 		for (int i = 0; i < program->m_statements.size(); i++)
 		{
-			result = evaluate(program->m_statements[i], environment);
+			result = evaluate(program->m_statements[i], environment, timeout);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -594,13 +600,13 @@ namespace evaluator
 		return result;
 	}
 
-	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment)
+	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
 		object::Object* result = &object::NULL_OBJECT;
 
 		for (int i = 0; i < blockStatements->m_statements.size(); i++)
 		{
-			result = evaluate(blockStatements->m_statements[i], environment);
+			result = evaluate(blockStatements->m_statements[i], environment, timeout);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -617,11 +623,11 @@ namespace evaluator
 	}
 
 
-	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment)
+	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
 		for (int i = 0; i < source->size(); i++)
 		{
-			object::Object* evaluatedExpression = evaluate((*source)[i], environment);
+			object::Object* evaluatedExpression = evaluate((*source)[i], environment, timeout);
 
 			if (evaluatedExpression->Type() == object::ERROR)
 			{
@@ -829,16 +835,16 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment)
+	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
-		object::Object* expression = evaluate(callExpression->m_function, environment);
+		object::Object* expression = evaluate(callExpression->m_function, environment, timeout);
 		if (expression->Type() == object::ERROR)
 		{
 			return expression;
 		}
 
 		std::vector<object::Object*> evaluatedArguments;
-		evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment);
+		evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment, timeout);
 
 		if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
 		{
@@ -882,7 +888,7 @@ namespace evaluator
 			return createError(error.str());
 		}
 
-		object::Object* output = applyFunction(expression, &evaluatedArguments);
+		object::Object* output = applyFunction(expression, &evaluatedArguments, timeout);
 
 		// YOU WERE HERE
 
@@ -905,13 +911,13 @@ namespace evaluator
 		return output;
 	}
 
-	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment)
+	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment, std::chrono::steady_clock::time_point timeout)
 	{
 		// Evaluate expression and apply index to it
-		object::Object* expression = evaluate(indexExpression->m_collection, environment);
+		object::Object* expression = evaluate(indexExpression->m_collection, environment, timeout);
 
 		// Get index
-		object::Object* indexObject = evaluate(indexExpression->m_index, environment);
+		object::Object* indexObject = evaluate(indexExpression->m_index, environment, timeout);
 		if (indexObject->Type() == object::ERROR) return indexObject;
 
 		if (expression->Type() != object::DICTIONARY && indexObject->Type() != object::INTEGER)
@@ -1025,7 +1031,7 @@ namespace evaluator
 		return &object::NULL_OBJECT;
 	}
 
-	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments)
+	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments, std::chrono::steady_clock::time_point timeout)
 	{
 		switch (function->Type())
 		{
@@ -1037,7 +1043,7 @@ namespace evaluator
 		case object::FUNCTION:
 		{
 			object::Environment* extendedEnvironment = extendFunctionEnvironment((object::Function*)function, arguments);
-			object::Object* evaluated = evaluate(((object::Function*)function)->m_body, extendedEnvironment);
+			object::Object* evaluated = evaluate(((object::Function*)function)->m_body, extendedEnvironment, timeout);
 			return unwrapReturnValue(evaluated);
 		}
 		}

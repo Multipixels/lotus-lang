@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 
 #include "ast.h"
 #include "object.h"
@@ -6,16 +7,16 @@
 namespace evaluator
 {
 	// Evaluates a node
-	object::Object* evaluate(ast::Node* node, object::Environment* environment);
+	object::Object* evaluate(ast::Node* node, object::Environment* environment, std::chrono::steady_clock::time_point timeout = std::chrono::steady_clock::time_point());
 
 	// Evaluates a program
-	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment);
+	object::Object* evaluateProgram(ast::Program* program, object::Environment* environment, std::chrono::steady_clock::time_point timeout);
 
 	// Evaluates a block statement
-	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment);
+	object::Object* evaluateBlockStatement(ast::BlockStatement* blockStatements, object::Environment* environment, std::chrono::steady_clock::time_point timeout);
 
 	// Evaluates a list of expressions
-	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment);
+	void evaluateExpressions(std::vector<ast::Expression*>* source, std::vector<object::Object*>* destination, object::Environment* environment, std::chrono::steady_clock::time_point timeout);
 
 	// Evaluates an identifier
 	object::Object* evaluateIdentifier(ast::Identifier* identifier, object::Environment* environment);
@@ -45,10 +46,10 @@ namespace evaluator
 	object::Object* evaluateMinusPrefixOperatorExpression(object::Object* expression);
 
 	// Evaluates a function call
-	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment);
+	object::Object* evaluateCallExpression(ast::CallExpression* callExpression, object::Environment* environment, std::chrono::steady_clock::time_point timeout);
 
 	// Evaluates an indexing on collections, strings, or dictionaries
-	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment);
+	object::Object* evaluateIndexExpression(ast::IndexExpression* indexExpression, object::Environment* environment, std::chrono::steady_clock::time_point timeout);
 
 	// Reassigns value in a collection
 	object::Object* collectionValueReassignment(object::Collection* collection, object::Object* indexObject, object::Object* valueObject);
@@ -57,7 +58,7 @@ namespace evaluator
 	object::Object* dictionaryValueReassignment(object::Dictionary* dictionary, object::Object* keyObject, object::Object* valueObject);
 
 	// Applies a function call to a function
-	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments);
+	object::Object* applyFunction(object::Object* function, std::vector<object::Object*>* arguments, std::chrono::steady_clock::time_point timeout);
 
 	// Helper function to extend a function's environment
 	object::Environment* extendFunctionEnvironment(object::Function* function, std::vector<object::Object*>* arguments);

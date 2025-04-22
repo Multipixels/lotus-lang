@@ -32,7 +32,8 @@ namespace repl
 			}
 			if (parser.m_errors.size() > 0) continue;
 
-			object::Object* output = evaluator::evaluate(program, &environment);
+			std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+			object::Object* output = evaluator::evaluate(program, &environment, timeoutValue);
 			if (output->Type() != object::NULL_TYPE)
 			{
 				std::cout << output->Inspect() << std::endl;
