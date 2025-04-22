@@ -26,10 +26,10 @@ TEST(ParserTest, DeclaringIntegerStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
@@ -38,7 +38,7 @@ TEST(ParserTest, DeclaringIntegerStatement)
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
-		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(statement);
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::INTEGER_TYPE);
 
 		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
@@ -71,10 +71,10 @@ TEST(ParserTest, DeclaringFloatStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
@@ -83,7 +83,7 @@ TEST(ParserTest, DeclaringFloatStatement)
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
-		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(statement);
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::FLOAT_TYPE);
 
 		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
@@ -115,10 +115,10 @@ TEST(ParserTest, DeclaringBooleanStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
@@ -127,7 +127,7 @@ TEST(ParserTest, DeclaringBooleanStatement)
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
-		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(statement);
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::BOOLEAN_TYPE);
 
 		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
@@ -159,10 +159,10 @@ TEST(ParserTest, DeclaringCharacterStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
@@ -171,7 +171,7 @@ TEST(ParserTest, DeclaringCharacterStatement)
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
-		ast::DeclareVariableStatement* declareVariableStatement = (ast::DeclareVariableStatement*)statement;
+		std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(statement);
 		ASSERT_EQ(declareVariableStatement->m_token.m_type, token::CHARACTER_TYPE);
 
 		EXPECT_EQ(declareVariableStatement->m_name.m_name, tests[i].expectedIdentifier)
@@ -207,10 +207,10 @@ TEST(ParserTest, ReturnStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
@@ -219,7 +219,7 @@ TEST(ParserTest, ReturnStatement)
 
 		// Test to see if this is a return statement
 		ASSERT_EQ(statement->Type(), ast::RETURN_STATEMENT_NODE);
-		ast::ReturnStatement* returnStatement = (ast::ReturnStatement*)statement;
+		std::shared_ptr<ast::ReturnStatement> returnStatement = std::static_pointer_cast<ast::ReturnStatement>(statement);
 
 		// Test expression separately
 		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(returnStatement->m_returnValue, tests[i].expectedValue, i));
@@ -245,16 +245,16 @@ TEST(ParserTest, IdentifierExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_NO_FATAL_FAILURE(testIdentifier(expressionStatement->m_expression, &tests[i].expectedIdentifer, i));
 	}
@@ -279,16 +279,16 @@ TEST(ParserTest, IntegerLiteralExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
@@ -313,16 +313,16 @@ TEST(ParserTest, FloatLiteralExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
@@ -347,16 +347,16 @@ TEST(ParserTest, BooleanLiteralExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
@@ -381,16 +381,16 @@ TEST(ParserTest, CharacterLiteralExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expressionStatement->m_expression, tests[i].expectedValue, i));
 	}
@@ -418,19 +418,19 @@ TEST(ParserTest, PrefixExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::PREFIX_EXPRESSION_NODE);
-		ast::PrefixExpression* prefixExpression = (ast::PrefixExpression*)(expressionStatement->m_expression);
+		std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>((expressionStatement->m_expression));
 
 		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
 		
@@ -469,19 +469,19 @@ TEST(ParserTest, InfixExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::INFIX_EXPRESSION_NODE);
-		ast::InfixExpression* infixExpression = (ast::InfixExpression*)(expressionStatement->m_expression);
+		std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>((expressionStatement->m_expression));
 
 		EXPECT_EQ(infixExpression->m_operator, tests[i].expectedOperator);
 
@@ -529,7 +529,7 @@ TEST(ParserTest, OperatorPrecedence)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		EXPECT_EQ(program->String(), tests[i].expected);
@@ -557,7 +557,7 @@ TEST(ParserTest, Errors)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 
 		EXPECT_EQ(parser.m_errors[0], tests[i].expectedError);
 	}
@@ -582,16 +582,16 @@ integer b = 5;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
 	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
-	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+	std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(statement);
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
@@ -631,16 +631,16 @@ return c;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
 	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
-	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+	std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(statement);
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
@@ -648,7 +648,7 @@ return c;
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
-	ast::IfStatement* elseStatement = ifStatement->m_alternative;
+	std::shared_ptr<ast::IfStatement> elseStatement = ifStatement->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 2);
 	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
@@ -687,16 +687,16 @@ return c;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
 	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
-	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+	std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(statement);
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
@@ -704,7 +704,7 @@ return c;
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
-	ast::IfStatement* elseIfStatement = ifStatement->m_alternative;
+	std::shared_ptr<ast::IfStatement> elseIfStatement = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement->m_consequence->m_statements.size(), 2);
@@ -759,16 +759,16 @@ float lol = 3.5;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an if statement
 	ASSERT_EQ(statement->Type(), ast::IF_STATEMENT_NODE);
-	ast::IfStatement* ifStatement = (ast::IfStatement*)statement;
+	std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(statement);
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(ifStatement->m_condition, true, 0));
 	ASSERT_EQ(ifStatement->m_consequence->m_statements.size(), 2);
@@ -776,7 +776,7 @@ float lol = 3.5;
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[0]->TokenLiteral(), "integer");
 	EXPECT_EQ(ifStatement->m_consequence->m_statements[1]->Type(), ast::EXPRESSION_STATEMENT_NODE);
 
-	ast::IfStatement* elseIfStatement1 = ifStatement->m_alternative;
+	std::shared_ptr<ast::IfStatement> elseIfStatement1 = ifStatement->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(elseIfStatement1->m_condition, false, 0));
 	ASSERT_EQ(elseIfStatement1->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement1->m_consequence->m_statements.size(), 2);
@@ -784,12 +784,12 @@ float lol = 3.5;
 	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[0]->TokenLiteral(), "boolean");
 	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->Type(), ast::RETURN_STATEMENT_NODE);
 
-	ast::IfStatement* elseIfStatement2 = elseIfStatement1->m_alternative;
+	std::shared_ptr<ast::IfStatement> elseIfStatement2 = elseIfStatement1->m_alternative;
 	EXPECT_NO_FATAL_FAILURE(testInfixExpression(elseIfStatement2->m_condition, 3, "<", 5.5f), 0);
 	ASSERT_EQ(elseIfStatement2->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement2->m_consequence->m_statements.size(), 0);
 
-	ast::IfStatement* elseStatement = elseIfStatement2->m_alternative;
+	std::shared_ptr<ast::IfStatement> elseStatement = elseIfStatement2->m_alternative;
 	ASSERT_EQ(elseStatement->m_token.m_type, token::ELSE);
 	ASSERT_EQ(elseStatement->m_consequence->m_statements.size(), 1);
 	EXPECT_EQ(elseStatement->m_consequence->m_statements[0]->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
@@ -817,16 +817,16 @@ true;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a while statement
 	ASSERT_EQ(statement->Type(), ast::WHILE_STATEMENT_NODE);
-	ast::WhileStatement* whileStatement = (ast::WhileStatement*)statement;
+	std::shared_ptr<ast::WhileStatement> whileStatement = std::static_pointer_cast<ast::WhileStatement>(statement);
 
 	EXPECT_NO_FATAL_FAILURE(testLiteralExpression(whileStatement->m_condition, true, 0));
 	ASSERT_EQ(whileStatement->m_consequence->m_statements.size(), 2);
@@ -855,16 +855,16 @@ true;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a do while statement
 	ASSERT_EQ(statement->Type(), ast::DO_WHILE_STATEMENT_NODE);
-	ast::DoWhileStatement* doWhileStatement = (ast::DoWhileStatement*)statement;
+	std::shared_ptr<ast::DoWhileStatement> doWhileStatement = std::static_pointer_cast<ast::DoWhileStatement>(statement);
 
 
 	ASSERT_EQ(doWhileStatement->m_consequence->m_statements.size(), 2);
@@ -894,16 +894,16 @@ true;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an iterate loop
 	ASSERT_EQ(statement->Type(), ast::FOR_STATEMENT_NODE);
-	ast::ForStatement* forStatement = (ast::ForStatement*)statement;
+	std::shared_ptr<ast::ForStatement> forStatement = std::static_pointer_cast<ast::ForStatement>(statement);
 
 	// Test m_initialization
 	EXPECT_EQ(forStatement->m_initialization->Type(), ast::DECLARE_VARIABLE_STATEMENT_NODE);
@@ -940,21 +940,21 @@ true;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is an iterate loop
 	ASSERT_EQ(statement->Type(), ast::ITERATE_STATEMENT_NODE);
-	ast::IterateStatement* iterateStatement = (ast::IterateStatement*)statement;
+	std::shared_ptr<ast::IterateStatement> iterateStatement = std::static_pointer_cast<ast::IterateStatement>(statement);
 
 	EXPECT_EQ(iterateStatement->m_var->m_name, "var");
 	
 	ASSERT_EQ(iterateStatement->m_collection->Type(), ast::IDENTIFIER_NODE);
-	ast::Identifier* collection = (ast::Identifier*)iterateStatement->m_collection;
+	std::shared_ptr<ast::Identifier> collection = std::static_pointer_cast<ast::Identifier>(iterateStatement->m_collection);
 	EXPECT_EQ(collection->m_name, "myCollection");
 
 	ASSERT_EQ(iterateStatement->m_consequence->m_statements.size(), 2);
@@ -981,16 +981,16 @@ return 5.1;
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a function declaration
 	ASSERT_EQ(statement->Type(), ast::DECLARE_FUNCTION_STATEMENT_NODE);
-	ast::DeclareFunctionStatement* declareFunctionStatement = (ast::DeclareFunctionStatement*)statement;
+	std::shared_ptr<ast::DeclareFunctionStatement> declareFunctionStatement = std::static_pointer_cast<ast::DeclareFunctionStatement>(statement);
 
 	// Check m_token
 	EXPECT_EQ(declareFunctionStatement->m_token.m_type, token::FLOAT_TYPE);
@@ -1024,25 +1024,25 @@ TEST(ParserTest, CallExpression)
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-	ast::Statement* statement = program->m_statements[0];
+	std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 	ASSERT_EQ(program->m_statements.size(), 1)
 		<< "Test #0" << std::endl;
 
 	// Test to see if this is this is a call expression
 	ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-	ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+	std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 	ASSERT_EQ(expressionStatement->m_expression->Type(), ast::CALL_EXPRESSION_NODE);
-	ast::CallExpression* callExpression = (ast::CallExpression*)expressionStatement->m_expression;
+	std::shared_ptr<ast::CallExpression> callExpression = std::static_pointer_cast<ast::CallExpression>(expressionStatement->m_expression);
 
 	// Check m_token
 	EXPECT_EQ(callExpression->m_token.m_type, token::LPARENTHESIS);
 
 	// Check m_function
 	ASSERT_EQ(callExpression->m_function->Type(), ast::IDENTIFIER_NODE);
-	ast::Identifier* identifier2 = (ast::Identifier*)callExpression->m_function;
+	std::shared_ptr<ast::Identifier> identifier2 = std::static_pointer_cast<ast::Identifier>(callExpression->m_function);
 	EXPECT_EQ(identifier2->m_name, "add");
 
 	// Check m_parameters
@@ -1078,16 +1078,16 @@ TEST(ParserTest, CollectionLiteralExpression)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test to see if this is an expression statement
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		EXPECT_NO_FATAL_FAILURE(testCollectionLiteral(expressionStatement->m_expression, &tests[i].values, 0));
 	}
@@ -1117,17 +1117,17 @@ TEST(ParserTest, DeclaringCollectionStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_COLLECTION_STATEMENT_NODE)
 			<< "Test #" << i << std::endl;
-		ast::DeclareCollectionStatement* declareCollectionStatement = (ast::DeclareCollectionStatement*)statement;
+		std::shared_ptr<ast::DeclareCollectionStatement> declareCollectionStatement = std::static_pointer_cast<ast::DeclareCollectionStatement>(statement);
 
 		ASSERT_EQ(declareCollectionStatement->m_token.m_type, token::COLLECTION_TYPE)
 			<< "Test #" << i << std::endl;
@@ -1141,7 +1141,7 @@ TEST(ParserTest, DeclaringCollectionStatement)
 
 		// Test to see if we're holding a collection
 		ASSERT_EQ(declareCollectionStatement->m_value->Type(), ast::COLLECTION_LITERAL_NODE);
-		ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)declareCollectionStatement->m_value;
+		std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(declareCollectionStatement->m_value);
 
 		// Test collection value
 		ASSERT_EQ(collectionLiteral->m_values.size(), tests[i].expectedValue.size());
@@ -1170,18 +1170,18 @@ TEST(ParserTest, CollectionIndexing)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::INDEX_EXPRESSION_NODE);
-		ast::IndexExpression* indexExpression = (ast::IndexExpression*)expressionStatement->m_expression;
+		std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(expressionStatement->m_expression);
 
 		EXPECT_EQ(indexExpression->m_collection->Type(), tests[i].expectedLeft);
 		EXPECT_EQ(indexExpression->m_index->Type(), tests[i].expectedRight);
@@ -1208,15 +1208,15 @@ TEST(ParserTest, StringLiteral)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		testStringLiteral(expressionStatement->m_expression, &tests[i].expectedValue, i);
 	}
@@ -1243,15 +1243,15 @@ TEST(ParserTest, DictionaryLiteral)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
-		ast::ExpressionStatement* expressionStatement = (ast::ExpressionStatement*)statement;
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
 
 		testDictionaryLiteral(expressionStatement->m_expression, &tests[i].expectedValue, i);
 	}
@@ -1280,17 +1280,17 @@ TEST(ParserTest, DeclaringDictionaryStatement)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		ast::Program* program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
-		ast::Statement* statement = program->m_statements[0];
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
 		ASSERT_EQ(program->m_statements.size(), 1)
 			<< "Test #" << i << std::endl;
 
 		// Test declaration identifier literal and name
 		ASSERT_EQ(statement->Type(), ast::DECLARE_DICTIONARY_STATEMENT_NODE)
 			<< "Test #" << i << std::endl;
-		ast::DeclareDictionaryStatement* declareDictionaryStatement = (ast::DeclareDictionaryStatement*)statement;
+		std::shared_ptr<ast::DeclareDictionaryStatement> declareDictionaryStatement = std::static_pointer_cast<ast::DeclareDictionaryStatement>(statement);
 
 		ASSERT_EQ(declareDictionaryStatement->m_token.m_type, token::DICTIONARY_TYPE)
 			<< "Test #" << i << std::endl;
@@ -1306,7 +1306,7 @@ TEST(ParserTest, DeclaringDictionaryStatement)
 
 		// Test to see if we're holding a collection
 		ASSERT_EQ(declareDictionaryStatement->m_value->Type(), ast::DICTIONARY_LITERAL_NODE);
-		ast::DictionaryLiteral* dictionaryLiteral = (ast::DictionaryLiteral*)declareDictionaryStatement->m_value;
+		std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(declareDictionaryStatement->m_value);
 
 		// Test collection value
 		ASSERT_EQ(dictionaryLiteral->m_map.size(), tests[i].expectedValue.size());
@@ -1446,7 +1446,7 @@ size(myCollection);
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);
-	ast::Program* program = parser.ParseProgram();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 	EXPECT_EQ(program->String(), expectedString);
@@ -1469,7 +1469,7 @@ void checkParserErrors(parser::Parser* parser)
 	FAIL();
 }
 
-void testLiteralExpression(ast::Expression* expression, std::any expectedValue, int testNumber)
+void testLiteralExpression(std::shared_ptr<ast::Expression> expression, std::any expectedValue, int testNumber)
 {
 	// Cannot use a switch on type as std::string is not integral
 	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
@@ -1498,12 +1498,12 @@ void testLiteralExpression(ast::Expression* expression, std::any expectedValue, 
 	}
 }
 
-void testIntegerLiteral(ast::Expression* expression, int expectedValue, int testNumber)
+void testIntegerLiteral(std::shared_ptr<ast::Expression> expression, int expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::INTEGER_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
-	ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)expression;
+	std::shared_ptr<ast::IntegerLiteral> integerLiteral = std::static_pointer_cast<ast::IntegerLiteral>(expression);
 
 	EXPECT_EQ(integerLiteral->m_value, expectedValue)
 		<< "Test #" << testNumber << std::endl;
@@ -1511,12 +1511,12 @@ void testIntegerLiteral(ast::Expression* expression, int expectedValue, int test
 		<< "Test #" << testNumber << std::endl;
 }
 
-void testFloatLiteral(ast::Expression* expression, float expectedValue, int testNumber)
+void testFloatLiteral(std::shared_ptr<ast::Expression> expression, float expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::FLOAT_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
-	ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)expression;
+	std::shared_ptr<ast::FloatLiteral> floatLiteral = std::static_pointer_cast<ast::FloatLiteral>(expression);
 
 	std::ostringstream outputString;
 	outputString << expectedValue;
@@ -1527,12 +1527,12 @@ void testFloatLiteral(ast::Expression* expression, float expectedValue, int test
 		<< "Test #" << testNumber << std::endl;
 }
 
-void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int testNumber)
+void testBooleanLiteral(std::shared_ptr<ast::Expression> expression, bool expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::BOOLEAN_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
-	ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)expression;
+	std::shared_ptr<ast::BooleanLiteral> booleanLiteral = std::static_pointer_cast<ast::BooleanLiteral>(expression);
 
 	EXPECT_EQ(booleanLiteral->m_value, expectedValue)
 		<< "Test #" << testNumber << std::endl;
@@ -1540,12 +1540,12 @@ void testBooleanLiteral(ast::Expression* expression, bool expectedValue, int tes
 		<< "Test #" << testNumber << std::endl;
 }
 
-void testCharacterLiteral(ast::Expression* expression, char expectedValue, int testNumber)
+void testCharacterLiteral(std::shared_ptr<ast::Expression> expression, char expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::CHARACTER_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
-	ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)expression;
+	std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(expression);
 
 	char charToString[2] = { expectedValue, '\0' };
 
@@ -1555,11 +1555,11 @@ void testCharacterLiteral(ast::Expression* expression, char expectedValue, int t
 		<< "Test #" << testNumber << std::endl;
 }
 
-void testCollectionLiteral(ast::Expression* expression, std::vector<std::any>* expectedValue, int testNumber)
+void testCollectionLiteral(std::shared_ptr<ast::Expression> expression, std::vector<std::any>* expectedValue, int testNumber)
 {
 	// Test to see if this is a collection literal expression
 	ASSERT_EQ(expression->Type(), ast::COLLECTION_LITERAL_NODE);
-	ast::CollectionLiteral* collectionLiteral = (ast::CollectionLiteral*)expression;
+	std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(expression);
 
 	ASSERT_EQ(collectionLiteral->m_values.size(), expectedValue->size());
 	for (int j = 0; j < collectionLiteral->m_values.size(); j++)
@@ -1568,39 +1568,39 @@ void testCollectionLiteral(ast::Expression* expression, std::vector<std::any>* e
 	}
 }
 
-void testDictionaryLiteral(ast::Expression* expression, std::map<std::string, std::any>* expectedValue, int testNumber)
+void testDictionaryLiteral(std::shared_ptr<ast::Expression> expression, std::map<std::string, std::any>* expectedValue, int testNumber)
 {
 	// Test to see if this is a dictionary literal expression
 	ASSERT_EQ(expression->Type(), ast::DICTIONARY_LITERAL_NODE);
-	ast::DictionaryLiteral* dictionaryLiteral = (ast::DictionaryLiteral*)expression;
+	std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(expression);
 
 	ASSERT_EQ(dictionaryLiteral->m_map.size(), expectedValue->size());
-	std::map<ast::Expression*, ast::Expression*>::iterator it;
+	std::map<std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>::iterator it;
 
 	for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
 	{
 		switch (it->first->Type()) {
 		case ast::INTEGER_LITERAL_NODE: 
 		{
-			ast::IntegerLiteral* integerLiteral = (ast::IntegerLiteral*)it->first;
+			std::shared_ptr<ast::IntegerLiteral> integerLiteral = std::static_pointer_cast<ast::IntegerLiteral>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
 			break;
 		}
 		case ast::FLOAT_LITERAL_NODE:
 		{
-			ast::FloatLiteral* floatLiteral = (ast::FloatLiteral*)it->first;
+			std::shared_ptr<ast::FloatLiteral> floatLiteral = std::static_pointer_cast<ast::FloatLiteral>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
 			break;
 		}
 		case ast::BOOLEAN_LITERAL_NODE:
 		{
-			ast::BooleanLiteral* booleanLiteral = (ast::BooleanLiteral*)it->first;
+			std::shared_ptr<ast::BooleanLiteral> booleanLiteral = std::static_pointer_cast<ast::BooleanLiteral>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
 			break;
 		}
 		case ast::CHARACTER_LITERAL_NODE:
 		{
-			ast::CharacterLiteral* characterLiteral = (ast::CharacterLiteral*)it->first;
+			std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
 			break;
 		}
@@ -1613,12 +1613,12 @@ void testDictionaryLiteral(ast::Expression* expression, std::map<std::string, st
 	}
 }
 
-void testStringLiteral(ast::Expression* expression, std::string* expectedValue, int testNumber)
+void testStringLiteral(std::shared_ptr<ast::Expression> expression, std::string* expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::STRING_LITERAL_NODE)
 		<< "Test #" << testNumber << std::endl;
 
-	ast::StringLiteral* stringLiteral = (ast::StringLiteral*)expression;
+	std::shared_ptr<ast::StringLiteral> stringLiteral = std::static_pointer_cast<ast::StringLiteral>(expression);
 
 	std::stringstream expected;
 	expected << '"' << *expectedValue << '"';
@@ -1626,10 +1626,10 @@ void testStringLiteral(ast::Expression* expression, std::string* expectedValue, 
 	EXPECT_EQ(stringLiteral->String(), expected.str());
 }
 
-void testIdentifier(ast::Expression* expression, std::string* expectedValue, int testNumber)
+void testIdentifier(std::shared_ptr<ast::Expression> expression, std::string* expectedValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::IDENTIFIER_NODE);
-	ast::Identifier* identifier = (ast::Identifier*)expression;
+	std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(expression);
 
 	// Test to see if identifier fields are right
 	EXPECT_EQ(identifier->m_name, *expectedValue)
@@ -1638,10 +1638,10 @@ void testIdentifier(ast::Expression* expression, std::string* expectedValue, int
 		<< "Test #" << testNumber << std::endl;
 }
 
-void testInfixExpression(ast::Expression* expression, std::any leftValue, std::string op, std::any rightValue, int testNumber)
+void testInfixExpression(std::shared_ptr<ast::Expression> expression, std::any leftValue, std::string op, std::any rightValue, int testNumber)
 {
 	ASSERT_EQ(expression->Type(), ast::INFIX_EXPRESSION_NODE);
-	ast::InfixExpression* infixExpression = (ast::InfixExpression*)expression;
+	std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(expression);
 
 	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, leftValue, testNumber));
 

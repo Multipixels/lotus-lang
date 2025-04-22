@@ -30,10 +30,10 @@ TEST(EvaluatorTest, IntegerExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		
 		ASSERT_EQ(evaluated->Type(), object::INTEGER);
-		object::Integer* integer = (object::Integer*)evaluated;
+		std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(evaluated);
 
 		EXPECT_NO_FATAL_FAILURE(testIntegerObject(evaluated, tests[i].expectedValue));
 	}
@@ -65,10 +65,10 @@ TEST(EvaluatorTest, FloatExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		ASSERT_EQ(evaluated->Type(), object::FLOAT);
-		object::Float* integer = (object::Float*)evaluated;
+		std::shared_ptr<object::Float> integer = std::static_pointer_cast<object::Float>(evaluated);
 
 		EXPECT_NO_FATAL_FAILURE(testFloatObject(evaluated, tests[i].expectedValue));
 	}
@@ -128,7 +128,7 @@ TEST(EvaluatorTest, BooleanExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testBooleanObject(evaluated, tests[i].expectedValue));
 	}
@@ -150,7 +150,7 @@ TEST(EvaluatorTest, CharacterExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testCharacterObject(evaluated, tests[i].expectedValue));
 	}
@@ -176,7 +176,7 @@ TEST(EvaluatorTest, CollectionExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testCollectionObject(evaluated, &tests[i].expectedValue, tests[i].objectType));
 	}
@@ -199,7 +199,7 @@ TEST(EvaluatorTest, DictionaryExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);;
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
 
 		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(evaluated, &tests[i].expectedValue, tests[i].expectedKeyType, tests[i].expectedValueType));
 	}
@@ -222,10 +222,10 @@ TEST(EvaluatorTest, StringExpression)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		ASSERT_EQ(evaluated->Type(), object::STRING);
-		object::String* string = (object::String*)evaluated;
+		std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(evaluated);
 
 		EXPECT_NO_FATAL_FAILURE(testStringObject(string, &tests[i].expectedValue));
 	}
@@ -249,7 +249,7 @@ TEST(EvaluatorTest, CollectionIndexing)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
@@ -271,7 +271,7 @@ TEST(EvaluatorTest, DictionaryIndexing)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
@@ -293,7 +293,7 @@ TEST(EvaluatorTest, StringIndexing)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
@@ -317,7 +317,7 @@ TEST(EvaluatorTest, ReturnStatement)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		EXPECT_NO_FATAL_FAILURE(testIntegerObject(evaluated, tests[i].expectedValue));
 	}
@@ -344,7 +344,7 @@ TEST(EvaluatorTest, Declaration)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -355,17 +355,17 @@ TEST(EvaluatorTest, Function)
 
 	lexer::Lexer lexer = lexer::Lexer(&input);
 	parser::Parser parser = parser::Parser(lexer);
-	ast::Program* program = parser.ParseProgram();
-	object::Environment environment = new object::Environment();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
+	std::shared_ptr<object::Environment> environment(new object::Environment);
 
-	object::Object* object = evaluator::evaluate(program, &environment);
+	std::shared_ptr<object::Object> object = evaluator::evaluate(program, environment);
 	ASSERT_EQ(object->Type(), object::NULL_TYPE);
 
 	std::string functionName = "myFunction";
-	object::Object* functionObj = environment.getIdentifier(&functionName);
+	std::shared_ptr<object::Object> functionObj = environment->getIdentifier(&functionName);
 	ASSERT_EQ(functionObj->Type(), object::FUNCTION);
 
-	object::Function* function = (object::Function*)functionObj;
+	std::shared_ptr<object::Function> function = std::static_pointer_cast<object::Function>(functionObj);
 
 	EXPECT_EQ(function->m_function_type, object::INTEGER);
 
@@ -393,7 +393,7 @@ TEST(EvaluatorTest, FunctionCall)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -417,7 +417,7 @@ TEST(EvaluatorTest, Reassignment)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -437,7 +437,7 @@ TEST(EvaluatorTest, CollectionReassignment)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -458,7 +458,7 @@ TEST(EvaluatorTest, DictionaryReassignment)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -489,7 +489,7 @@ TEST(EvaluatorTest, IfStatement)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -512,7 +512,7 @@ TEST(EvaluatorTest, WhileLoop)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -535,7 +535,7 @@ TEST(EvaluatorTest, DoWhileLoop)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -558,7 +558,7 @@ TEST(EvaluatorTest, ForLoop)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -581,7 +581,7 @@ TEST(EvaluatorTest, IterateLoop)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -607,7 +607,7 @@ TEST(EvaluatorTest, BuiltInFunctions)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
@@ -653,24 +653,24 @@ TEST(EvaluatorTest, Error)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		object::Object* evaluated = testEvaluation(&tests[i].input);
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		ASSERT_EQ(evaluated->Type(), object::ERROR);
-		EXPECT_EQ(((object::Error*)evaluated)->m_error_message, tests[i].expectedError);
+		EXPECT_EQ(std::static_pointer_cast<object::Error>(evaluated)->m_error_message, tests[i].expectedError);
 	}
 }
 
-object::Object* testEvaluation(std::string* input)
+std::shared_ptr<object::Object> testEvaluation(std::string* input)
 {
 	lexer::Lexer lexer = lexer::Lexer(input);
 	parser::Parser parser = parser::Parser(lexer);
-	ast::Program* program = parser.ParseProgram();
-	object::Environment environment = new object::Environment();
+	std::shared_ptr<ast::Program> program = parser.ParseProgram();
+	std::shared_ptr<object::Environment> environment(new object::Environment());
 
-	return evaluator::evaluate(program, &environment);
+	return evaluator::evaluate(program, environment);
 }
 
-void testLiteralObject(object::Object* object, std::any expectedValue)
+void testLiteralObject(std::shared_ptr<object::Object> object, std::any expectedValue)
 {
 	// Cannot use a switch on type as std::string is not integral
 	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
@@ -708,42 +708,42 @@ void testLiteralObject(object::Object* object, std::any expectedValue)
 	FAIL();
 }
 
-void testIntegerObject(object::Object* object, int expectedValue)
+void testIntegerObject(std::shared_ptr<object::Object> object, int expectedValue)
 {
 	ASSERT_EQ(object->Type(), object::INTEGER);
-	object::Integer* integer = (object::Integer*)object;
+	std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(object);
 
 	EXPECT_EQ(integer->m_value, expectedValue);
 }
 
-void testFloatObject(object::Object* object, float expectedValue)
+void testFloatObject(std::shared_ptr<object::Object> object, float expectedValue)
 {
 	ASSERT_EQ(object->Type(), object::FLOAT);
-	object::Float* floating = (object::Float*)object;
+	std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(object);
 
 	EXPECT_EQ(floating->m_value, expectedValue);
 }
 
-void testBooleanObject(object::Object* object, bool expectedValue)
+void testBooleanObject(std::shared_ptr<object::Object> object, bool expectedValue)
 {
 	ASSERT_EQ(object->Type(), object::BOOLEAN);
-	object::Boolean* boolean = (object::Boolean*)object;
+	std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(object);
 
 	EXPECT_EQ(boolean->m_value, expectedValue);
 }
 
-void testCharacterObject(object::Object* object, char expectedValue)
+void testCharacterObject(std::shared_ptr<object::Object> object, char expectedValue)
 {
 	ASSERT_EQ(object->Type(), object::CHARACTER);
-	object::Character* character = (object::Character*)object;
+	std::shared_ptr<object::Character> character = std::static_pointer_cast<object::Character>(object);
 
 	EXPECT_EQ(character->m_value, expectedValue);
 }
 
-void testCollectionObject(object::Object* object, std::vector<std::any>* expectedValue, object::ObjectType expectedType)
+void testCollectionObject(std::shared_ptr<object::Object> object, std::vector<std::any>* expectedValue, object::ObjectType expectedType)
 {
 	ASSERT_EQ(object->Type(), object::COLLECTION);
-	object::Collection* collection = (object::Collection*)object;
+	std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(object);
 
 	ASSERT_EQ(collection->m_collection_type, expectedType);
 
@@ -754,15 +754,15 @@ void testCollectionObject(object::Object* object, std::vector<std::any>* expecte
 	}
 }
 
-void testDictionaryObject(object::Object* object, std::map<std::string, std::any>* expectedValue, object::ObjectType expectedKeyType, object::ObjectType expectedValueType)
+void testDictionaryObject(std::shared_ptr<object::Object> object, std::map<std::string, std::any>* expectedValue, object::ObjectType expectedKeyType, object::ObjectType expectedValueType)
 {
 	ASSERT_EQ(object->Type(), object::DICTIONARY);
-	object::Dictionary* dictionary = (object::Dictionary*)object;
+	std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(object);
 
 	ASSERT_EQ(dictionary->m_key_type, expectedKeyType);
 	ASSERT_EQ(dictionary->m_value_type, expectedValueType);
 
-	std::map<object::Object*, object::Object*>::iterator it;
+	std::map<std::shared_ptr<object::Object>, std::shared_ptr<object::Object>>::iterator it;
 	for (it = dictionary->m_map.begin(); it != dictionary->m_map.end(); it++)
 	{
 		ASSERT_EQ(it->first->Type(), expectedKeyType);
@@ -771,25 +771,25 @@ void testDictionaryObject(object::Object* object, std::map<std::string, std::any
 		switch (it->first->Type()) {
 		case object::INTEGER:
 		{
-			object::Integer* integerLiteral = (object::Integer*)it->first;
+			std::shared_ptr<object::Integer> integerLiteral = std::static_pointer_cast<object::Integer>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
 			break;
 		}
 		case object::FLOAT:
 		{
-			object::Float* floatLiteral = (object::Float*)it->first;
+			std::shared_ptr<object::Float> floatLiteral = std::static_pointer_cast<object::Float>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
 			break;
 		}
 		case object::BOOLEAN:
 		{
-			object::Boolean* booleanLiteral = (object::Boolean*)it->first;
+			std::shared_ptr<object::Boolean> booleanLiteral = std::static_pointer_cast<object::Boolean>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
 			break;
 		}
 		case object::CHARACTER:
 		{
-			object::Character* characterLiteral = (object::Character*)it->first;
+			std::shared_ptr<object::Character> characterLiteral = std::static_pointer_cast<object::Character>(it->first);
 			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
 			break;
 		}
@@ -802,10 +802,10 @@ void testDictionaryObject(object::Object* object, std::map<std::string, std::any
 	}
 }
 
-void testStringObject(object::Object* object, std::string* expectedValue)
+void testStringObject(std::shared_ptr<object::Object> object, std::string* expectedValue)
 {
 	ASSERT_EQ(object->Type(), object::STRING);
-	object::String* string = (object::String*)object;
+	std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(object);
 
 	EXPECT_EQ(string->m_value, *expectedValue);
 }

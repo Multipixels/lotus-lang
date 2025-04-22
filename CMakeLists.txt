@@ -112,6 +112,9 @@ if(NOT ${RELEASE_BUILD})
       LotusTests
       GTest::gtest_main
     )
+
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RELEASE_BUILD=0) 
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC DEVELOPMENT_BUILD=1) 
     
     target_include_directories(LotusTests PUBLIC 
         "src/ast"
