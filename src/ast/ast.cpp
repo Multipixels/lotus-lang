@@ -125,7 +125,7 @@ namespace ast
 
 		outputString << "{";
 
-		std::map<Expression*, Expression*>::iterator it;
+		std::map<std::shared_ptr<Expression>, std::shared_ptr<Expression>>::iterator it;
 		for (it = m_map.begin(); it != m_map.end(); it++)
 		{
 			outputString << it->first->String() << ": "

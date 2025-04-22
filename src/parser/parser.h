@@ -9,8 +9,8 @@ namespace parser
 	class Parser
 	{
 	public:
-		typedef ast::Expression* (Parser::*PrefixParseFunction)();
-		typedef ast::Expression* (Parser::*InfixParseFunction) (ast::Expression*);
+		typedef std::shared_ptr<ast::Expression> (Parser::*PrefixParseFunction)();
+		typedef std::shared_ptr<ast::Expression> (Parser::*InfixParseFunction) (std::shared_ptr<ast::Expression>);
 
 		lexer::Lexer m_lexer;
 
@@ -25,7 +25,7 @@ namespace parser
 		Parser(lexer::Lexer lexer);
 		
 		// Parses the program described by the lexer and returns a parsed program
-		ast::Program* ParseProgram();
+		std::shared_ptr<ast::Program> ParseProgram();
 	private:
 		typedef enum Precedence
 		{
@@ -88,37 +88,37 @@ namespace parser
 
 		// STATEMENTS
 
-		ast::Statement* parseStatement();
-		ast::DeclareVariableStatement* parseVariableDeclaration();
-		ast::DeclareCollectionStatement* parseCollectionDeclaration();
-		ast::DeclareDictionaryStatement* parseDictionaryDeclaration();
-		ast::DeclareFunctionStatement* parseFunctionDeclaration();
-		ast::ReturnStatement* parseReturnStatement();
-		ast::ExpressionStatement* parseExpressionStatement();
-		ast::BlockStatement* parseBlockStatement();
-		ast::IfStatement* parseIfStatement();
-		ast::IfStatement* parseElseStatement();
-		ast::WhileStatement* parseWhileStatement();
-		ast::DoWhileStatement* parseDoWhileStatement();
-		ast::ForStatement* parseForStatement();
-		ast::IterateStatement* parseIterateStatement();
+		std::shared_ptr<ast::Statement> parseStatement();
+		std::shared_ptr<ast::DeclareVariableStatement> parseVariableDeclaration();
+		std::shared_ptr<ast::DeclareCollectionStatement> parseCollectionDeclaration();
+		std::shared_ptr<ast::DeclareDictionaryStatement> parseDictionaryDeclaration();
+		std::shared_ptr<ast::DeclareFunctionStatement> parseFunctionDeclaration();
+		std::shared_ptr<ast::ReturnStatement> parseReturnStatement();
+		std::shared_ptr<ast::ExpressionStatement> parseExpressionStatement();
+		std::shared_ptr<ast::BlockStatement> parseBlockStatement();
+		std::shared_ptr<ast::IfStatement> parseIfStatement();
+		std::shared_ptr<ast::IfStatement> parseElseStatement();
+		std::shared_ptr<ast::WhileStatement> parseWhileStatement();
+		std::shared_ptr<ast::DoWhileStatement> parseDoWhileStatement();
+		std::shared_ptr<ast::ForStatement> parseForStatement();
+		std::shared_ptr<ast::IterateStatement> parseIterateStatement();
 
 		// EXPRESSIONS
 
-		ast::Expression* parseExpression(Precedence precedence);
-		ast::Expression* parsePrefixExpression();
-		ast::Expression* parseInfixExpression(ast::Expression* leftExpression);
-		ast::Expression* parseGroupedExpression();
-		ast::Expression* parseIntegerLiteral();
-		ast::Expression* parseFloatLiteral();
-		ast::Expression* parseBooleanLiteral();
-		ast::Expression* parseCharacterLiteral();
-		ast::Expression* parseCollectionLiteral();
-		ast::Expression* parseDictionaryLiteral();
-		ast::Expression* parseStringLiteral();
-		ast::Expression* parseIdentifier();
-		ast::Expression* parseCallExpression(ast::Expression* leftExpression);
-		ast::Expression* parseIndexExpression(ast::Expression* leftExpression);
+		std::shared_ptr<ast::Expression> parseExpression(Precedence precedence);
+		std::shared_ptr<ast::Expression> parsePrefixExpression();
+		std::shared_ptr<ast::Expression> parseInfixExpression(std::shared_ptr<ast::Expression> leftExpression);
+		std::shared_ptr<ast::Expression> parseGroupedExpression();
+		std::shared_ptr<ast::Expression> parseIntegerLiteral();
+		std::shared_ptr<ast::Expression> parseFloatLiteral();
+		std::shared_ptr<ast::Expression> parseBooleanLiteral();
+		std::shared_ptr<ast::Expression> parseCharacterLiteral();
+		std::shared_ptr<ast::Expression> parseCollectionLiteral();
+		std::shared_ptr<ast::Expression> parseDictionaryLiteral();
+		std::shared_ptr<ast::Expression> parseStringLiteral();
+		std::shared_ptr<ast::Expression> parseIdentifier();
+		std::shared_ptr<ast::Expression> parseCallExpression(std::shared_ptr<ast::Expression> leftExpression);
+		std::shared_ptr<ast::Expression> parseIndexExpression(std::shared_ptr<ast::Expression> leftExpression);
 
 		// HELPERS
 
@@ -128,12 +128,12 @@ namespace parser
 		// Registers an infix function into the parser
 		void registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction);
 	
-		void parseParameters(std::vector<ast::DeclareVariableStatement*> *parameters);
+		void parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>> *parameters);
 
 		// Parses a list of literals, with given separator token and end token.
-		void parseLiterals(std::vector<ast::Expression*>* destination, token::TokenType separator, token::TokenType ender);
+		void parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender);
 
 		// Parses a list of key value pairs, with given separator token and end token.
-		void parseKeyValuePairs(std::map<ast::Expression*, ast::Expression*>* destination, token::TokenType separator, token::TokenType ender);
+		void parseKeyValuePairs(std::map< std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender);
 	};
 }

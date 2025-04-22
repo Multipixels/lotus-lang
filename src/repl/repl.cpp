@@ -13,7 +13,7 @@ namespace repl
 	int Start() 
 	{
 		bool isRunning = true;
-		object::Environment environment;
+		std::shared_ptr<object::Environment> environment(new object::Environment);
 
 		while (isRunning) 
 		{
@@ -24,7 +24,7 @@ namespace repl
 
 			lexer::Lexer lexer = lexer::Lexer(&input);
 			parser::Parser parser = parser::Parser(lexer);
-			ast::Program* program = parser.ParseProgram();
+			std::shared_ptr<ast::Program> program = parser.ParseProgram();
 
 			for(int i = 0; i < parser.m_errors.size(); i++)
 			{
@@ -33,7 +33,13 @@ namespace repl
 			if (parser.m_errors.size() > 0) continue;
 
 			std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
-			object::Object* output = evaluator::evaluate(program, &environment, timeoutValue);
+
+#ifdef DEVELOPMENT_BUILD
+			std::shared_ptr<object::Object> output = evaluator::evaluate(program, environment);
+#else
+			std::shared_ptr<object::Object> output = evaluator::evaluate(program, environment, timeoutValue);
+#endif
+
 			if (output->Type() != object::NULL_TYPE)
 			{
 				std::cout << output->Inspect() << std::endl;
@@ -55,7 +61,7 @@ namespace repl
 
 			lexer::Lexer lexer = lexer::Lexer(&fileInput);
 			parser::Parser parser = parser::Parser(lexer);
-			ast::Program* program = parser.ParseProgram();
+			std::shared_ptr<ast::Program> program = parser.ParseProgram();
 			object::Environment environment;
 
 			for (int i = 0; i < parser.m_errors.size(); i++)
@@ -64,7 +70,7 @@ namespace repl
 			}
 			if (parser.m_errors.size() > 0);
 
-			object::Object* output = evaluator::evaluate(program, &environment);
+			std::shared_ptr<object::Object> output = evaluator::evaluate(program, std::shared_ptr<object::Environment>(&environment));
 			if (output->Type() != object::NULL_TYPE)
 			{
 				std::cout << output->Inspect() << std::endl;

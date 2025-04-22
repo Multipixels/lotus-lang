@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -75,7 +76,7 @@ namespace ast
 	class Program : public Node
 	{
 	public:
-		std::vector<Statement*> m_statements;
+		std::vector<std::shared_ptr<Statement>> m_statements;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -103,7 +104,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		std::vector<Statement*> m_statements;
+		std::vector<std::shared_ptr<Statement>> m_statements;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -170,7 +171,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token; // '['
-		std::vector<Expression*> m_values;
+		std::vector<std::shared_ptr<Expression>> m_values;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -183,7 +184,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token; // '{'
-		std::map<Expression*, Expression*> m_map;
+		std::map<std::shared_ptr<Expression>, std::shared_ptr<Expression>> m_map;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -196,7 +197,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token; // '['
-		CollectionLiteral* m_stringCollection;
+		std::shared_ptr<CollectionLiteral> m_stringCollection;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -209,7 +210,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		ast::BlockStatement* m_body;
+		std::shared_ptr<ast::BlockStatement> m_body;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -223,7 +224,7 @@ namespace ast
 	public:
 		token::Token m_token;
 		std::string m_operator;
-		ast::Expression* m_right_expression;
+		std::shared_ptr<ast::Expression> m_right_expression;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -236,9 +237,9 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		ast::Expression* m_left_expression;
+		std::shared_ptr<ast::Expression> m_left_expression;
 		std::string m_operator;
-		ast::Expression* m_right_expression;
+		std::shared_ptr<ast::Expression> m_right_expression;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -251,8 +252,8 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		ast::Expression* m_function; // Either an identifier or function literal
-		std::vector<ast::Expression*> m_parameters;
+		std::shared_ptr<ast::Expression> m_function; // Either an identifier or function literal
+		std::vector<std::shared_ptr<ast::Expression>> m_parameters;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -265,8 +266,8 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		ast::Expression* m_collection; // Either an identifier or collection literal
-		ast::Expression* m_index;
+		std::shared_ptr<ast::Expression> m_collection; // Either an identifier or collection literal
+		std::shared_ptr<ast::Expression> m_index;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -282,7 +283,7 @@ namespace ast
 	public:
 		token::Token m_token;
 		Identifier m_name;
-		Expression* m_value;
+		std::shared_ptr<Expression> m_value;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -297,7 +298,7 @@ namespace ast
 		token::Token m_token;
 		token::Token m_typeToken;
 		Identifier m_name;
-		Expression* m_value;
+		std::shared_ptr<Expression> m_value;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -313,7 +314,7 @@ namespace ast
 		token::Token m_keyTypeToken;
 		token::Token m_valueTypeToken;
 		Identifier m_name;
-		Expression* m_value;
+		std::shared_ptr<Expression> m_value;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -326,9 +327,9 @@ namespace ast
 	{
 	public:
 		token::Token m_token; // function type (integer, boolean, etc.)
-		std::vector<ast::DeclareVariableStatement*> m_parameters;
+		std::vector<std::shared_ptr<ast::DeclareVariableStatement>> m_parameters;
 		ast::Identifier m_name;
-		ast::FunctionLiteral* m_body;
+		std::shared_ptr<ast::FunctionLiteral> m_body;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -341,7 +342,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_returnValue;
+		std::shared_ptr<Expression> m_returnValue;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -354,7 +355,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_expression;
+		std::shared_ptr<Expression> m_expression;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -368,9 +369,9 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_condition;
-		BlockStatement* m_consequence;
-		IfStatement* m_alternative;
+		std::shared_ptr<Expression> m_condition;
+		std::shared_ptr<BlockStatement> m_consequence;
+		std::shared_ptr<IfStatement> m_alternative;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -383,8 +384,8 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Expression* m_condition;
-		BlockStatement* m_consequence;
+		std::shared_ptr<Expression> m_condition;
+		std::shared_ptr<BlockStatement> m_consequence;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -397,8 +398,8 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		BlockStatement* m_consequence;
-		Expression* m_condition;
+		std::shared_ptr<BlockStatement> m_consequence;
+		std::shared_ptr<Expression> m_condition;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -411,10 +412,10 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Statement* m_initialization;
-		Statement* m_condition;
-		Statement* m_updation;
-		BlockStatement* m_consequence;
+		std::shared_ptr<Statement> m_initialization;
+		std::shared_ptr<Statement> m_condition;
+		std::shared_ptr<Statement> m_updation;
+		std::shared_ptr<BlockStatement> m_consequence;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -427,9 +428,9 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		Identifier* m_var;
-		Expression* m_collection;
-		BlockStatement* m_consequence;
+		std::shared_ptr<Identifier> m_var;
+		std::shared_ptr<Expression> m_collection;
+		std::shared_ptr<BlockStatement> m_consequence;
 
 		std::string TokenLiteral();
 		std::string String();

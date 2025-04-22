@@ -41,13 +41,13 @@ namespace parser
 		registerInfixFunction(token::LBRACKET, &Parser::parseIndexExpression);
 	}
 
-	ast::Program* Parser::ParseProgram()
+	std::shared_ptr<ast::Program> Parser::ParseProgram()
 	{
-		ast::Program* program = new ast::Program();
+		std::shared_ptr<ast::Program> program(new ast::Program);
 		
 		while (m_currentToken.m_type != token::END_OF_FILE)
 		{
-			ast::Statement* statement = parseStatement();
+			std::shared_ptr<ast::Statement> statement = parseStatement();
 
 			if (statement != NULL)
 			{
@@ -132,7 +132,7 @@ namespace parser
 		m_errors.push_back(error.str());
 	}
 
-	ast::Statement* Parser::parseStatement()
+	std::shared_ptr<ast::Statement> Parser::parseStatement()
 	{
 		switch (m_currentToken.m_type)
 		{
@@ -187,9 +187,9 @@ namespace parser
 		}
 	}
 
-	ast::DeclareVariableStatement* Parser::parseVariableDeclaration()
+	std::shared_ptr<ast::DeclareVariableStatement> Parser::parseVariableDeclaration()
 	{
-		ast::DeclareVariableStatement* statement = new ast::DeclareVariableStatement;
+		std::shared_ptr<ast::DeclareVariableStatement> statement(new ast::DeclareVariableStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::IDENTIFIER))
@@ -224,9 +224,9 @@ namespace parser
 		return statement;
 	};
 
-	ast::DeclareCollectionStatement* Parser::parseCollectionDeclaration()
+	std::shared_ptr<ast::DeclareCollectionStatement> Parser::parseCollectionDeclaration()
 	{
-		ast::DeclareCollectionStatement* statement = new ast::DeclareCollectionStatement;
+		std::shared_ptr<ast::DeclareCollectionStatement> statement(new ast::DeclareCollectionStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LCHEVRON))
@@ -274,9 +274,9 @@ namespace parser
 		return statement;
 	};
 
-	ast::DeclareDictionaryStatement* Parser::parseDictionaryDeclaration()
+	std::shared_ptr<ast::DeclareDictionaryStatement> Parser::parseDictionaryDeclaration()
 	{
-		ast::DeclareDictionaryStatement* statement = new ast::DeclareDictionaryStatement;
+		std::shared_ptr<ast::DeclareDictionaryStatement> statement(new ast::DeclareDictionaryStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LCHEVRON))
@@ -332,9 +332,9 @@ namespace parser
 		return statement;
 	};
 
-	ast::DeclareFunctionStatement* Parser::parseFunctionDeclaration()
+	std::shared_ptr<ast::DeclareFunctionStatement> Parser::parseFunctionDeclaration()
 	{
-		ast::DeclareFunctionStatement* statement = new ast::DeclareFunctionStatement;
+		std::shared_ptr<ast::DeclareFunctionStatement> statement(new ast::DeclareFunctionStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LPARENTHESIS))
@@ -354,23 +354,23 @@ namespace parser
 			return NULL;
 		}
 
-		statement->m_name = *((ast::Identifier*)parseIdentifier());
+		statement->m_name = *std::static_pointer_cast<ast::Identifier>(parseIdentifier());
 
 		if (!expectPeek(token::LBRACE))
 		{
 			return NULL;
 		}
 
-		statement->m_body = new ast::FunctionLiteral;
+		statement->m_body = std::shared_ptr<ast::FunctionLiteral>(new ast::FunctionLiteral);
 		statement->m_body->m_token = m_currentToken;
 		statement->m_body->m_body = parseBlockStatement();
 
 		return statement;
 	}
 
-	ast::ReturnStatement* Parser::parseReturnStatement()
+	std::shared_ptr<ast::ReturnStatement> Parser::parseReturnStatement()
 	{
-		ast::ReturnStatement* statement = new ast::ReturnStatement;
+		std::shared_ptr<ast::ReturnStatement> statement(new ast::ReturnStatement);
 		statement->m_token = m_currentToken;
 
 		nextToken();
@@ -385,9 +385,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::ExpressionStatement* Parser::parseExpressionStatement()
+	std::shared_ptr<ast::ExpressionStatement> Parser::parseExpressionStatement()
 	{
-		ast::ExpressionStatement* statement = new ast::ExpressionStatement;
+		std::shared_ptr<ast::ExpressionStatement> statement(new ast::ExpressionStatement);
 		statement->m_token = m_currentToken;
 		statement->m_expression = parseExpression(LOWEST);
 
@@ -399,16 +399,16 @@ namespace parser
 		return statement;
 	}
 
-	ast::BlockStatement* Parser::parseBlockStatement()
+	std::shared_ptr<ast::BlockStatement> Parser::parseBlockStatement()
 	{
-		ast::BlockStatement* statement = new ast::BlockStatement;
+		std::shared_ptr<ast::BlockStatement> statement(new ast::BlockStatement);
 		statement->m_token = m_currentToken;
 
 		nextToken();
 
 		while (!currentTokenIs(token::RBRACE) && !currentTokenIs(token::END_OF_FILE))
 		{
-			ast::Statement* subStatement = parseStatement();
+			std::shared_ptr<ast::Statement> subStatement = parseStatement();
 			if (subStatement != NULL)
 			{
 				statement->m_statements.push_back(subStatement);
@@ -419,9 +419,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::IfStatement* Parser::parseIfStatement()
+	std::shared_ptr<ast::IfStatement> Parser::parseIfStatement()
 	{
-		ast::IfStatement* statement = new ast::IfStatement;
+		std::shared_ptr<ast::IfStatement> statement(new ast::IfStatement);
 		statement->m_token = m_currentToken;
 		
 		if (!expectPeek(token::LPARENTHESIS))
@@ -457,7 +457,7 @@ namespace parser
 		return statement;
 	}
 
-	ast::IfStatement* Parser::parseElseStatement()
+	std::shared_ptr<ast::IfStatement> Parser::parseElseStatement()
 	{
 		if (peekTokenIs(token::IF))
 		{
@@ -465,7 +465,7 @@ namespace parser
 			return parseIfStatement();
 		}
 
-		ast::IfStatement* statement = new ast::IfStatement;
+		std::shared_ptr<ast::IfStatement> statement(new ast::IfStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LBRACE))
@@ -480,9 +480,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::WhileStatement* Parser::parseWhileStatement()
+	std::shared_ptr<ast::WhileStatement> Parser::parseWhileStatement()
 	{
-		ast::WhileStatement* statement = new ast::WhileStatement;
+		std::shared_ptr<ast::WhileStatement> statement(new ast::WhileStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LPARENTHESIS))
@@ -507,9 +507,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::DoWhileStatement* Parser::parseDoWhileStatement()
+	std::shared_ptr<ast::DoWhileStatement> Parser::parseDoWhileStatement()
 	{
-		ast::DoWhileStatement* statement = new ast::DoWhileStatement;
+		std::shared_ptr<ast::DoWhileStatement> statement(new ast::DoWhileStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LBRACE))
@@ -545,9 +545,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::ForStatement* Parser::parseForStatement()
+	std::shared_ptr<ast::ForStatement> Parser::parseForStatement()
 	{
-		ast::ForStatement* statement = new ast::ForStatement;
+		std::shared_ptr<ast::ForStatement> statement(new ast::ForStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LPARENTHESIS))
@@ -579,9 +579,9 @@ namespace parser
 		return statement;
 	}
 
-	ast::IterateStatement* Parser::parseIterateStatement()
+	std::shared_ptr<ast::IterateStatement> Parser::parseIterateStatement()
 	{
-		ast::IterateStatement* statement = new ast::IterateStatement;
+		std::shared_ptr<ast::IterateStatement> statement(new ast::IterateStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::LPARENTHESIS))
@@ -590,7 +590,7 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_var = (ast::Identifier*)parseIdentifier();
+		statement->m_var = std::static_pointer_cast<ast::Identifier>(parseIdentifier());
 
 		if (!expectPeek(token::COLON))
 		{
@@ -615,7 +615,7 @@ namespace parser
 		return statement;
 	}
 
-	ast::Expression* Parser::parseExpression(Precedence precedence)
+	std::shared_ptr<ast::Expression> Parser::parseExpression(Precedence precedence)
 	{
 		PrefixParseFunction prefix;
 		if (m_prefixParseFunctions.count(m_currentToken.m_type) >= 1)
@@ -629,7 +629,7 @@ namespace parser
 		}
 		
 		// Dereference this member function pointer and call it
-		ast::Expression* leftExpression = (this->*prefix)();
+		std::shared_ptr<ast::Expression> leftExpression = (this->*prefix)();
 
 		while (!peekTokenIs(token::SEMICOLON) && precedence < peekPrecedence())
 		{
@@ -648,9 +648,9 @@ namespace parser
 		return leftExpression;
 	}
 
-	ast::Expression* Parser::parsePrefixExpression()
+	std::shared_ptr<ast::Expression> Parser::parsePrefixExpression()
 	{
-		ast::PrefixExpression* expression = new ast::PrefixExpression;
+		std::shared_ptr<ast::PrefixExpression> expression(new ast::PrefixExpression);
 
 		expression->m_token = m_currentToken;
 		expression->m_operator = m_currentToken.m_literal;
@@ -662,9 +662,9 @@ namespace parser
 		return expression;
 	}
 
-	ast::Expression* Parser::parseInfixExpression(ast::Expression* leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseInfixExpression(std::shared_ptr<ast::Expression> leftExpression)
 	{
-		ast::InfixExpression* expression = new ast::InfixExpression;
+		std::shared_ptr<ast::InfixExpression> expression(new ast::InfixExpression);
 
 		expression->m_token = m_currentToken;
 		expression->m_operator = m_currentToken.m_literal;
@@ -677,11 +677,11 @@ namespace parser
 		return expression;
 	}
 
-	ast::Expression* Parser::parseGroupedExpression()
+	std::shared_ptr<ast::Expression> Parser::parseGroupedExpression()
 	{
 		nextToken();
 
-		ast::Expression* expression = parseExpression(LOWEST);
+		std::shared_ptr<ast::Expression> expression = parseExpression(LOWEST);
 
 		if(!expectPeek(token::RPARENTHESIS))
 		{
@@ -691,31 +691,31 @@ namespace parser
 		return expression;
 	}
 
-	ast::Expression* Parser::parseIntegerLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseIntegerLiteral()
 	{
-		ast::IntegerLiteral* expression = new ast::IntegerLiteral;
+		std::shared_ptr<ast::IntegerLiteral> expression(new ast::IntegerLiteral);
 		expression->m_token = m_currentToken;
 		expression->m_value = stoi(m_currentToken.m_literal);
 		return expression;
 	}
 
-	ast::Expression* Parser::parseFloatLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseFloatLiteral()
 	{
-		ast::FloatLiteral* expression = new ast::FloatLiteral;
+		std::shared_ptr<ast::FloatLiteral> expression(new ast::FloatLiteral);
 		expression->m_token = m_currentToken;
 		expression->m_value = stof(m_currentToken.m_literal);
 		return expression;
 	}
 
-	ast::Expression* Parser::parseBooleanLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseBooleanLiteral()
 	{
-		ast::BooleanLiteral* expression = new ast::BooleanLiteral;
+		std::shared_ptr<ast::BooleanLiteral> expression(new ast::BooleanLiteral);
 		expression->m_token = m_currentToken;
 		expression->m_value = currentTokenIs(token::TRUE_LITERAL);
 		return expression;
 	}
 
-	ast::Expression* Parser::parseCharacterLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseCharacterLiteral()
 	{
 		if (m_currentToken.m_literal.size() != 1) {
 			std::ostringstream error;
@@ -727,37 +727,37 @@ namespace parser
 			m_errors.push_back(error.str());
 		}
 
-		ast::CharacterLiteral* expression = new ast::CharacterLiteral;
+		std::shared_ptr<ast::CharacterLiteral> expression(new ast::CharacterLiteral);
 		expression->m_token = m_currentToken;
 		expression->m_value = m_currentToken.m_literal[0];
 		return expression;
 	}
 
-	ast::Expression* Parser::parseCollectionLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseCollectionLiteral()
 	{
-		ast::CollectionLiteral* expression = new ast::CollectionLiteral;
+		std::shared_ptr<ast::CollectionLiteral> expression(new ast::CollectionLiteral);
 		expression->m_token = m_currentToken;
 		parseLiterals(&expression->m_values, token::COMMA, token::RBRACKET);
 		return expression;
 	}
 
-	ast::Expression* Parser::parseDictionaryLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseDictionaryLiteral()
 	{
-		ast::DictionaryLiteral* expression = new ast::DictionaryLiteral;
+		std::shared_ptr<ast::DictionaryLiteral> expression(new ast::DictionaryLiteral);
 		expression->m_token = m_currentToken;
 		parseKeyValuePairs(&expression->m_map, token::COMMA, token::RBRACE);
 		return expression;
 	}
 
-	ast::Expression* Parser::parseStringLiteral()
+	std::shared_ptr<ast::Expression> Parser::parseStringLiteral()
 	{
-		ast::StringLiteral* stringLiteral = new ast::StringLiteral;
+		std::shared_ptr<ast::StringLiteral> stringLiteral(new ast::StringLiteral);
 		stringLiteral->m_token = m_currentToken;
-		stringLiteral->m_stringCollection = new ast::CollectionLiteral;
+		stringLiteral->m_stringCollection = std::shared_ptr<ast::CollectionLiteral>(new ast::CollectionLiteral);
 
 		for (int i = 0; i < m_currentToken.m_literal.size(); i++)
 		{
-			ast::CharacterLiteral* expression = new ast::CharacterLiteral;
+			std::shared_ptr<ast::CharacterLiteral> expression(new ast::CharacterLiteral);
 
 			expression->m_token.m_type = token::CHARACTER_LITERAL;
 			expression->m_token.m_literal = m_currentToken.m_literal[i];
@@ -769,17 +769,17 @@ namespace parser
 		return stringLiteral;
 	}
 
-	ast::Expression* Parser::parseIdentifier()
+	std::shared_ptr<ast::Expression> Parser::parseIdentifier()
 	{
-		ast::Identifier* expression = new ast::Identifier;
+		std::shared_ptr<ast::Identifier> expression(new ast::Identifier);
 		expression->m_token = m_currentToken;
 		expression->m_name = m_currentToken.m_literal;
 		return expression;
 	}
 
-	ast::Expression* Parser::parseCallExpression(ast::Expression* leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseCallExpression(std::shared_ptr<ast::Expression> leftExpression)
 	{
-		ast::CallExpression* expression = new ast::CallExpression;
+		std::shared_ptr<ast::CallExpression> expression(new ast::CallExpression);
 		expression->m_token = m_currentToken;
 		expression->m_function = leftExpression;
 		parseLiterals(&expression->m_parameters, token::COMMA, token::RPARENTHESIS);
@@ -787,9 +787,9 @@ namespace parser
 		return expression;
 	}
 
-	ast::Expression* Parser::parseIndexExpression(ast::Expression* leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseIndexExpression(std::shared_ptr<ast::Expression> leftExpression)
 	{
-		ast::IndexExpression* expression = new ast::IndexExpression;
+		std::shared_ptr<ast::IndexExpression> expression(new ast::IndexExpression);
 		expression->m_token = m_currentToken;
 		expression->m_collection = leftExpression;
 
@@ -814,13 +814,13 @@ namespace parser
 		m_infixParseFunctions[tokenType] = infixParseFunction;
 	}
 
-	void Parser::parseParameters(std::vector<ast::DeclareVariableStatement*>* parameters)
+	void Parser::parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>>* parameters)
 	{
 		while (!peekTokenIs(token::RPARENTHESIS))
 		{
 			nextToken();
 
-			ast::DeclareVariableStatement* statement = new ast::DeclareVariableStatement;
+			std::shared_ptr<ast::DeclareVariableStatement> statement(new ast::DeclareVariableStatement);
 			statement->m_token = m_currentToken;
 
 			if (!expectPeek(token::IDENTIFIER))
@@ -842,13 +842,13 @@ namespace parser
 		}
 	}
 
-	void Parser::parseLiterals(std::vector<ast::Expression*>* destination, token::TokenType separator, token::TokenType ender)
+	void Parser::parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender)
 	{
 		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
 		{
 			nextToken();
 
-			ast::Expression* statement = parseExpression(LOWEST);
+			std::shared_ptr<ast::Expression> statement = parseExpression(LOWEST);
 
 			if (peekTokenIs(separator))
 			{
@@ -860,20 +860,20 @@ namespace parser
 		nextToken();
 	}
 
-	void Parser::parseKeyValuePairs(std::map<ast::Expression*, ast::Expression*>* destination, token::TokenType separator, token::TokenType ender)
+	void Parser::parseKeyValuePairs(std::map<std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender)
 	{
 		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
 		{
 			nextToken();
 
-			ast::Expression* key = parseExpression(LOWEST);
+			std::shared_ptr<ast::Expression> key = parseExpression(LOWEST);
 
 			if (expectPeek(token::COLON))
 			{
 				nextToken();
 			}
 
-			ast::Expression* value = parseExpression(LOWEST);
+			std::shared_ptr<ast::Expression> value = parseExpression(LOWEST);
 
 			if (peekTokenIs(separator))
 			{

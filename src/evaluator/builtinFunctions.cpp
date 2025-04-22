@@ -9,7 +9,7 @@
 
 namespace evaluator
 {
-	object::Object* logBuiltIn(std::vector<object::Object*>* params)
+	std::shared_ptr<object::Object> logBuiltIn(std::vector<std::shared_ptr<object::Object>>* params)
 	{
 		std::ostringstream outputStringStream;
 
@@ -26,16 +26,16 @@ namespace evaluator
 
 		std::cout << outputString << std::endl;
 
-#ifndef NDEBUG
+#ifdef DEVELOPMENT_BUILD
 		// For lotus-interpreter-tests
-		object::String* stringObj = new object::String(&outputString);
+		std::shared_ptr<object::String> stringObj(new object::String(&outputString));
 		return stringObj;
 #endif
 
-		return &object::NULL_OBJECT;
+		return object::NULL_OBJECT;
 	}
 
-	object::Object* sizeBuiltIn(std::vector<object::Object*>* params)
+	std::shared_ptr<object::Object> sizeBuiltIn(std::vector<std::shared_ptr<object::Object>>* params)
 	{
 		if (params->size() != 1)
 		{
@@ -44,19 +44,19 @@ namespace evaluator
 			return createError(error.str());
 		}
 
-		object::Object* objectToSize = params->front();
+		std::shared_ptr<object::Object> objectToSize = params->front();
 		switch (objectToSize->Type()) {
 		case object::COLLECTION:
 		{
-			object::Collection* collection = (object::Collection*)objectToSize;
+			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(objectToSize);
 			int size = collection->m_values.size();
-			return new object::Integer(size);
+			return std::shared_ptr<object::Integer>(new object::Integer(size));
 		}
 		case object::STRING:
 		{
-			object::String* string = (object::String*)objectToSize;
+			std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(objectToSize);
 			int size = string->m_value.length();
-			return new object::Integer(size);
+			return std::shared_ptr<object::Integer>(new object::Integer(size));
 		}
 		default:
 		{
@@ -65,7 +65,7 @@ namespace evaluator
 			return createError(error.str());
 		}
 		}
-		
-		return &object::NULL_OBJECT;
+
+		return object::NULL_OBJECT;
 	}
 }

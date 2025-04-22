@@ -7,16 +7,16 @@
 
 namespace object
 {
-	Null NULL_OBJECT;
-	Boolean TRUE_OBJECT(true);
-	Boolean FALSE_OBJECT(false);
+	std::shared_ptr<Null> NULL_OBJECT = std::make_shared<object::Null>();
+	std::shared_ptr<Boolean> TRUE_OBJECT = std::make_shared<object::Boolean>(true);
+	std::shared_ptr<Boolean> FALSE_OBJECT = std::make_shared<object::Boolean>(false);
 
 	Environment::Environment()
 		: m_outer(NULL) {}
-	Environment::Environment(Environment* outer)
+	Environment::Environment(std::shared_ptr<Environment> outer)
 		: m_outer(outer) {}
 
-	object::Object* Environment::getIdentifier(std::string* identifier)
+	std::shared_ptr<Object> Environment::getIdentifier(std::string* identifier)
 	{
 		if (m_store.count(*identifier) > 0)
 		{
@@ -31,7 +31,7 @@ namespace object
 		return NULL;
 	}
 
-	object::Object* Environment::getLocalIdentifier(std::string* identifier)
+	std::shared_ptr<Object> Environment::getLocalIdentifier(std::string* identifier)
 	{
 		if (m_store.count(*identifier) > 0)
 		{
@@ -41,12 +41,12 @@ namespace object
 		return NULL;
 	}
 
-	void Environment::setIdentifier(std::string* identifier, Object* value)
+	void Environment::setIdentifier(std::string* identifier, std::shared_ptr<Object> value)
 	{
 		m_store[*identifier] = value;
 	}
 
-	void Environment::reassignIdentifier(std::string* identifier, Object* value)
+	void Environment::reassignIdentifier(std::string* identifier, std::shared_ptr<Object> value)
 	{
 		if (m_store.count(*identifier) > 0)
 		{
@@ -156,7 +156,7 @@ namespace object
 	{
 	}
 
-	Collection::Collection(ObjectType collection_type, std::vector<Object*> value)
+	Collection::Collection(ObjectType collection_type, std::vector<std::shared_ptr<Object>> value)
 		: m_collection_type(collection_type), m_values(value)
 	{
 	}
@@ -181,38 +181,38 @@ namespace object
 		return output.str();
 	}
 
-	bool Dictionary::ObjCmp::operator()(object::Object* lhs, object::Object* rhs) const
+	bool Dictionary::ObjCmp::operator()(std::shared_ptr<Object> lhs, std::shared_ptr<Object> rhs) const
 	{
 		switch (lhs->Type()) {
-		case object::INTEGER:
+		case INTEGER:
 		{
-			if (rhs->Type() != object::INTEGER) return true;
-			object::Integer* lhsI = (object::Integer*) lhs;
-			object::Integer* rhsI = (object::Integer*) rhs;
+			if (rhs->Type() != INTEGER) return true;
+			std::shared_ptr<Integer> lhsI = std::static_pointer_cast<Integer>(lhs);
+			std::shared_ptr<Integer> rhsI = std::static_pointer_cast<Integer>(rhs);
 
 			return lhsI->m_value < rhsI->m_value;
 		}
-		case object::FLOAT:
+		case FLOAT:
 		{
-			if (rhs->Type() != object::FLOAT) return true;
-			object::Float* lhsF = (object::Float*)lhs;
-			object::Float* rhsF = (object::Float*)rhs;
+			if (rhs->Type() != FLOAT) return true;
+			std::shared_ptr<Float> lhsF = std::static_pointer_cast<Float>(lhs);
+			std::shared_ptr<Float> rhsF = std::static_pointer_cast<Float>(rhs);
 
 			return lhsF->m_value < rhsF->m_value;
 		}
-		case object::BOOLEAN:
+		case BOOLEAN:
 		{
-			if (rhs->Type() != object::BOOLEAN) return true;
-			object::Boolean* lhsB = (object::Boolean*)lhs;
-			object::Boolean* rhsB = (object::Boolean*)rhs;
+			if (rhs->Type() != BOOLEAN) return true;
+			std::shared_ptr<Boolean> lhsB = std::static_pointer_cast<Boolean>(lhs);
+			std::shared_ptr<Boolean> rhsB = std::static_pointer_cast<Boolean>(rhs);
 
 			return lhsB->m_value < rhsB->m_value;
 		}
-		case object::CHARACTER:
+		case CHARACTER:
 		{
-			if (rhs->Type() != object::CHARACTER) return true;
-			object::Character* lhsC = (object::Character*)lhs;
-			object::Character* rhsC = (object::Character*)rhs;
+			if (rhs->Type() != CHARACTER) return true;
+			std::shared_ptr<Character> lhsC = std::static_pointer_cast<Character>(lhs);
+			std::shared_ptr<Character> rhsC = std::static_pointer_cast<Character>(rhs);
 
 			return lhsC->m_value < rhsC->m_value;
 		}
@@ -228,7 +228,7 @@ namespace object
 	{
 	}
 
-	Dictionary::Dictionary(ObjectType keyType, ObjectType valueType, std::vector<Object*> keys, std::vector<Object*> values)
+	Dictionary::Dictionary(ObjectType keyType, ObjectType valueType, std::vector<std::shared_ptr<Object>> keys, std::vector<std::shared_ptr<Object>> values)
 		: m_key_type(keyType), m_value_type(valueType)
 	{
 		for (int i = 0; i < keys.size(); i++)
@@ -248,7 +248,7 @@ namespace object
 		std::ostringstream output;
 		output << "{";
 
-		std::map<Object*, Object*>::iterator it;
+		std::map<std::shared_ptr<Object>, std::shared_ptr<Object>>::iterator it;
 		for (it = m_map.begin(); it != m_map.end(); it++)
 		{
 			output << it->first->Inspect() << ": "
@@ -294,7 +294,7 @@ namespace object
 		return "null";
 	}
 
-	Return::Return(Object* return_value)
+	Return::Return(std::shared_ptr<Object> return_value)
 		: m_return_value(return_value)
 	{
 	}
@@ -309,7 +309,7 @@ namespace object
 		return m_return_value->Inspect();
 	}
 
-	Function::Function(ObjectType functionType, ast::DeclareFunctionStatement* functionDeclaration, Environment* environment)
+	Function::Function(ObjectType functionType, std::shared_ptr<ast::DeclareFunctionStatement> functionDeclaration, std::shared_ptr<Environment> environment)
 		: m_function_type(functionType)
 		, m_function_name(&functionDeclaration->m_name)
 		, m_body(functionDeclaration->m_body->m_body)

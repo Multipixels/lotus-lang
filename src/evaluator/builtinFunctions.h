@@ -6,13 +6,13 @@
 
 namespace evaluator
 {
-	object::Object* logBuiltIn(std::vector<object::Object*>* params);
-	object::Object* sizeBuiltIn(std::vector<object::Object*>* params);
+	std::shared_ptr<object::Object> logBuiltIn(std::vector<std::shared_ptr<object::Object>>* params);
+	std::shared_ptr<object::Object> sizeBuiltIn(std::vector<std::shared_ptr<object::Object>>* params);
 
-	const std::map<std::string, object::Object*> builtins =
+	const std::map<std::string, std::shared_ptr<object::Object>> builtins =
 	{
-		{"log", new object::Builtin(&logBuiltIn)},
-		{"size", new object::Builtin(&sizeBuiltIn)},
+		{"log", std::shared_ptr<object::Object>(new object::Builtin(&logBuiltIn))},
+		{"size", std::shared_ptr<object::Object>(new object::Builtin(&sizeBuiltIn))},
 	};
 
 }

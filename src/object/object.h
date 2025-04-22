@@ -58,22 +58,22 @@ namespace object
 	{
 	public:
 		Environment();
-		Environment(Environment* m_outer);
+		Environment(std::shared_ptr<Environment> m_outer);
 
 		// Gets value of identifier, looking through outer layers as welll.
-		object::Object* getIdentifier(std::string* identifier);
+		std::shared_ptr<Object> getIdentifier(std::string* identifier);
 
 		// Gets value of identifier only in the current level of environment.
-		object::Object* getLocalIdentifier(std::string* identifier);
+		std::shared_ptr<Object> getLocalIdentifier(std::string* identifier);
 
 		// Assigns value to identifier in this level of environment.
-		void setIdentifier(std::string* identifier, Object* value);
+		void setIdentifier(std::string* identifier, std::shared_ptr<Object> value);
 
 		// Checks outer level for identifier for assignment.
-		void reassignIdentifier(std::string* identifier, Object* value);
+		void reassignIdentifier(std::string* identifier, std::shared_ptr<Object> value);
 	private:
-		std::map<std::string, Object*> m_store;
-		Environment* m_outer;
+		std::map<std::string, std::shared_ptr<Object>> m_store;
+		std::shared_ptr<Environment> m_outer;
 	};
 
 	class Integer : public Object
@@ -121,29 +121,29 @@ namespace object
 	{
 	public:
 		Collection();
-		Collection(ObjectType collection_type, std::vector<Object*> value);
+		Collection(ObjectType collection_type, std::vector<std::shared_ptr<Object>> value);
 		ObjectType Type();
 		std::string Inspect();
 
 		ObjectType m_collection_type;
-		std::vector<Object*> m_values;
+		std::vector<std::shared_ptr<Object>> m_values;
 	};
 
 	class Dictionary : public Object
 	{
 	private:
 		struct ObjCmp {
-			bool operator()(object::Object* lhs, object::Object* rhs) const;
+			bool operator()(std::shared_ptr<Object> lhs, std::shared_ptr<Object> rhs) const;
 		};
 	public:
 		Dictionary();
-		Dictionary(ObjectType keyType, ObjectType valueType, std::vector<Object*> keys, std::vector<Object*> values);
+		Dictionary(ObjectType keyType, ObjectType valueType, std::vector<std::shared_ptr<Object>> keys, std::vector<std::shared_ptr<Object>> values);
 		ObjectType Type();
 		std::string Inspect();
 
 		ObjectType m_key_type;
 		ObjectType m_value_type;
-		std::map<Object*, Object*, ObjCmp> m_map;
+		std::map<std::shared_ptr<Object>, std::shared_ptr<Object>, ObjCmp> m_map;
 	};
 
 	class String : public Object
@@ -168,25 +168,25 @@ namespace object
 	class Return : public Object
 	{
 	public:
-		Return(Object* return_value);
+		Return(std::shared_ptr<Object> return_value);
 		ObjectType Type();
 		std::string Inspect();
 		
-		Object* m_return_value;
+		std::shared_ptr<Object> m_return_value;
 	};
 
 	class Function : public Object
 	{
 	public:
-		Function(ObjectType functionType, ast::DeclareFunctionStatement* functionDeclaration, Environment* environment);
+		Function(ObjectType functionType, std::shared_ptr<ast::DeclareFunctionStatement> functionDeclaration, std::shared_ptr<Environment> environment);
 		ObjectType Type();
 		std::string Inspect();
 
 		ObjectType m_function_type;
-		ast::Identifier* m_function_name;
-		std::vector<ast::DeclareVariableStatement*> m_parameters;
-		ast::BlockStatement* m_body;
-		Environment* m_environment;
+		std::shared_ptr<ast::Identifier> m_function_name;
+		std::vector<std::shared_ptr<ast::DeclareVariableStatement>> m_parameters;
+		std::shared_ptr<ast::BlockStatement> m_body;
+		std::shared_ptr<Environment> m_environment;
 	};
 
 	class Error : public Object
@@ -202,7 +202,7 @@ namespace object
 	class Builtin : public Object
 	{
 	public:
-		typedef object::Object* (*BuiltinFunctionPointer) (std::vector<object::Object*>*);
+		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*);
 
 		Builtin(BuiltinFunctionPointer fn);
 		ObjectType Type();
@@ -211,7 +211,7 @@ namespace object
 		BuiltinFunctionPointer m_function;
 	};
 
-	extern Null NULL_OBJECT;
-	extern Boolean TRUE_OBJECT;
-	extern Boolean FALSE_OBJECT;
+	extern std::shared_ptr<Null> NULL_OBJECT;
+	extern std::shared_ptr<Boolean> TRUE_OBJECT;
+	extern std::shared_ptr<Boolean> FALSE_OBJECT;
 }
