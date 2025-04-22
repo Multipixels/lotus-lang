@@ -16,10 +16,12 @@ void run(std::string input) {
     {
         std::cout << "Parser error: " << parser.m_errors[i] << std::endl;
     }
-    if (parser.m_errors.size() > 0);
+    if (parser.m_errors.size() > 0) return;
 
     object::Object* output = evaluator::evaluate(program, &environment);
-    if (output->Type() != object::NULL_TYPE)
+
+    // Output only if you get an error
+    if (output->Type() == object::ERROR)
     {
         std::cout << output->Inspect() << std::endl;
     }
