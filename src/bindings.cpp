@@ -7,8 +7,8 @@
 
 using namespace emscripten;
 
-void run(std::string input, int timeout = 0) {
-    lexer::Lexer lexer = lexer::Lexer(&input);
+void run(std::string p_input, int p_timeout = 0) {
+    lexer::Lexer lexer = lexer::Lexer(&p_input);
     parser::Parser parser = parser::Parser(lexer);
     ast::Program* program = parser.ParseProgram();
     object::Environment environment;
@@ -19,7 +19,7 @@ void run(std::string input, int timeout = 0) {
     }
     if (parser.m_errors.size() > 0) return;
 
-    std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout);
+    std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(p_timeout);
     object::Object* output = evaluator::evaluate(program, &environment, timeoutValue);
 
     // Output only if you get an error

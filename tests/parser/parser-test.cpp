@@ -434,7 +434,7 @@ TEST(ParserTest, PrefixExpression)
 
 		EXPECT_EQ(prefixExpression->m_operator, tests[i].expectedOperator);
 		
-		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(prefixExpression->m_right_expression, tests[i].expectedExpression, i));
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(prefixExpression->m_rightExpression, tests[i].expectedExpression, i));
 	}
 }
 
@@ -485,8 +485,8 @@ TEST(ParserTest, InfixExpression)
 
 		EXPECT_EQ(infixExpression->m_operator, tests[i].expectedOperator);
 
-		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, tests[i].expectedLeftExpression, i));
-		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, tests[i].expectedRightExpression, i));
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_leftExpression, tests[i].expectedLeftExpression, i));
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_rightExpression, tests[i].expectedRightExpression, i));
 	}
 }
 
@@ -1453,128 +1453,128 @@ size(myCollection);
 }
 
 
-void checkParserErrors(parser::Parser* parser)
+void checkParserErrors(parser::Parser* p_parser)
 {
-	if (parser->m_errors.size() == 0)
+	if (p_parser->m_errors.size() == 0)
 	{
 		return;
 	}
 
-	for (int i = 0; i < parser->m_errors.size(); i++)
+	for (int i = 0; i < p_parser->m_errors.size(); i++)
 	{
-		std::cout << "Parser error: " << parser->m_errors[i]
+		std::cout << "Parser error: " << p_parser->m_errors[i]
 			<< std::endl;
 	}
 
 	FAIL();
 }
 
-void testLiteralExpression(std::shared_ptr<ast::Expression> expression, std::any expectedValue, int testNumber)
+void testLiteralExpression(std::shared_ptr<ast::Expression> p_expression, std::any p_expectedValue, int p_testNumber)
 {
 	// Cannot use a switch on type as std::string is not integral
 	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
 
-	std::string expectedValueType = expectedValue.type().name();
+	std::string expectedValueType = p_expectedValue.type().name();
 	if(expectedValueType == "int")
 	{
-		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(expression, std::any_cast<int>(expectedValue), testNumber));
+		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(p_expression, std::any_cast<int>(p_expectedValue), p_testNumber));
 	}
 	else if (expectedValueType == "float")
 	{
-		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(expression, std::any_cast<float>(expectedValue), testNumber));
+		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(p_expression, std::any_cast<float>(p_expectedValue), p_testNumber));
 	}
 	else if (expectedValueType == "bool")
 	{
-		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(expression, std::any_cast<bool>(expectedValue), testNumber));
+		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(p_expression, std::any_cast<bool>(p_expectedValue), p_testNumber));
 	}
 	else if (expectedValueType == "char")
 	{
-		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(expression, std::any_cast<char>(expectedValue), testNumber));
+		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(p_expression, std::any_cast<char>(p_expectedValue), p_testNumber));
 	}
 	else
 	{
 		FAIL()
-			<< "Test #" << testNumber << std::endl;
+			<< "Test #" << p_testNumber << std::endl;
 	}
 }
 
-void testIntegerLiteral(std::shared_ptr<ast::Expression> expression, int expectedValue, int testNumber)
+void testIntegerLiteral(std::shared_ptr<ast::Expression> p_expression, int p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::INTEGER_LITERAL_NODE)
-		<< "Test #" << testNumber << std::endl;
+	ASSERT_EQ(p_expression->Type(), ast::INTEGER_LITERAL_NODE)
+		<< "Test #" << p_testNumber << std::endl;
 
-	std::shared_ptr<ast::IntegerLiteral> integerLiteral = std::static_pointer_cast<ast::IntegerLiteral>(expression);
+	std::shared_ptr<ast::IntegerLiteral> integerLiteral = std::static_pointer_cast<ast::IntegerLiteral>(p_expression);
 
-	EXPECT_EQ(integerLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << std::endl;
-	EXPECT_EQ(integerLiteral->TokenLiteral(), std::to_string(expectedValue))
-		<< "Test #" << testNumber << std::endl;
+	EXPECT_EQ(integerLiteral->m_value, p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
+	EXPECT_EQ(integerLiteral->TokenLiteral(), std::to_string(p_expectedValue))
+		<< "Test #" << p_testNumber << std::endl;
 }
 
-void testFloatLiteral(std::shared_ptr<ast::Expression> expression, float expectedValue, int testNumber)
+void testFloatLiteral(std::shared_ptr<ast::Expression> p_expression, float p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::FLOAT_LITERAL_NODE)
-		<< "Test #" << testNumber << std::endl;
+	ASSERT_EQ(p_expression->Type(), ast::FLOAT_LITERAL_NODE)
+		<< "Test #" << p_testNumber << std::endl;
 
-	std::shared_ptr<ast::FloatLiteral> floatLiteral = std::static_pointer_cast<ast::FloatLiteral>(expression);
+	std::shared_ptr<ast::FloatLiteral> floatLiteral = std::static_pointer_cast<ast::FloatLiteral>(p_expression);
 
 	std::ostringstream outputString;
-	outputString << expectedValue;
+	outputString << p_expectedValue;
 
-	EXPECT_EQ(floatLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << std::endl;
+	EXPECT_EQ(floatLiteral->m_value, p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
 	EXPECT_EQ(floatLiteral->TokenLiteral(), outputString.str())
-		<< "Test #" << testNumber << std::endl;
+		<< "Test #" << p_testNumber << std::endl;
 }
 
-void testBooleanLiteral(std::shared_ptr<ast::Expression> expression, bool expectedValue, int testNumber)
+void testBooleanLiteral(std::shared_ptr<ast::Expression> p_expression, bool p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::BOOLEAN_LITERAL_NODE)
-		<< "Test #" << testNumber << std::endl;
+	ASSERT_EQ(p_expression->Type(), ast::BOOLEAN_LITERAL_NODE)
+		<< "Test #" << p_testNumber << std::endl;
 
-	std::shared_ptr<ast::BooleanLiteral> booleanLiteral = std::static_pointer_cast<ast::BooleanLiteral>(expression);
+	std::shared_ptr<ast::BooleanLiteral> booleanLiteral = std::static_pointer_cast<ast::BooleanLiteral>(p_expression);
 
-	EXPECT_EQ(booleanLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << std::endl;
-	EXPECT_EQ(booleanLiteral->TokenLiteral(), expectedValue ? "true" : "false")
-		<< "Test #" << testNumber << std::endl;
+	EXPECT_EQ(booleanLiteral->m_value, p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
+	EXPECT_EQ(booleanLiteral->TokenLiteral(), p_expectedValue ? "true" : "false")
+		<< "Test #" << p_testNumber << std::endl;
 }
 
-void testCharacterLiteral(std::shared_ptr<ast::Expression> expression, char expectedValue, int testNumber)
+void testCharacterLiteral(std::shared_ptr<ast::Expression> p_expression, char p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::CHARACTER_LITERAL_NODE)
-		<< "Test #" << testNumber << std::endl;
+	ASSERT_EQ(p_expression->Type(), ast::CHARACTER_LITERAL_NODE)
+		<< "Test #" << p_testNumber << std::endl;
 
-	std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(expression);
+	std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(p_expression);
 
-	char charToString[2] = { expectedValue, '\0' };
+	char charToString[2] = { p_expectedValue, '\0' };
 
-	EXPECT_EQ(characterLiteral->m_value, expectedValue)
-		<< "Test #" << testNumber << std::endl;
+	EXPECT_EQ(characterLiteral->m_value, p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
 	EXPECT_EQ(characterLiteral->TokenLiteral(), charToString)
-		<< "Test #" << testNumber << std::endl;
+		<< "Test #" << p_testNumber << std::endl;
 }
 
-void testCollectionLiteral(std::shared_ptr<ast::Expression> expression, std::vector<std::any>* expectedValue, int testNumber)
+void testCollectionLiteral(std::shared_ptr<ast::Expression> p_expression, std::vector<std::any>* p_expectedValue, int p_testNumber)
 {
 	// Test to see if this is a collection literal expression
-	ASSERT_EQ(expression->Type(), ast::COLLECTION_LITERAL_NODE);
-	std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(expression);
+	ASSERT_EQ(p_expression->Type(), ast::COLLECTION_LITERAL_NODE);
+	std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(p_expression);
 
-	ASSERT_EQ(collectionLiteral->m_values.size(), expectedValue->size());
+	ASSERT_EQ(collectionLiteral->m_values.size(), p_expectedValue->size());
 	for (int j = 0; j < collectionLiteral->m_values.size(); j++)
 	{
-		EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], (*expectedValue)[j], testNumber));
+		EXPECT_NO_FATAL_FAILURE(testLiteralExpression(collectionLiteral->m_values[j], (*p_expectedValue)[j], p_testNumber));
 	}
 }
 
-void testDictionaryLiteral(std::shared_ptr<ast::Expression> expression, std::map<std::string, std::any>* expectedValue, int testNumber)
+void testDictionaryLiteral(std::shared_ptr<ast::Expression> p_expression, std::map<std::string, std::any>* p_expectedValue, int p_testNumber)
 {
 	// Test to see if this is a dictionary literal expression
-	ASSERT_EQ(expression->Type(), ast::DICTIONARY_LITERAL_NODE);
-	std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(expression);
+	ASSERT_EQ(p_expression->Type(), ast::DICTIONARY_LITERAL_NODE);
+	std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(p_expression);
 
-	ASSERT_EQ(dictionaryLiteral->m_map.size(), expectedValue->size());
+	ASSERT_EQ(dictionaryLiteral->m_map.size(), p_expectedValue->size());
 	std::map<std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>::iterator it;
 
 	for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
@@ -1583,25 +1583,25 @@ void testDictionaryLiteral(std::shared_ptr<ast::Expression> expression, std::map
 		case ast::INTEGER_LITERAL_NODE: 
 		{
 			std::shared_ptr<ast::IntegerLiteral> integerLiteral = std::static_pointer_cast<ast::IntegerLiteral>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), p_expectedValue->at(std::to_string(integerLiteral->m_value))));
 			break;
 		}
 		case ast::FLOAT_LITERAL_NODE:
 		{
 			std::shared_ptr<ast::FloatLiteral> floatLiteral = std::static_pointer_cast<ast::FloatLiteral>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), p_expectedValue->at(std::to_string(floatLiteral->m_value))));
 			break;
 		}
 		case ast::BOOLEAN_LITERAL_NODE:
 		{
 			std::shared_ptr<ast::BooleanLiteral> booleanLiteral = std::static_pointer_cast<ast::BooleanLiteral>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), p_expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
 			break;
 		}
 		case ast::CHARACTER_LITERAL_NODE:
 		{
 			std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralExpression(dictionaryLiteral->m_map.at(it->first), p_expectedValue->at(std::string(1, characterLiteral->m_value))));
 			break;
 		}
 		default:
@@ -1613,39 +1613,39 @@ void testDictionaryLiteral(std::shared_ptr<ast::Expression> expression, std::map
 	}
 }
 
-void testStringLiteral(std::shared_ptr<ast::Expression> expression, std::string* expectedValue, int testNumber)
+void testStringLiteral(std::shared_ptr<ast::Expression> p_expression, std::string* p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::STRING_LITERAL_NODE)
-		<< "Test #" << testNumber << std::endl;
+	ASSERT_EQ(p_expression->Type(), ast::STRING_LITERAL_NODE)
+		<< "Test #" << p_testNumber << std::endl;
 
-	std::shared_ptr<ast::StringLiteral> stringLiteral = std::static_pointer_cast<ast::StringLiteral>(expression);
+	std::shared_ptr<ast::StringLiteral> stringLiteral = std::static_pointer_cast<ast::StringLiteral>(p_expression);
 
 	std::stringstream expected;
-	expected << '"' << *expectedValue << '"';
+	expected << '"' << *p_expectedValue << '"';
 
 	EXPECT_EQ(stringLiteral->String(), expected.str());
 }
 
-void testIdentifier(std::shared_ptr<ast::Expression> expression, std::string* expectedValue, int testNumber)
+void testIdentifier(std::shared_ptr<ast::Expression> p_expression, std::string* p_expectedValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::IDENTIFIER_NODE);
-	std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(expression);
+	ASSERT_EQ(p_expression->Type(), ast::IDENTIFIER_NODE);
+	std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(p_expression);
 
 	// Test to see if identifier fields are right
-	EXPECT_EQ(identifier->m_name, *expectedValue)
-		<< "Test #" << testNumber << std::endl;
-	EXPECT_EQ(identifier->TokenLiteral(), *expectedValue)
-		<< "Test #" << testNumber << std::endl;
+	EXPECT_EQ(identifier->m_name, *p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
+	EXPECT_EQ(identifier->TokenLiteral(), *p_expectedValue)
+		<< "Test #" << p_testNumber << std::endl;
 }
 
-void testInfixExpression(std::shared_ptr<ast::Expression> expression, std::any leftValue, std::string op, std::any rightValue, int testNumber)
+void testInfixExpression(std::shared_ptr<ast::Expression> p_expression, std::any p_leftValue, std::string p_op, std::any p_rightValue, int p_testNumber)
 {
-	ASSERT_EQ(expression->Type(), ast::INFIX_EXPRESSION_NODE);
-	std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(expression);
+	ASSERT_EQ(p_expression->Type(), ast::INFIX_EXPRESSION_NODE);
+	std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(p_expression);
 
-	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_left_expression, leftValue, testNumber));
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_leftExpression, p_leftValue, p_testNumber));
 
-	EXPECT_EQ(infixExpression->m_operator, op);
+	EXPECT_EQ(infixExpression->m_operator, p_op);
 
-	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_right_expression, rightValue, testNumber));
+	ASSERT_NO_FATAL_FAILURE(testLiteralExpression(infixExpression->m_rightExpression, p_rightValue, p_testNumber));
 }

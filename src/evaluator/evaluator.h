@@ -7,68 +7,68 @@
 namespace evaluator
 {
 	// Evaluates a node
-	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> node, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout = std::chrono::steady_clock::time_point());
+	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout = std::chrono::steady_clock::time_point());
 
 	// Evaluates a program
-	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> program, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout);
+	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
 
 	// Evaluates a block statement
-	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> blockStatements, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout);
+	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
 
 	// Evaluates a list of expressions
-	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* source, std::vector<std::shared_ptr<object::Object>>* destination, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout);
+	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
 
 	// Evaluates an identifier
-	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> identifier, std::shared_ptr<object::Environment> environment);
+	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates a prefix expression
-	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* prefixOperator, std::shared_ptr<object::Object> rightObject);
+	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject);
 	
 	// Evaluates an infix expression
-	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> leftObject, std::string* infixOperator, std::shared_ptr<object::Object> rightObject);
+	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Object> p_rightObject);
 
 	// Evaluates an integer infix expression
-	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> leftObject, std::string* infixOperator, std::shared_ptr<object::Integer> rightObject);
+	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Integer> p_rightObject);
 	
 	// Evaluates a boolean infix expression
-	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> leftObject, std::string* infixOperator, std::shared_ptr<object::Boolean> rightObject);
+	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Boolean> p_rightObject);
 
 	// Evaluates a character infix expression
-	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> leftObject, std::string* infixOperator, std::shared_ptr<object::Character> rightObject);
+	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Character> p_rightObject);
 	
 	// Evaluates an integer infix expression
-	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> leftObject, std::string* infixOperator, std::shared_ptr<object::Float> rightObject);
+	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Float> p_rightObject);
 
 	// Applies bang operator
-	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> expression);
+	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> p_expression);
 
 	// Applies negative operator (prefix)
-	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> expression);
+	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression);
 
 	// Evaluates a function call
-	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> callExpression, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout);
+	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
 
 	// Evaluates an indexing on collections, strings, or dictionaries
-	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> indexExpression, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout);
+	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
 
 	// Reassigns value in a collection
-	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> collection, std::shared_ptr<object::Object> indexObject, std::shared_ptr<object::Object> valueObject);
+	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject);
 
 	// Reassigns value in a dictionary
-	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> dictionary, std::shared_ptr<object::Object> keyObject, std::shared_ptr<object::Object> valueObject);
+	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject);
 
 	// Applies a function call to a function
-	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> function, std::vector<std::shared_ptr<object::Object>>* arguments, std::chrono::steady_clock::time_point timeout);
+	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments, std::chrono::steady_clock::time_point p_timeout);
 
 	// Helper function to extend a function's environment
-	std::shared_ptr<object::Environment> extendFunctionEnvironment(std::shared_ptr<object::Function> function, std::vector<std::shared_ptr<object::Object>>* arguments);
+	std::shared_ptr<object::Environment> extendFunctionEnvironment(std::shared_ptr<object::Function> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments);
 
 	// Unwraps return value
-	std::shared_ptr<object::Object> unwrapReturnValue(std::shared_ptr<object::Object> object);
+	std::shared_ptr<object::Object> unwrapReturnValue(std::shared_ptr<object::Object> p_object);
 
 	// Checks value of a truthy object
-	std::shared_ptr<object::Object> isTruthy(std::shared_ptr<object::Object> object);
+	std::shared_ptr<object::Object> isTruthy(std::shared_ptr<object::Object> p_object);
 
 	// Creates an error object with the provided error message
-	std::shared_ptr<object::Error> createError(std::string errorMessage);
+	std::shared_ptr<object::Error> createError(std::string p_errorMessage);
 }

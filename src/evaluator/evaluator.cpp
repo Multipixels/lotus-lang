@@ -6,59 +6,58 @@
 
 namespace evaluator
 {
-	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> node, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
-		if (timeout != std::chrono::steady_clock::time_point() && timeout < std::chrono::steady_clock::now())
+		if (p_timeout != std::chrono::steady_clock::time_point() && p_timeout < std::chrono::steady_clock::now())
 		{
 			std::ostringstream error;
 			error << "Evaluation of the program timed out.";
 			return createError(error.str());
 		}
 
-		if (node == NULL) return object::NULL_OBJECT;
+		if (p_node == NULL) return object::NULL_OBJECT;
 
-		switch (node->Type())
+		switch (p_node->Type())
 		{
 		case ast::PROGRAM_NODE:
 		{
-			std::shared_ptr<object::Object> test = evaluateProgram(std::static_pointer_cast<ast::Program>(node), environment, timeout);
-			return test;
+			return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment, p_timeout);
 		}
 		case ast::IDENTIFIER_NODE:
 		{
-			return evaluateIdentifier(std::static_pointer_cast<ast::Identifier>(node), environment);
+			return evaluateIdentifier(std::static_pointer_cast<ast::Identifier>(p_node), p_environment);
 		}
 		case ast::BLOCK_STATEMENT_NODE:
 		{
-			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(node), environment, timeout);
+			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment, p_timeout);
 		}
 		case ast::INTEGER_LITERAL_NODE:
 		{
 			std::shared_ptr<object::Integer> object(new object::Integer);
-			object->m_value = std::static_pointer_cast<ast::IntegerLiteral>(node)->m_value;
+			object->m_value = std::static_pointer_cast<ast::IntegerLiteral>(p_node)->m_value;
 			return object;
 		}
 		case ast::FLOAT_LITERAL_NODE:
 		{
 			std::shared_ptr<object::Float> object(new object::Float);
-			object->m_value = std::static_pointer_cast<ast::FloatLiteral>(node)->m_value;
+			object->m_value = std::static_pointer_cast<ast::FloatLiteral>(p_node)->m_value;
 			return object;
 		}
 		case ast::BOOLEAN_LITERAL_NODE:
 		{
 			std::shared_ptr<object::Boolean> object(new object::Boolean);
-			object->m_value = std::static_pointer_cast<ast::BooleanLiteral>(node)->m_value;
+			object->m_value = std::static_pointer_cast<ast::BooleanLiteral>(p_node)->m_value;
 			return object;
 		}
 		case ast::CHARACTER_LITERAL_NODE:
 		{
 			std::shared_ptr<object::Character> object(new object::Character);
-			object->m_value = std::static_pointer_cast<ast::CharacterLiteral>(node)->m_value;
+			object->m_value = std::static_pointer_cast<ast::CharacterLiteral>(p_node)->m_value;
 			return object;
 		}
 		case ast::COLLECTION_LITERAL_NODE:
 		{
-			std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(node);
+			std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(p_node);
 
 			if (collectionLiteral->m_values.size() == 0)
 			{
@@ -69,18 +68,18 @@ namespace evaluator
 
 			for (int i = 0; i < collectionLiteral->m_values.size(); i++)
 			{
-				std::shared_ptr<object::Object> evaluatedItem = evaluate(collectionLiteral->m_values[i], environment, timeout);
+				std::shared_ptr<object::Object> evaluatedItem = evaluate(collectionLiteral->m_values[i], p_environment, p_timeout);
 
 				if (evaluatedItem->Type() == object::ERROR) return evaluatedItem;
 
-				if (object->m_collection_type != object::NULL_TYPE && evaluatedItem->Type() != object->m_collection_type)
+				if (object->m_collectionType != object::NULL_TYPE && evaluatedItem->Type() != object->m_collectionType)
 				{
 					std::ostringstream error;
-					error << "The collection " << node->String() << " must have uniform typing of elements.";
+					error << "The collection " << p_node->String() << " must have uniform typing of elements.";
 					return createError(error.str());
 				}
 
-				if (object->m_collection_type == object::NULL_TYPE) object->m_collection_type = evaluatedItem->Type();
+				if (object->m_collectionType == object::NULL_TYPE) object->m_collectionType = evaluatedItem->Type();
 				object->m_values.push_back(evaluatedItem);
 			}
 
@@ -88,7 +87,7 @@ namespace evaluator
 		}
 		case ast::DICTIONARY_LITERAL_NODE:
 		{
-			std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(node);
+			std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(p_node);
 
 			if (dictionaryLiteral->m_map.size() == 0)
 			{
@@ -101,7 +100,7 @@ namespace evaluator
 			for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
 			{
 				// Checking the key
-				std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, environment, timeout);
+				std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, p_environment, p_timeout);
 				if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
 
 				if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
@@ -109,18 +108,18 @@ namespace evaluator
 				{
 					std::ostringstream error;
 					error << "Invalid dictionary key type. " << 
-						object::objectTypeToString.at(evaluatedKey->Type()) << " is not a hashable type.";
+						object::c_objectTypeToString.at(evaluatedKey->Type()) << " is not a hashable type.";
 					return createError(error.str());
 				}
 
-				if (object->m_key_type != object::NULL_TYPE && evaluatedKey->Type() != object->m_key_type)
+				if (object->m_keyType != object::NULL_TYPE && evaluatedKey->Type() != object->m_keyType)
 				{
 					std::ostringstream error;
 					error << "Dictionary has mismatching key types.";
 					return createError(error.str());
 				}
 
-				if (object->m_key_type == object::NULL_TYPE) object->m_key_type = evaluatedKey->Type();
+				if (object->m_keyType == object::NULL_TYPE) object->m_keyType = evaluatedKey->Type();
 				if (object->m_map.find(evaluatedKey) != object->m_map.end())
 				{
 					std::ostringstream error;
@@ -129,17 +128,17 @@ namespace evaluator
 				}
 
 				// Checking the value
-				std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, environment, timeout);
+				std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, p_environment, p_timeout);
 				if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
 
-				if (object->m_value_type != object::NULL_TYPE && evaluatedValue->Type() != object->m_value_type)
+				if (object->m_valueType != object::NULL_TYPE && evaluatedValue->Type() != object->m_valueType)
 				{
 					std::ostringstream error;
 					error << "Dictionary has mismatching value types.";
 					return createError(error.str());
 				}
 
-				if (object->m_value_type == object::NULL_TYPE) object->m_value_type = evaluatedValue->Type();
+				if (object->m_valueType == object::NULL_TYPE) object->m_valueType = evaluatedValue->Type();
 
 				// Storing key value pair
 				object->m_map.emplace(evaluatedKey, evaluatedValue);
@@ -151,10 +150,10 @@ namespace evaluator
 		{
 			std::stringstream value;
 
-			for (int i = 0; i < (std::static_pointer_cast<ast::StringLiteral>(node))->m_stringCollection->m_values.size(); i++)
+			for (int i = 0; i < (std::static_pointer_cast<ast::StringLiteral>(p_node))->m_stringCollection->m_values.size(); i++)
 			{
 				// Take expressoin from string collection and cast to character literal pointer
-				std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>((std::static_pointer_cast<ast::StringLiteral>(node))->m_stringCollection->m_values[i]);
+				std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>((std::static_pointer_cast<ast::StringLiteral>(p_node))->m_stringCollection->m_values[i]);
 				value << characterLiteral->m_value;
 			}
 
@@ -164,21 +163,21 @@ namespace evaluator
 		}
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
-			std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>(node);
+			std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>(p_node);
 
-			std::shared_ptr<object::Object> rightObject = evaluate(prefixExpression->m_right_expression, environment, timeout);
+			std::shared_ptr<object::Object> rightObject = evaluate(prefixExpression->m_rightExpression, p_environment, p_timeout);
 			if (rightObject->Type() == object::ERROR) return rightObject;
 
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
 		}
 		case ast::INFIX_EXPRESSION_NODE:
 		{
-			std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(node);
+			std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(p_node);
 
-			if (infixExpression->m_left_expression->Type() == ast::IDENTIFIER_NODE && infixExpression->m_operator == "=")
+			if (infixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE && infixExpression->m_operator == "=")
 			{
-				std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(infixExpression->m_left_expression);
-				std::shared_ptr<object::Object> savedValue = environment->getIdentifier(&identifier->m_name);
+				std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(infixExpression->m_leftExpression);
+				std::shared_ptr<object::Object> savedValue = p_environment->getIdentifier(&identifier->m_name);
 				if (savedValue == NULL)
 				{
 					std::ostringstream error;
@@ -186,7 +185,7 @@ namespace evaluator
 					return createError(error.str());
 				}
 
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_right_expression, environment, timeout);
+				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
 
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
@@ -194,26 +193,26 @@ namespace evaluator
 				{
 					std::ostringstream error;
 					error << "Cannot assign '" << identifier->m_name << "' of type '"
-						<< object::objectTypeToString.at(savedValue->Type()) << "' a value of type '"
-						<< object::objectTypeToString.at(rightObject->Type()) << "'.";
+						<< object::c_objectTypeToString.at(savedValue->Type()) << "' a value of type '"
+						<< object::c_objectTypeToString.at(rightObject->Type()) << "'.";
 					return createError(error.str());
 				}
 
-				environment->reassignIdentifier(&identifier->m_name, rightObject);
+				p_environment->reassignIdentifier(&identifier->m_name, rightObject);
 
 				return object::NULL_OBJECT;
 			}
-			else if (infixExpression->m_left_expression->Type() == ast::INDEX_EXPRESSION_NODE && infixExpression->m_operator == "=")
+			else if (infixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE && infixExpression->m_operator == "=")
 			{
-				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(infixExpression->m_left_expression);
+				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(infixExpression->m_leftExpression);
 				
-				std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, environment, timeout);
+				std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, p_environment, p_timeout);
 				if (object->Type() == object::ERROR) return object;
 
-				std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, environment, timeout);
+				std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, p_environment, p_timeout);
 				if (indexObject->Type() == object::ERROR) return indexObject;
 
-				std::shared_ptr<object::Object> valueObject = evaluate(infixExpression->m_right_expression, environment, timeout);
+				std::shared_ptr<object::Object> valueObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
 				if (valueObject->Type() == object::ERROR) return valueObject;
 
 				switch (object->Type()) {
@@ -241,10 +240,10 @@ namespace evaluator
 			}
 			else
 			{
-				std::shared_ptr<object::Object> leftObject = evaluate(infixExpression->m_left_expression, environment, timeout);
+				std::shared_ptr<object::Object> leftObject = evaluate(infixExpression->m_leftExpression, p_environment, p_timeout);
 				if (leftObject->Type() == object::ERROR) return leftObject;
 
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_right_expression, environment, timeout);
+				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
 				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
@@ -252,137 +251,137 @@ namespace evaluator
 		}
 		case ast::CALL_EXPRESSION_NODE:
 		{
-			std::shared_ptr<ast::CallExpression> callExpression = std::static_pointer_cast<ast::CallExpression>(node);
-			return evaluateCallExpression(callExpression, environment, timeout);
+			std::shared_ptr<ast::CallExpression> callExpression = std::static_pointer_cast<ast::CallExpression>(p_node);
+			return evaluateCallExpression(callExpression, p_environment, p_timeout);
 		}
 		case ast::INDEX_EXPRESSION_NODE:
 		{
-			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(node);
-			return evaluateIndexExpression(indexExpression, environment, timeout);
+			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_node);
+			return evaluateIndexExpression(indexExpression, p_environment, p_timeout);
 		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(node);
+			std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(p_node);
 
-			if (environment->getLocalIdentifier(&declareVariableStatement->m_name.m_name) != NULL)
+			if (p_environment->getLocalIdentifier(&declareVariableStatement->m_name.m_name) != NULL)
 			{
 				std::ostringstream error;
 				error << "Redefinition of '" << declareVariableStatement->m_name.m_name << "'.";
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareVariableStatement->m_value, environment, timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareVariableStatement->m_value, p_environment, p_timeout);
 
 			if (object->Type() == object::ERROR)
 			{
 				return object;
 			}
 
-			if (declareVariableStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			if (declareVariableStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
 			{
 				std::ostringstream error;
 				error << "'" << declareVariableStatement->m_name.m_name
 					<< "' is defined as type '" << declareVariableStatement->m_token.m_literal
-					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
+					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
 				return createError(error.str());
 			}
 
-			environment->setIdentifier(&declareVariableStatement->m_name.m_name, object);
+			p_environment->setIdentifier(&declareVariableStatement->m_name.m_name, object);
 
 			return object::NULL_OBJECT;
 		}
 		case ast::DECLARE_COLLECTION_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::DeclareCollectionStatement> declareCollectionStatement = std::static_pointer_cast<ast::DeclareCollectionStatement>(node);
+			std::shared_ptr<ast::DeclareCollectionStatement> declareCollectionStatement = std::static_pointer_cast<ast::DeclareCollectionStatement>(p_node);
 
-			if (environment->getLocalIdentifier(&declareCollectionStatement->m_name.m_name) != NULL)
+			if (p_environment->getLocalIdentifier(&declareCollectionStatement->m_name.m_name) != NULL)
 			{
 				std::ostringstream error;
 				error << "Redefinition of '" << declareCollectionStatement->m_name.m_name << "'.";
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareCollectionStatement->m_value, environment, timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareCollectionStatement->m_value, p_environment, p_timeout);
 
 			if (object->Type() == object::ERROR)
 			{
 				return object;
 			}
 
-			if (declareCollectionStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			if (declareCollectionStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
 			{
 				std::ostringstream error;
 				error << "'" << declareCollectionStatement->m_name.m_name
 					<< "' is defined as type '" << declareCollectionStatement->m_token.m_literal
-					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
+					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
 				return createError(error.str());
 			}
 
 			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(object);
 
-			if (collection->m_collection_type != object::NULL_TYPE && declareCollectionStatement->m_typeToken.m_literal != object::objectTypeToString.at(collection->m_collection_type))
+			if (collection->m_collectionType != object::NULL_TYPE && declareCollectionStatement->m_typeToken.m_literal != object::c_objectTypeToString.at(collection->m_collectionType))
 			{
 				std::ostringstream error;
 				error << "'" << declareCollectionStatement->m_name.m_name
 					<< "' is a collection of '" << declareCollectionStatement->m_typeToken.m_literal
-					<< "'s, but got a collection of type '" << object::objectTypeToString.at(collection->m_collection_type) << "'s.";
+					<< "'s, but got a collection of type '" << object::c_objectTypeToString.at(collection->m_collectionType) << "'s.";
 				return createError(error.str());
 			}
 
-			environment->setIdentifier(&declareCollectionStatement->m_name.m_name, object);
+			p_environment->setIdentifier(&declareCollectionStatement->m_name.m_name, object);
 
 			return object::NULL_OBJECT;
 		}
 		case ast::DECLARE_DICTIONARY_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::DeclareDictionaryStatement> declareDictionaryStatement = std::static_pointer_cast<ast::DeclareDictionaryStatement>(node);
+			std::shared_ptr<ast::DeclareDictionaryStatement> declareDictionaryStatement = std::static_pointer_cast<ast::DeclareDictionaryStatement>(p_node);
 
-			if (environment->getLocalIdentifier(&declareDictionaryStatement->m_name.m_name) != NULL)
+			if (p_environment->getLocalIdentifier(&declareDictionaryStatement->m_name.m_name) != NULL)
 			{
 				std::ostringstream error;
 				error << "Redefinition of '" << declareDictionaryStatement->m_name.m_name << "'.";
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareDictionaryStatement->m_value, environment, timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareDictionaryStatement->m_value, p_environment, p_timeout);
 
 			if (object->Type() == object::ERROR)
 			{
 				return object;
 			}
 
-			if (declareDictionaryStatement->m_token.m_literal != object::objectTypeToString.at(object->Type()))
+			if (declareDictionaryStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
 			{
 				std::ostringstream error;
 				error << "'" << declareDictionaryStatement->m_name.m_name
 					<< "' is defined as type '" << declareDictionaryStatement->m_token.m_literal
-					<< "', not '" << (object::objectTypeToString.at(object->Type())) << "'.";
+					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
 				return createError(error.str());
 			}
 
 			std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(object);
 
-			if (dictionary->m_key_type != object::NULL_TYPE && 
-				(declareDictionaryStatement->m_keyTypeToken.m_literal != object::objectTypeToString.at(dictionary->m_key_type) || 
-				 declareDictionaryStatement->m_valueTypeToken.m_literal != object::objectTypeToString.at(dictionary->m_value_type)))
+			if (dictionary->m_keyType != object::NULL_TYPE && 
+				(declareDictionaryStatement->m_keyTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_keyType) || 
+				 declareDictionaryStatement->m_valueTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_valueType)))
 			{
 				std::ostringstream error;
 				error << "'" << declareDictionaryStatement->m_name.m_name
 					<< "' is a dictionary of <" << declareDictionaryStatement->m_keyTypeToken.m_literal << ", " << declareDictionaryStatement->m_valueTypeToken.m_literal
 					<< "> pairs, but got a dictionary of type <" 
-					<< object::objectTypeToString.at(dictionary->m_key_type) << ", " << object::objectTypeToString.at(dictionary->m_value_type) << "> pairs.";
+					<< object::c_objectTypeToString.at(dictionary->m_keyType) << ", " << object::c_objectTypeToString.at(dictionary->m_valueType) << "> pairs.";
 				return createError(error.str());
 			}
 
-			environment->setIdentifier(&declareDictionaryStatement->m_name.m_name, object);
+			p_environment->setIdentifier(&declareDictionaryStatement->m_name.m_name, object);
 
 			return object::NULL_OBJECT;
 		}
 		case ast::DECLARE_FUNCTION_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::DeclareFunctionStatement> declareFunctionStatement = std::static_pointer_cast<ast::DeclareFunctionStatement>(node);
+			std::shared_ptr<ast::DeclareFunctionStatement> declareFunctionStatement = std::static_pointer_cast<ast::DeclareFunctionStatement>(p_node);
 
-			if (object::nodeTypeToObjectType.count(declareFunctionStatement->m_token.m_type) == 0)
+			if (object::c_nodeTypeToObjectType.count(declareFunctionStatement->m_token.m_type) == 0)
 			{
 				std::ostringstream error;
 				error << "'" << declareFunctionStatement->m_token.m_literal
@@ -390,32 +389,32 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			object::ObjectType functionType = object::nodeTypeToObjectType.at(declareFunctionStatement->m_token.m_type);
-			std::shared_ptr<object::Function> result(new object::Function(functionType, declareFunctionStatement, environment));
+			object::ObjectType functionType = object::c_nodeTypeToObjectType.at(declareFunctionStatement->m_token.m_type);
+			std::shared_ptr<object::Function> result(new object::Function(functionType, declareFunctionStatement, p_environment));
 
-			environment->setIdentifier(&declareFunctionStatement->m_name.m_name, result);
+			p_environment->setIdentifier(&declareFunctionStatement->m_name.m_name, result);
 
 			return object::NULL_OBJECT;
 		}
 		case ast::RETURN_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::ReturnStatement> returnStatement = std::static_pointer_cast<ast::ReturnStatement>(node);
-			return std::shared_ptr<object::Object>(new object::Return(evaluate(returnStatement->m_returnValue, environment, timeout)));
+			std::shared_ptr<ast::ReturnStatement> returnStatement = std::static_pointer_cast<ast::ReturnStatement>(p_node);
+			return std::shared_ptr<object::Object>(new object::Return(evaluate(returnStatement->m_returnValue, p_environment, p_timeout)));
 		}
 		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(node)->m_expression, environment, timeout);
+			return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(p_node)->m_expression, p_environment, p_timeout);
 		case ast::IF_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(node);
+			std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(p_node);
 
 			// Treat as else caluse
 			if (ifStatement->m_condition == NULL)
 			{
-				std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(environment));
-				return evaluate(ifStatement->m_consequence, ifEnvironment, timeout);
+				std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
+				return evaluate(ifStatement->m_consequence, ifEnvironment, p_timeout);
 			}
 
-			std::shared_ptr<object::Object> evaluatedCondition = evaluate(ifStatement->m_condition, environment, timeout);
+			std::shared_ptr<object::Object> evaluatedCondition = evaluate(ifStatement->m_condition, p_environment, p_timeout);
 
 			if (evaluatedCondition->Type() == object::ERROR)
 			{
@@ -430,20 +429,29 @@ namespace evaluator
 			}
 
 			std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
-			std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(environment));
+			std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
 
-			if (truthyBoolean->m_value) return evaluate(ifStatement->m_consequence, ifEnvironment, timeout);
-			else if (ifStatement->m_alternative != NULL) return evaluate(ifStatement->m_alternative, ifEnvironment, timeout);
-			else return object::NULL_OBJECT;
+			if (truthyBoolean->m_value)
+			{
+				return evaluate(ifStatement->m_consequence, ifEnvironment, p_timeout);
+			}
+			else if (ifStatement->m_alternative != NULL)
+			{
+				return evaluate(ifStatement->m_alternative, ifEnvironment, p_timeout);
+			}
+			else
+			{
+				return object::NULL_OBJECT;
+			}
 		}
 		case ast::WHILE_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::WhileStatement> whileStatement = std::static_pointer_cast<ast::WhileStatement>(node);
-			std::shared_ptr<object::Environment> whileEnvironment(new object::Environment(environment));
+			std::shared_ptr<ast::WhileStatement> whileStatement = std::static_pointer_cast<ast::WhileStatement>(p_node);
+			std::shared_ptr<object::Environment> whileEnvironment(new object::Environment(p_environment));
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(whileStatement->m_condition, environment, timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(whileStatement->m_condition, p_environment, p_timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -458,7 +466,7 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment, p_timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -469,10 +477,10 @@ namespace evaluator
 		}
 		case ast::DO_WHILE_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::DoWhileStatement> doWhileStatement = std::static_pointer_cast<ast::DoWhileStatement>(node);
-			std::shared_ptr<object::Environment> doWhileEnvironment(new object::Environment(environment));
+			std::shared_ptr<ast::DoWhileStatement> doWhileStatement = std::static_pointer_cast<ast::DoWhileStatement>(p_node);
+			std::shared_ptr<object::Environment> doWhileEnvironment(new object::Environment(p_environment));
 
-			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, timeout);
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, p_timeout);
 			if (evaluatedConsequence->Type() == object::ERROR)
 			{
 				return evaluatedConsequence;
@@ -480,7 +488,7 @@ namespace evaluator
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(doWhileStatement->m_condition, environment, timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(doWhileStatement->m_condition, p_environment, p_timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -495,7 +503,7 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, p_timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -506,11 +514,11 @@ namespace evaluator
 		}
 		case ast::FOR_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::ForStatement> forStatement = std::static_pointer_cast<ast::ForStatement>(node);
-			std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(environment));
+			std::shared_ptr<ast::ForStatement> forStatement = std::static_pointer_cast<ast::ForStatement>(p_node);
+			std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(p_environment));
 			std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
 
-			std::shared_ptr<object::Object> evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment, timeout);
+			std::shared_ptr<object::Object> evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment, p_timeout);
 			if (evaluatedInitialization->Type() == object::ERROR)
 			{
 				return evaluatedInitialization;
@@ -518,7 +526,7 @@ namespace evaluator
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment, p_timeout);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -533,13 +541,13 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment, p_timeout);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
 				}
 
-				std::shared_ptr<object::Object> evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment, p_timeout);
 				if (evaluatedUpdation->Type() == object::ERROR)
 				{
 					return evaluatedUpdation;
@@ -550,16 +558,20 @@ namespace evaluator
 		}
 		case ast::ITERATE_STATEMENT_NODE:
 		{
-			std::shared_ptr<ast::IterateStatement> iterateStatement = std::static_pointer_cast<ast::IterateStatement>(node);
-			std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(environment));
+			std::shared_ptr<ast::IterateStatement> iterateStatement = std::static_pointer_cast<ast::IterateStatement>(p_node);
+			std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(p_environment));
 
-			std::shared_ptr<object::Object> evaluatedCollection = evaluate(iterateStatement->m_collection, environment, timeout);
-			if (evaluatedCollection->Type() == object::ERROR) return evaluatedCollection;
+			std::shared_ptr<object::Object> evaluatedCollection = evaluate(iterateStatement->m_collection, p_environment, p_timeout);
+			if (evaluatedCollection->Type() == object::ERROR)
+			{
+				return evaluatedCollection;
+			}
+
 			if (evaluatedCollection->Type() != object::COLLECTION)
 			{
 				std::ostringstream error;
 				error << "Expected to see a collection to iterate over. Instead got a(n) '"
-					<< object::objectTypeToString.at(evaluatedCollection->Type()) << "'.";
+					<< object::c_objectTypeToString.at(evaluatedCollection->Type()) << "'.";
 				return createError(error.str());
 			}
 			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(evaluatedCollection);
@@ -568,7 +580,7 @@ namespace evaluator
 			{
 				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment, timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment, p_timeout);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 			}
 
@@ -579,18 +591,18 @@ namespace evaluator
 		return NULL;
 	}
 
-	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> program, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
 		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
 
-		for (int i = 0; i < program->m_statements.size(); i++)
+		for (int i = 0; i < p_program->m_statements.size(); i++)
 		{
-			result = evaluate(program->m_statements[i], environment, timeout);
+			result = evaluate(p_program->m_statements[i], p_environment, p_timeout);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
 				std::shared_ptr<object::Return> returnObj = std::static_pointer_cast<object::Return>(result);
-				return returnObj->m_return_value;
+				return returnObj->m_returnValue;
 			}
 
 			if (result != NULL && result->Type() == object::ERROR)
@@ -602,13 +614,13 @@ namespace evaluator
 		return result;
 	}
 
-	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> blockStatements, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
 		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
 
-		for (int i = 0; i < blockStatements->m_statements.size(); i++)
+		for (int i = 0; i < p_blockStatements->m_statements.size(); i++)
 		{
-			result = evaluate(blockStatements->m_statements[i], environment, timeout);
+			result = evaluate(p_blockStatements->m_statements[i], p_environment, p_timeout);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -625,228 +637,228 @@ namespace evaluator
 	}
 
 
-	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* source, std::vector<std::shared_ptr<object::Object>>* destination, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
-		for (int i = 0; i < source->size(); i++)
+		for (int i = 0; i < p_source->size(); i++)
 		{
-			std::shared_ptr<object::Object> evaluatedExpression = evaluate((*source)[i], environment, timeout);
+			std::shared_ptr<object::Object> evaluatedExpression = evaluate((*p_source)[i], p_environment, p_timeout);
 
 			if (evaluatedExpression->Type() == object::ERROR)
 			{
-				(*destination).clear();
-				(*destination).push_back(evaluatedExpression);
+				(*p_destination).clear();
+				(*p_destination).push_back(evaluatedExpression);
 				return;
 			}
-			(*destination).push_back(evaluatedExpression);
+			(*p_destination).push_back(evaluatedExpression);
 		}
 	}
 
-	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> identifier, std::shared_ptr<object::Environment> environment) {
-		std::shared_ptr<object::Object> result = environment->getIdentifier(&(identifier->m_name));
+	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment) {
+		std::shared_ptr<object::Object> result = p_environment->getIdentifier(&(p_identifier->m_name));
 		if (result != NULL)
 		{
 			return result;
 		}
 
-		if (builtins.find(identifier->m_name) != builtins.end()) {
-			return builtins.at(identifier->m_name);
+		if (c_builtins.find(p_identifier->m_name) != c_builtins.end()) {
+			return c_builtins.at(p_identifier->m_name);
 		}
 
 		std::ostringstream error;
-		error << "'" << identifier->m_name << "' is not defined.";
+		error << "'" << p_identifier->m_name << "' is not defined.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* prefixOperator, std::shared_ptr<object::Object> rightObject)
+	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*prefixOperator == "!") return evaluateBangOperatorExpression(rightObject);
-		if (*prefixOperator == "-") return evaluateMinusPrefixOperatorExpression(rightObject);
+		if (*p_prefixOperator == "!") return evaluateBangOperatorExpression(p_rightObject);
+		if (*p_prefixOperator == "-") return evaluateMinusPrefixOperatorExpression(p_rightObject);
 
 		std::ostringstream error;
-		error << *prefixOperator << object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << *p_prefixOperator << object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> leftObject, std::string* infixOperator, std::shared_ptr<object::Object> rightObject)
+	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Object> p_rightObject)
 	{
-		switch (leftObject->Type())
+		switch (p_leftObject->Type())
 		{
 		case object::INTEGER:
 		{
-			if (rightObject->Type() == object::INTEGER)
+			if (p_rightObject->Type() == object::INTEGER)
 				return evaluateIntegerInfixExpression(
-					std::static_pointer_cast<object::Integer>(leftObject), infixOperator, std::static_pointer_cast<object::Integer>(rightObject));
-			if (rightObject->Type() == object::FLOAT)
+					std::static_pointer_cast<object::Integer>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Integer>(p_rightObject));
+			if (p_rightObject->Type() == object::FLOAT)
 				return evaluateFloatInfixExpression(
-					std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(leftObject)->m_value)), infixOperator, std::static_pointer_cast<object::Float>(rightObject));
+					std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(p_leftObject)->m_value)), p_infixOperator, std::static_pointer_cast<object::Float>(p_rightObject));
 			break;
 		}
 		case object::FLOAT:
 		{
-			if (rightObject->Type() == object::INTEGER)
+			if (p_rightObject->Type() == object::INTEGER)
 				return evaluateFloatInfixExpression(
-					std::static_pointer_cast<object::Float>(leftObject), infixOperator, std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(rightObject)->m_value)));
-			if (rightObject->Type() == object::FLOAT)
+					std::static_pointer_cast<object::Float>(p_leftObject), p_infixOperator, std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(p_rightObject)->m_value)));
+			if (p_rightObject->Type() == object::FLOAT)
 				return evaluateFloatInfixExpression(
-					std::static_pointer_cast<object::Float>(leftObject), infixOperator, std::static_pointer_cast<object::Float>(rightObject));
+					std::static_pointer_cast<object::Float>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Float>(p_rightObject));
 			break;
 		}
 		case object::BOOLEAN:
 		{
-			if (rightObject->Type() == object::BOOLEAN)
+			if (p_rightObject->Type() == object::BOOLEAN)
 				return evaluateBooleanInfixExpression(
-					std::static_pointer_cast<object::Boolean>(leftObject), infixOperator, std::static_pointer_cast<object::Boolean>(rightObject));
+					std::static_pointer_cast<object::Boolean>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Boolean>(p_rightObject));
 			break;
 		}
 		case object::CHARACTER:
 		{
-			if (rightObject->Type() == object::CHARACTER)
+			if (p_rightObject->Type() == object::CHARACTER)
 				return evaluateCharacterInfixExpression(
-					std::static_pointer_cast<object::Character>(leftObject), infixOperator, std::static_pointer_cast<object::Character>(rightObject));
+					std::static_pointer_cast<object::Character>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Character>(p_rightObject));
 			break;
 		}
 		}
 
 		std::ostringstream error;
-		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << *infixOperator << ' '
-			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> leftObject, std::string* infixOperator, std::shared_ptr<object::Integer> rightObject)
+	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Integer> p_rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*infixOperator == "+") return std::shared_ptr<object::Integer>(new object::Integer(leftObject->m_value + rightObject->m_value));
-		if (*infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(leftObject->m_value - rightObject->m_value));
-		if (*infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(leftObject->m_value * rightObject->m_value));
-		if (*infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(leftObject->m_value / rightObject->m_value));
-		if (*infixOperator == "<") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value < rightObject->m_value));
-		if (*infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value <= rightObject->m_value));
-		if (*infixOperator == ">") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value > rightObject->m_value));
-		if (*infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value >= rightObject->m_value));
-		if (*infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value == rightObject->m_value));
-		if (*infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value != rightObject->m_value));
+		if (*p_infixOperator == "+") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value + p_rightObject->m_value));
+		if (*p_infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value - p_rightObject->m_value));
+		if (*p_infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value * p_rightObject->m_value));
+		if (*p_infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
+		if (*p_infixOperator == "<") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value < p_rightObject->m_value));
+		if (*p_infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value <= p_rightObject->m_value));
+		if (*p_infixOperator == ">") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value > p_rightObject->m_value));
+		if (*p_infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value >= p_rightObject->m_value));
+		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
+		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
 
 		std::ostringstream error;
-		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << *infixOperator << ' '
-			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> leftObject, std::string* infixOperator, std::shared_ptr<object::Float> rightObject)
+	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Float> p_rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*infixOperator == "+")  return std::shared_ptr<object::Float>(new object::Float(leftObject->m_value + rightObject->m_value));
-		if (*infixOperator == "-")  return std::shared_ptr<object::Float>(new object::Float(leftObject->m_value - rightObject->m_value));
-		if (*infixOperator == "*")  return std::shared_ptr<object::Float>(new object::Float(leftObject->m_value * rightObject->m_value));
-		if (*infixOperator == "/")  return std::shared_ptr<object::Float>(new object::Float(leftObject->m_value / rightObject->m_value));
-		if (*infixOperator == "<")  return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value < rightObject->m_value));
-		if (*infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value <= rightObject->m_value));
-		if (*infixOperator == ">")  return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value > rightObject->m_value));
-		if (*infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value >= rightObject->m_value));
-		if (*infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value == rightObject->m_value));
-		if (*infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value != rightObject->m_value));
+		if (*p_infixOperator == "+")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value + p_rightObject->m_value));
+		if (*p_infixOperator == "-")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value - p_rightObject->m_value));
+		if (*p_infixOperator == "*")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value * p_rightObject->m_value));
+		if (*p_infixOperator == "/")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value / p_rightObject->m_value));
+		if (*p_infixOperator == "<")  return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value < p_rightObject->m_value));
+		if (*p_infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value <= p_rightObject->m_value));
+		if (*p_infixOperator == ">")  return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value > p_rightObject->m_value));
+		if (*p_infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value >= p_rightObject->m_value));
+		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
+		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
 
 		std::ostringstream error;
-		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << *infixOperator << ' '
-			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> leftObject, std::string* infixOperator, std::shared_ptr<object::Boolean> rightObject)
+	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Boolean> p_rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*infixOperator == "&&") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value && rightObject->m_value));
-		if (*infixOperator == "||") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value || rightObject->m_value));
-		if (*infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value == rightObject->m_value));
-		if (*infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value != rightObject->m_value));
+		if (*p_infixOperator == "&&") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value && p_rightObject->m_value));
+		if (*p_infixOperator == "||") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value || p_rightObject->m_value));
+		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
+		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
 
 		std::ostringstream error;
-		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << *infixOperator << ' '
-			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> leftObject, std::string* infixOperator, std::shared_ptr<object::Character> rightObject)
+	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Character> p_rightObject)
 	{
 		// TODO: Change operator to an enum for performance gain
-		if (*infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value == rightObject->m_value));
-		if (*infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(leftObject->m_value != rightObject->m_value));
+		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
+		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
 
 		std::ostringstream error;
-		error << "'" << object::objectTypeToString.at(leftObject->Type())
-			<< ' ' << *infixOperator << ' '
-			<< object::objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> expression)
+	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> p_expression)
 	{
-		switch (expression->Type())
+		switch (p_expression->Type())
 		{
 		case object::INTEGER:
 		{
-			std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(expression);
+			std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(p_expression);
 			if (integer->m_value) return object::FALSE_OBJECT;
 			else return object::TRUE_OBJECT;
 		}
 		case object::FLOAT:
 		{
-			std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(expression);
+			std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(p_expression);
 			if (floating->m_value) return object::FALSE_OBJECT;
 			else return object::TRUE_OBJECT;
 		}
 		case object::BOOLEAN:
 		{
-			std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(expression);
+			std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(p_expression);
 			if (boolean->m_value) return object::FALSE_OBJECT;
 			else return object::TRUE_OBJECT;
 		}
 		}
 
 		std::ostringstream error;
-		error << "'!" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
+		error << "'!" << object::c_objectTypeToString.at(p_expression->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> expression)
+	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression)
 	{
-		switch (expression->Type())
+		switch (p_expression->Type())
 		{
 		case object::INTEGER:
 		{
-			std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(expression);
+			std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(p_expression);
 			std::shared_ptr<object::Integer> returnValue(new object::Integer(-integer->m_value));
 			return returnValue;
 		}
 		case object::FLOAT:
 		{
-			std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(expression);
+			std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(p_expression);
 			std::shared_ptr<object::Float> returnValue(new object::Float(-floating->m_value));
 			return returnValue;
 		}
 		}
 
 		std::ostringstream error;
-		error << "'-" << object::objectTypeToString.at(expression->Type()) << "\' is not supported.";
+		error << "'-" << object::c_objectTypeToString.at(p_expression->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> callExpression, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
-		std::shared_ptr<object::Object> expression = evaluate(callExpression->m_function, environment, timeout);
+		std::shared_ptr<object::Object> expression = evaluate(p_callExpression->m_function, p_environment, p_timeout);
 		if (expression->Type() == object::ERROR)
 		{
 			return expression;
 		}
 
 		std::vector<std::shared_ptr<object::Object>> evaluatedArguments;
-		evaluateExpressions(&callExpression->m_parameters, &evaluatedArguments, environment, timeout);
+		evaluateExpressions(&p_callExpression->m_parameters, &evaluatedArguments, p_environment, p_timeout);
 
 		if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
 		{
@@ -857,24 +869,24 @@ namespace evaluator
 		{ 
 			std::shared_ptr<object::Function> function = std::static_pointer_cast<object::Function>(expression);
 
-			if (callExpression->m_parameters.size() != function->m_parameters.size())
+			if (p_callExpression->m_parameters.size() != function->m_parameters.size())
 			{
 				std::ostringstream error;
-				error << "'" << function->m_function_name->String() << "' was supplied with "
-					<< callExpression->m_parameters.size() << " argument(s) instead of "
+				error << "'" << function->m_functionName->String() << "' was supplied with "
+					<< p_callExpression->m_parameters.size() << " argument(s) instead of "
 					<< function->m_parameters.size() << ".";
 				return createError(error.str());
 			}
 
 			for (int i = 0; i < evaluatedArguments.size(); i++)
 			{
-				if (evaluatedArguments[i]->Type() != object::nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
+				if (evaluatedArguments[i]->Type() != object::c_nodeTypeToObjectType.at(function->m_parameters[i]->m_token.m_type))
 				{
 					std::ostringstream error;
 					error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
-						<< object::objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
+						<< object::c_objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
 						<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
-						<< function->m_function_name->String() << "'.";
+						<< function->m_functionName->String() << "'.";
 					return createError(error.str());
 				}
 			}
@@ -886,40 +898,38 @@ namespace evaluator
 		else
 		{
 			std::ostringstream error;
-			error << "'" << callExpression->m_function->String() << "' is not a function.";
+			error << "'" << p_callExpression->m_function->String() << "' is not a function.";
 			return createError(error.str());
 		}
 
-		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments, timeout);
-
-		// YOU WERE HERE
+		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments, p_timeout);
 
 		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
 		{
 			std::ostringstream error;
-			error << "'" << std::static_pointer_cast<object::Function>(expression)->m_function_name->String() << "' has no return value.";
+			error << "'" << std::static_pointer_cast<object::Function>(expression)->m_functionName->String() << "' has no return value.";
 			return createError(error.str());
 		}
 
-		if (expression->Type() == object::FUNCTION && output->Type() != std::static_pointer_cast<object::Function>(expression)->m_function_type)
+		if (expression->Type() == object::FUNCTION && output->Type() != std::static_pointer_cast<object::Function>(expression)->m_functionType)
 		{
 			std::ostringstream error;
-			error << "'" << callExpression->String() << "\' produced a value of type '"
-				<< object::objectTypeToString.at(output->Type()) << "' instead of type '"
-				<< object::objectTypeToString.at(std::static_pointer_cast<object::Function>(expression)->m_function_type) << "'.";
+			error << "'" << p_callExpression->String() << "\' produced a value of type '"
+				<< object::c_objectTypeToString.at(output->Type()) << "' instead of type '"
+				<< object::c_objectTypeToString.at(std::static_pointer_cast<object::Function>(expression)->m_functionType) << "'.";
 			return createError(error.str());
 		}
 
 		return output;
 	}
 
-	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> indexExpression, std::shared_ptr<object::Environment> environment, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
 	{
 		// Evaluate expression and apply index to it
-		std::shared_ptr<object::Object> expression = evaluate(indexExpression->m_collection, environment, timeout);
+		std::shared_ptr<object::Object> expression = evaluate(p_indexExpression->m_collection, p_environment, p_timeout);
 
 		// Get index
-		std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, environment, timeout);
+		std::shared_ptr<object::Object> indexObject = evaluate(p_indexExpression->m_index, p_environment, p_timeout);
 		if (indexObject->Type() == object::ERROR) return indexObject;
 
 		if (expression->Type() != object::DICTIONARY && indexObject->Type() != object::INTEGER)
@@ -929,12 +939,12 @@ namespace evaluator
 			return createError(error.str());
 		}
 		else if (expression->Type() == object::DICTIONARY &&
-			(indexObject->Type() != std::static_pointer_cast<object::Dictionary>(expression)->m_key_type))
+			(indexObject->Type() != std::static_pointer_cast<object::Dictionary>(expression)->m_keyType))
 		{
 			std::ostringstream error;
 			error << "Dictionary has keys of type: '" << 
-				object::objectTypeToString.at(std::static_pointer_cast<object::Dictionary>(expression)->m_key_type) <<
-				"'. Got type: '" << object::objectTypeToString.at(indexObject->Type()) << "'";
+				object::c_objectTypeToString.at(std::static_pointer_cast<object::Dictionary>(expression)->m_keyType) <<
+				"'. Got type: '" << object::c_objectTypeToString.at(indexObject->Type()) << "'";
 			return createError(error.str());
 		}
 
@@ -986,16 +996,16 @@ namespace evaluator
 	}
 
 
-	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> collection, std::shared_ptr<object::Object> indexObject, std::shared_ptr<object::Object> valueObject)
+	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject)
 	{
-		if (indexObject->Type() != object::INTEGER)
+		if (p_indexObject->Type() != object::INTEGER)
 		{
 			std::ostringstream error;
-			error << "Invalid index: '" << indexObject->Inspect() << "'";
+			error << "Invalid index: '" << p_indexObject->Inspect() << "'";
 			return createError(error.str());
 		}
 
-		std::shared_ptr<object::Integer> index = std::static_pointer_cast<object::Integer>(indexObject);
+		std::shared_ptr<object::Integer> index = std::static_pointer_cast<object::Integer>(p_indexObject);
 
 		if (index->m_value < 0)
 		{
@@ -1004,107 +1014,107 @@ namespace evaluator
 			return createError(error.str());
 		}
 
-		if (index->m_value >= (collection->m_values.size())) return createError("Index out of bounds.");
+		if (index->m_value >= (p_collection->m_values.size())) return createError("Index out of bounds.");
 
-		if (valueObject->Type() != collection->m_collection_type)
+		if (p_valueObject->Type() != p_collection->m_collectionType)
 		{
 			std::ostringstream error;
-			error << "'The collection has values of type '" << object::objectTypeToString.at(collection->m_collection_type)
-				<< "'. Got value of type '" << object::objectTypeToString.at(valueObject->Type()) << "'.";
+			error << "'The collection has values of type '" << object::c_objectTypeToString.at(p_collection->m_collectionType)
+				<< "'. Got value of type '" << object::c_objectTypeToString.at(p_valueObject->Type()) << "'.";
 			return createError(error.str());
 		}
 
-		collection->m_values[index->m_value] = valueObject;
+		p_collection->m_values[index->m_value] = p_valueObject;
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> dictionary, std::shared_ptr<object::Object> keyObject, std::shared_ptr<object::Object> valueObject)
+	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject)
 	{
-		if (keyObject->Type() != dictionary->m_key_type)
+		if (p_keyObject->Type() != p_dictionary->m_keyType)
 		{
 			std::ostringstream error;
 			error << "Dictionary has keys of type: '" <<
-				object::objectTypeToString.at(dictionary->m_key_type) <<
-				"'. Got type: '" << object::objectTypeToString.at(keyObject->Type()) << "'";
+				object::c_objectTypeToString.at(p_dictionary->m_keyType) <<
+				"'. Got type: '" << object::c_objectTypeToString.at(p_keyObject->Type()) << "'";
 			return createError(error.str());
 		}
 
-		dictionary->m_map[keyObject] = valueObject;
+		p_dictionary->m_map[p_keyObject] = p_valueObject;
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> function, std::vector<std::shared_ptr<object::Object>>* arguments, std::chrono::steady_clock::time_point timeout)
+	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments, std::chrono::steady_clock::time_point p_timeout)
 	{
-		switch (function->Type())
+		switch (p_function->Type())
 		{
 		case object::BUILTIN_FUNCTION:
 		{
-			std::shared_ptr<object::Object> evaluated = std::static_pointer_cast<object::Builtin>(function)->m_function(arguments);
+			std::shared_ptr<object::Object> evaluated = std::static_pointer_cast<object::Builtin>(p_function)->m_function(p_arguments);
 			return unwrapReturnValue(evaluated);
 		}
 		case object::FUNCTION:
 		{
-			std::shared_ptr<object::Environment> extendedEnvironment = extendFunctionEnvironment(std::static_pointer_cast<object::Function>(function), arguments);
-			std::shared_ptr<object::Object> evaluated = evaluate(std::static_pointer_cast<object::Function>(function)->m_body, extendedEnvironment, timeout);
+			std::shared_ptr<object::Environment> extendedEnvironment = extendFunctionEnvironment(std::static_pointer_cast<object::Function>(p_function), p_arguments);
+			std::shared_ptr<object::Object> evaluated = evaluate(std::static_pointer_cast<object::Function>(p_function)->m_body, extendedEnvironment, p_timeout);
 			return unwrapReturnValue(evaluated);
 		}
 		}
 
 		// Error for unsupported types.
 		std::ostringstream error;
-		error << "'" << function->Inspect() << "' is not a callable function.";
+		error << "'" << p_function->Inspect() << "' is not a callable function.";
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Environment> extendFunctionEnvironment(std::shared_ptr<object::Function> function, std::vector<std::shared_ptr<object::Object>>* arguments)
+	std::shared_ptr<object::Environment> extendFunctionEnvironment(std::shared_ptr<object::Function> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments)
 	{
-		std::shared_ptr<object::Environment> newEnvironment(new object::Environment(function->m_environment));
+		std::shared_ptr<object::Environment> newEnvironment(new object::Environment(p_function->m_environment));
 
-		for (int i = 0; i < arguments->size(); i++)
+		for (int i = 0; i < p_arguments->size(); i++)
 		{
-			newEnvironment->setIdentifier(&function->m_parameters[i]->m_name.m_name, (*arguments)[i]);
+			newEnvironment->setIdentifier(&p_function->m_parameters[i]->m_name.m_name, (*p_arguments)[i]);
 		}
 
 		return newEnvironment;
 	}
 
-	std::shared_ptr<object::Object> unwrapReturnValue(std::shared_ptr<object::Object> object)
+	std::shared_ptr<object::Object> unwrapReturnValue(std::shared_ptr<object::Object> p_object)
 	{
-		if (object->Type() == object::RETURN)
+		if (p_object->Type() == object::RETURN)
 		{
-			std::shared_ptr<object::Return> returnObject = std::static_pointer_cast<object::Return>(object);
-			return returnObject->m_return_value;
+			std::shared_ptr<object::Return> returnObject = std::static_pointer_cast<object::Return>(p_object);
+			return returnObject->m_returnValue;
 		}
 
-		return object;
+		return p_object;
 	}
 
-	std::shared_ptr<object::Object> isTruthy(std::shared_ptr<object::Object> object)
+	std::shared_ptr<object::Object> isTruthy(std::shared_ptr<object::Object> p_object)
 	{
-		switch (object->Type())
+		switch (p_object->Type())
 		{
 		case object::BOOLEAN:
 		{
-			std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(object);
-			if (boolean->m_value) return object::TRUE_OBJECT;
+			std::shared_ptr<object::Boolean> booleanValue = std::static_pointer_cast<object::Boolean>(p_object);
+			if (booleanValue->m_value) return object::TRUE_OBJECT;
 			else return object::FALSE_OBJECT;
 		}
 		case object::INTEGER:
 		{
-			std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(object);
-			if (integer->m_value != 0) return object::TRUE_OBJECT;
+			std::shared_ptr<object::Integer> integerValue = std::static_pointer_cast<object::Integer>(p_object);
+			if (integerValue->m_value != 0) return object::TRUE_OBJECT;
 			else return object::FALSE_OBJECT;
 		}
 		case object::FLOAT:
 		{
-			std::shared_ptr<object::Float> floatValue = std::static_pointer_cast<object::Float>(object);
+			std::shared_ptr<object::Float> floatValue = std::static_pointer_cast<object::Float>(p_object);
 			if (floatValue->m_value != 0) return object::TRUE_OBJECT;
 			else return object::FALSE_OBJECT;
 		}
 		default:
 		{
 			std::ostringstream error;
-			error << "'" << object->Inspect() << "' is not a valid truthy value.";
+			error << "'" << p_object->Inspect() << "' is not a valid truthy value.";
 			return createError(error.str());
 		}
 		}

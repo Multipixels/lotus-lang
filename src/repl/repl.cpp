@@ -8,7 +8,7 @@
 
 namespace repl 
 {
-	const std::string prompt = ">> ";
+	const std::string c_prompt = ">> ";
 
 	int Start() 
 	{
@@ -17,7 +17,7 @@ namespace repl
 
 		while (isRunning) 
 		{
-			std::cout << prompt;
+			std::cout << c_prompt;
 
 			std::string input;
 			std::getline(std::cin, input);
@@ -35,6 +35,7 @@ namespace repl
 			std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
 
 #ifdef DEVELOPMENT_BUILD
+			// Disable timeout in debug mode
 			std::shared_ptr<object::Object> output = evaluator::evaluate(program, environment);
 #else
 			std::shared_ptr<object::Object> output = evaluator::evaluate(program, environment, timeoutValue);
@@ -49,9 +50,9 @@ namespace repl
 		return 0;
 	}
 
-	int Run(const char* fileName)
+	int Run(const char* p_fileName)
 	{
-		std::ifstream file(fileName, std::ios_base::in);
+		std::ifstream file(p_fileName, std::ios_base::in);
 		std::stringstream buffer;
 		std::string fileInput;
 

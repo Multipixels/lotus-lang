@@ -22,7 +22,7 @@ namespace parser
 
 		std::vector<std::string> m_errors;
 
-		Parser(lexer::Lexer lexer);
+		Parser(lexer::Lexer p_lexer);
 		
 		// Parses the program described by the lexer and returns a parsed program
 		std::shared_ptr<ast::Program> ParseProgram();
@@ -40,7 +40,7 @@ namespace parser
 			INDEX,			// collection indexing
 		} Precedence;
 
-		const std::map<token::TokenType, Precedence> precedenceOfTokenType =
+		const std::map<token::TokenType, Precedence> c_precedenceOfTokenType =
 		{
 			{token::ASSIGN, ASSIGNMENT},
 			{token::EQ, EQUALS},
@@ -63,13 +63,13 @@ namespace parser
 		void nextToken();
 
 		// Checks if peek token type is as expected. If it is, cycle to it
-		bool expectPeek(token::TokenType tokenType);
+		bool expectPeek(token::TokenType p_tokenType);
 
 		// Checks if the current token type is as given
-		bool currentTokenIs(token::TokenType token);
+		bool currentTokenIs(token::TokenType p_token);
 
 		// Checks if the peek token type is as given
-		bool peekTokenIs(token::TokenType token);
+		bool peekTokenIs(token::TokenType p_token);
 
 		// Returns the precedence of the token in front of current token.
 		Precedence peekPrecedence();
@@ -80,10 +80,10 @@ namespace parser
 		// ERRORS
 
 		// Peek token is not as expected.
-		void expectedPeekError(token::TokenType expectedToken);
+		void expectedPeekError(token::TokenType p_expectedToken);
 
 		// Prefix function not defined.
-		void noPrefixParseFunction(token::TokenType operatorError);
+		void noPrefixParseFunction(token::TokenType p_operatorError);
 
 
 		// STATEMENTS
@@ -105,9 +105,9 @@ namespace parser
 
 		// EXPRESSIONS
 
-		std::shared_ptr<ast::Expression> parseExpression(Precedence precedence);
+		std::shared_ptr<ast::Expression> parseExpression(Precedence p_precedence);
 		std::shared_ptr<ast::Expression> parsePrefixExpression();
-		std::shared_ptr<ast::Expression> parseInfixExpression(std::shared_ptr<ast::Expression> leftExpression);
+		std::shared_ptr<ast::Expression> parseInfixExpression(std::shared_ptr<ast::Expression> p_leftExpression);
 		std::shared_ptr<ast::Expression> parseGroupedExpression();
 		std::shared_ptr<ast::Expression> parseIntegerLiteral();
 		std::shared_ptr<ast::Expression> parseFloatLiteral();
@@ -117,23 +117,23 @@ namespace parser
 		std::shared_ptr<ast::Expression> parseDictionaryLiteral();
 		std::shared_ptr<ast::Expression> parseStringLiteral();
 		std::shared_ptr<ast::Expression> parseIdentifier();
-		std::shared_ptr<ast::Expression> parseCallExpression(std::shared_ptr<ast::Expression> leftExpression);
-		std::shared_ptr<ast::Expression> parseIndexExpression(std::shared_ptr<ast::Expression> leftExpression);
+		std::shared_ptr<ast::Expression> parseCallExpression(std::shared_ptr<ast::Expression> p_leftExpression);
+		std::shared_ptr<ast::Expression> parseIndexExpression(std::shared_ptr<ast::Expression> p_leftExpression);
 
 		// HELPERS
 
 		// Registers a prefix function into the parser
-		void registerPrefixFunction(token::TokenType tokenType, PrefixParseFunction prefixParseFunction);
+		void registerPrefixFunction(token::TokenType p_tokenType, PrefixParseFunction p_prefixParseFunction);
 		
 		// Registers an infix function into the parser
-		void registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction);
+		void registerInfixFunction(token::TokenType p_tokenType, InfixParseFunction p_infixParseFunction);
 	
-		void parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>> *parameters);
+		void parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>> *p_parameters);
 
 		// Parses a list of literals, with given separator token and end token.
-		void parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender);
+		void parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* p_destination, token::TokenType p_separator, token::TokenType p_ender);
 
 		// Parses a list of key value pairs, with given separator token and end token.
-		void parseKeyValuePairs(std::map< std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender);
+		void parseKeyValuePairs(std::map< std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* p_, token::TokenType p_separator, token::TokenType p_ender);
 	};
 }

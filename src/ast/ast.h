@@ -224,7 +224,7 @@ namespace ast
 	public:
 		token::Token m_token;
 		std::string m_operator;
-		std::shared_ptr<ast::Expression> m_right_expression;
+		std::shared_ptr<ast::Expression> m_rightExpression;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -237,9 +237,9 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		std::shared_ptr<ast::Expression> m_left_expression;
+		std::shared_ptr<ast::Expression> m_leftExpression;
 		std::string m_operator;
-		std::shared_ptr<ast::Expression> m_right_expression;
+		std::shared_ptr<ast::Expression> m_rightExpression;
 
 		std::string TokenLiteral();
 		std::string String();

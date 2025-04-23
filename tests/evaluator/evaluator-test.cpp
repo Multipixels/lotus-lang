@@ -367,13 +367,13 @@ TEST(EvaluatorTest, Function)
 
 	std::shared_ptr<object::Function> function = std::static_pointer_cast<object::Function>(functionObj);
 
-	EXPECT_EQ(function->m_function_type, object::INTEGER);
+	EXPECT_EQ(function->m_functionType, object::INTEGER);
 
 	EXPECT_EQ(function->m_parameters.size(), 1);
 	EXPECT_EQ(function->m_parameters[0]->m_token.m_literal, "integer");
 	EXPECT_EQ(function->m_parameters[0]->m_name.m_name, "x");
 
-	EXPECT_EQ(function->m_function_name->m_name, "myFunction");
+	EXPECT_EQ(function->m_functionName->m_name, "myFunction");
 	EXPECT_EQ(function->m_body->String(), "return (x + 2);\n");
 }
 
@@ -656,13 +656,13 @@ TEST(EvaluatorTest, Error)
 		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
 
 		ASSERT_EQ(evaluated->Type(), object::ERROR);
-		EXPECT_EQ(std::static_pointer_cast<object::Error>(evaluated)->m_error_message, tests[i].expectedError);
+		EXPECT_EQ(std::static_pointer_cast<object::Error>(evaluated)->m_errorMessage, tests[i].expectedError);
 	}
 }
 
-std::shared_ptr<object::Object> testEvaluation(std::string* input)
+std::shared_ptr<object::Object> testEvaluation(std::string* p_input)
 {
-	lexer::Lexer lexer = lexer::Lexer(input);
+	lexer::Lexer lexer = lexer::Lexer(p_input);
 	parser::Parser parser = parser::Parser(lexer);
 	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	std::shared_ptr<object::Environment> environment(new object::Environment());
@@ -670,37 +670,37 @@ std::shared_ptr<object::Object> testEvaluation(std::string* input)
 	return evaluator::evaluate(program, environment);
 }
 
-void testLiteralObject(std::shared_ptr<object::Object> object, std::any expectedValue)
+void testLiteralObject(std::shared_ptr<object::Object> p_object, std::any p_expectedValue)
 {
 	// Cannot use a switch on type as std::string is not integral
 	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
 	
-	if (object == NULL) FAIL();
+	if (p_object == NULL) FAIL();
 
-	switch (object->Type())
+	switch (p_object->Type())
 	{
 	case object::INTEGER:
-		EXPECT_NO_FATAL_FAILURE(testIntegerObject(object, std::any_cast<int>(expectedValue)));
+		EXPECT_NO_FATAL_FAILURE(testIntegerObject(p_object, std::any_cast<int>(p_expectedValue)));
 		return;
 	case object::FLOAT:
-		EXPECT_NO_FATAL_FAILURE(testFloatObject(object, std::any_cast<float>(expectedValue)));
+		EXPECT_NO_FATAL_FAILURE(testFloatObject(p_object, std::any_cast<float>(p_expectedValue)));
 		return;
 	case object::BOOLEAN:
-		EXPECT_NO_FATAL_FAILURE(testBooleanObject(object, std::any_cast<bool>(expectedValue)));
+		EXPECT_NO_FATAL_FAILURE(testBooleanObject(p_object, std::any_cast<bool>(p_expectedValue)));
 		return;
 	case object::CHARACTER:
-		EXPECT_NO_FATAL_FAILURE(testCharacterObject(object, std::any_cast<char>(expectedValue)));
+		EXPECT_NO_FATAL_FAILURE(testCharacterObject(p_object, std::any_cast<char>(p_expectedValue)));
 		return;
 	case object::COLLECTION:
-		EXPECT_NO_FATAL_FAILURE(testCollectionObject(object, std::any_cast<std::vector<std::any>*>(expectedValue), object::INTEGER));
+		EXPECT_NO_FATAL_FAILURE(testCollectionObject(p_object, std::any_cast<std::vector<std::any>*>(p_expectedValue), object::INTEGER));
 		return;
 	case object::DICTIONARY:
-		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(object, std::any_cast<std::map<std::string, std::any>*>(expectedValue), object::INTEGER, object::STRING));
+		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(p_object, std::any_cast<std::map<std::string, std::any>*>(p_expectedValue), object::INTEGER, object::STRING));
 		return;
 	case object::STRING:
 	{
-		std::string expectedString = std::any_cast<const char*>(expectedValue);
-		EXPECT_NO_FATAL_FAILURE(testStringObject(object, &expectedString));
+		std::string expectedString = std::any_cast<const char*>(p_expectedValue);
+		EXPECT_NO_FATAL_FAILURE(testStringObject(p_object, &expectedString));
 		return;
 	}
 	}
@@ -708,89 +708,89 @@ void testLiteralObject(std::shared_ptr<object::Object> object, std::any expected
 	FAIL();
 }
 
-void testIntegerObject(std::shared_ptr<object::Object> object, int expectedValue)
+void testIntegerObject(std::shared_ptr<object::Object> p_object, int p_expectedValue)
 {
-	ASSERT_EQ(object->Type(), object::INTEGER);
-	std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(object);
+	ASSERT_EQ(p_object->Type(), object::INTEGER);
+	std::shared_ptr<object::Integer> integer = std::static_pointer_cast<object::Integer>(p_object);
 
-	EXPECT_EQ(integer->m_value, expectedValue);
+	EXPECT_EQ(integer->m_value, p_expectedValue);
 }
 
-void testFloatObject(std::shared_ptr<object::Object> object, float expectedValue)
+void testFloatObject(std::shared_ptr<object::Object> p_object, float p_expectedValue)
 {
-	ASSERT_EQ(object->Type(), object::FLOAT);
-	std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(object);
+	ASSERT_EQ(p_object->Type(), object::FLOAT);
+	std::shared_ptr<object::Float> floating = std::static_pointer_cast<object::Float>(p_object);
 
-	EXPECT_EQ(floating->m_value, expectedValue);
+	EXPECT_EQ(floating->m_value, p_expectedValue);
 }
 
-void testBooleanObject(std::shared_ptr<object::Object> object, bool expectedValue)
+void testBooleanObject(std::shared_ptr<object::Object> p_object, bool p_expectedValue)
 {
-	ASSERT_EQ(object->Type(), object::BOOLEAN);
-	std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(object);
+	ASSERT_EQ(p_object->Type(), object::BOOLEAN);
+	std::shared_ptr<object::Boolean> boolean = std::static_pointer_cast<object::Boolean>(p_object);
 
-	EXPECT_EQ(boolean->m_value, expectedValue);
+	EXPECT_EQ(boolean->m_value, p_expectedValue);
 }
 
-void testCharacterObject(std::shared_ptr<object::Object> object, char expectedValue)
+void testCharacterObject(std::shared_ptr<object::Object> p_object, char p_expectedValue)
 {
-	ASSERT_EQ(object->Type(), object::CHARACTER);
-	std::shared_ptr<object::Character> character = std::static_pointer_cast<object::Character>(object);
+	ASSERT_EQ(p_object->Type(), object::CHARACTER);
+	std::shared_ptr<object::Character> character = std::static_pointer_cast<object::Character>(p_object);
 
-	EXPECT_EQ(character->m_value, expectedValue);
+	EXPECT_EQ(character->m_value, p_expectedValue);
 }
 
-void testCollectionObject(std::shared_ptr<object::Object> object, std::vector<std::any>* expectedValue, object::ObjectType expectedType)
+void testCollectionObject(std::shared_ptr<object::Object> p_object, std::vector<std::any>* p_expectedValue, object::ObjectType p_expectedType)
 {
-	ASSERT_EQ(object->Type(), object::COLLECTION);
-	std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(object);
+	ASSERT_EQ(p_object->Type(), object::COLLECTION);
+	std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(p_object);
 
-	ASSERT_EQ(collection->m_collection_type, expectedType);
+	ASSERT_EQ(collection->m_collectionType, p_expectedType);
 
 	for (int i = 0; i < collection->m_values.size(); i++)
 	{
-		ASSERT_EQ(collection->m_values[i]->Type(), expectedType);
-		EXPECT_NO_FATAL_FAILURE(testLiteralObject(collection->m_values[i], (*expectedValue)[i]));
+		ASSERT_EQ(collection->m_values[i]->Type(), p_expectedType);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(collection->m_values[i], (*p_expectedValue)[i]));
 	}
 }
 
-void testDictionaryObject(std::shared_ptr<object::Object> object, std::map<std::string, std::any>* expectedValue, object::ObjectType expectedKeyType, object::ObjectType expectedValueType)
+void testDictionaryObject(std::shared_ptr<object::Object> p_object, std::map<std::string, std::any>* p_expectedValue, object::ObjectType p_expectedKeyType, object::ObjectType p_expectedValueType)
 {
-	ASSERT_EQ(object->Type(), object::DICTIONARY);
-	std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(object);
+	ASSERT_EQ(p_object->Type(), object::DICTIONARY);
+	std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(p_object);
 
-	ASSERT_EQ(dictionary->m_key_type, expectedKeyType);
-	ASSERT_EQ(dictionary->m_value_type, expectedValueType);
+	ASSERT_EQ(dictionary->m_keyType, p_expectedKeyType);
+	ASSERT_EQ(dictionary->m_valueType, p_expectedValueType);
 
 	std::map<std::shared_ptr<object::Object>, std::shared_ptr<object::Object>>::iterator it;
 	for (it = dictionary->m_map.begin(); it != dictionary->m_map.end(); it++)
 	{
-		ASSERT_EQ(it->first->Type(), expectedKeyType);
-		ASSERT_EQ(it->second->Type(), expectedValueType);
+		ASSERT_EQ(it->first->Type(), p_expectedKeyType);
+		ASSERT_EQ(it->second->Type(), p_expectedValueType);
 
 		switch (it->first->Type()) {
 		case object::INTEGER:
 		{
 			std::shared_ptr<object::Integer> integerLiteral = std::static_pointer_cast<object::Integer>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(integerLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), p_expectedValue->at(std::to_string(integerLiteral->m_value))));
 			break;
 		}
 		case object::FLOAT:
 		{
 			std::shared_ptr<object::Float> floatLiteral = std::static_pointer_cast<object::Float>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::to_string(floatLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), p_expectedValue->at(std::to_string(floatLiteral->m_value))));
 			break;
 		}
 		case object::BOOLEAN:
 		{
 			std::shared_ptr<object::Boolean> booleanLiteral = std::static_pointer_cast<object::Boolean>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), p_expectedValue->at(booleanLiteral->m_value ? "true" : "false")));
 			break;
 		}
 		case object::CHARACTER:
 		{
 			std::shared_ptr<object::Character> characterLiteral = std::static_pointer_cast<object::Character>(it->first);
-			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), expectedValue->at(std::string(1, characterLiteral->m_value))));
+			EXPECT_NO_FATAL_FAILURE(testLiteralObject(dictionary->m_map.at(it->first), p_expectedValue->at(std::string(1, characterLiteral->m_value))));
 			break;
 		}
 		default:
@@ -802,10 +802,10 @@ void testDictionaryObject(std::shared_ptr<object::Object> object, std::map<std::
 	}
 }
 
-void testStringObject(std::shared_ptr<object::Object> object, std::string* expectedValue)
+void testStringObject(std::shared_ptr<object::Object> p_object, std::string* p_expectedValue)
 {
-	ASSERT_EQ(object->Type(), object::STRING);
-	std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(object);
+	ASSERT_EQ(p_object->Type(), object::STRING);
+	std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(p_object);
 
-	EXPECT_EQ(string->m_value, *expectedValue);
+	EXPECT_EQ(string->m_value, *p_expectedValue);
 }

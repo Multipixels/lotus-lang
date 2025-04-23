@@ -6,8 +6,8 @@
 
 namespace lexer 
 {
-	Lexer::Lexer(std::string* input)
-		: m_input(input),
+	Lexer::Lexer(std::string* p_input)
+		: m_input(p_input),
 		m_currentChar('\0'),
 		m_currentPosition(-1),
 		m_nextPosition(0)
@@ -47,7 +47,7 @@ namespace lexer
 			{
 				char prevChar = m_currentChar;
 				readChar();
-				token = token::Token(token::EQ, std::string{prevChar} + std::string{ m_currentChar });
+				token = token::Token(token::EQ, std::string{ prevChar } + std::string{ m_currentChar });
 			}
 			else
 			{
@@ -155,16 +155,16 @@ namespace lexer
 			break;
 		case '\'':
 		{
-			std::string char_literal;
-			readCharacter(&char_literal);
-			token = token::Token(token::CHARACTER_LITERAL, char_literal);
+			std::string charLiteral;
+			readCharacter(&charLiteral);
+			token = token::Token(token::CHARACTER_LITERAL, charLiteral);
 			break;
 		}
 		case '"':
 		{
-			std::string string_literal;
-			readString(&string_literal);
-			token = token::Token(token::STRING_LITERAL, string_literal);
+			std::string stringLiteral;
+			readString(&stringLiteral);
+			token = token::Token(token::STRING_LITERAL, stringLiteral);
 			break;
 		}
 		case '\0':
@@ -179,16 +179,16 @@ namespace lexer
 			}
 			else if (validIdentifierChar(m_currentChar))
 			{
-				std::string identifier_literal;
-				readIdentifier(&identifier_literal);
+				std::string identifierLiteral;
+				readIdentifier(&identifierLiteral);
 
-				if (token::keywordToTokenType.count(identifier_literal) > 0)
+				if (token::c_keywordToTokenType.count(identifierLiteral) > 0)
 				{
-					token = token::Token(token::keywordToTokenType.at(identifier_literal), identifier_literal);
+					token = token::Token(token::c_keywordToTokenType.at(identifierLiteral), identifierLiteral);
 				}
 				else
 				{
-					token = token::Token(token::IDENTIFIER, identifier_literal);
+					token = token::Token(token::IDENTIFIER, identifierLiteral);
 				}
 			}
 			else
@@ -275,8 +275,8 @@ namespace lexer
 						readChar();
 					}
 
-					std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
-					return token::Token(token::ILLEGAL_NUMERIC, number_literal);
+					std::string numberLiteral = m_input->substr(startPosition, m_nextPosition - startPosition);
+					return token::Token(token::ILLEGAL_NUMERIC, numberLiteral);
 				}
 				else
 				{
@@ -296,31 +296,31 @@ namespace lexer
 
 				if (invalidValue) // We've seen an 'f' already, found unexpected digits, '.', or 'f'.
 				{
-					std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
-					return token::Token(token::ILLEGAL_NUMERIC, number_literal);
+					std::string numberLiteral = m_input->substr(startPosition, m_nextPosition - startPosition);
+					return token::Token(token::ILLEGAL_NUMERIC, numberLiteral);
 				}
 			}
 		}
 
 		if (!seenDecimal && !seenF) // No decimal, no 'f'
 		{
-			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
-			return token::Token(token::INTEGER_LITERAL, number_literal);
+			std::string numberLiteral = m_input->substr(startPosition, m_nextPosition - startPosition);
+			return token::Token(token::INTEGER_LITERAL, numberLiteral);
 		}
 		else if(seenF && (!seenDecimal || (seenDecimal && seenSecondDigit))) // Seen 'f' and seen decimal digits or see 'f' with no dot
 		{
-			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition - 1); // Ensure 'f' is not included
-			return token::Token(token::FLOAT_LITERAL, number_literal);
+			std::string numberLiteral = m_input->substr(startPosition, m_nextPosition - startPosition - 1); // Ensure 'f' is not included
+			return token::Token(token::FLOAT_LITERAL, numberLiteral);
 		} 
 		else
 		{
-			std::string number_literal = m_input->substr(startPosition, m_nextPosition - startPosition);
-			return token::Token(token::ILLEGAL_NUMERIC, number_literal);
+			std::string numberLiteral = m_input->substr(startPosition, m_nextPosition - startPosition);
+			return token::Token(token::ILLEGAL_NUMERIC, numberLiteral);
 		}
 		
 	}
 
-	void Lexer::readIdentifier(std::string* output) 
+	void Lexer::readIdentifier(std::string* p_output) 
 	{
 		int startPosition = m_currentPosition;
 		while (validIdentifierChar(peekChar()))
@@ -328,10 +328,10 @@ namespace lexer
 			readChar();
 		}
 
-		*output = m_input->substr(startPosition, m_nextPosition - startPosition);
+		*p_output = m_input->substr(startPosition, m_nextPosition - startPosition);
 	}
 
-	void Lexer::readString(std::string* output) 
+	void Lexer::readString(std::string* p_output) 
 	{
 		int startPosition = m_currentPosition+1;
 		readChar();
@@ -342,16 +342,16 @@ namespace lexer
 
 		if (m_currentChar == '"')
 		{
-			*output = m_input->substr(startPosition, m_currentPosition - startPosition);
+			*p_output = m_input->substr(startPosition, m_currentPosition - startPosition);
 		}
 		else if (m_currentChar == '\0')
 		{
 			// TODO: Handle errors
-			*output = m_input->substr(startPosition, m_currentPosition - startPosition);
+			*p_output = m_input->substr(startPosition, m_currentPosition - startPosition);
 		}
 	}
 
-	void Lexer::readCharacter(std::string* output)
+	void Lexer::readCharacter(std::string* p_output)
 	{
 		int startPosition = m_currentPosition + 1;
 		readChar();
@@ -362,28 +362,28 @@ namespace lexer
 
 		if (m_currentChar == '\'')
 		{
-			*output = m_input->substr(startPosition, m_currentPosition - startPosition);
+			*p_output = m_input->substr(startPosition, m_currentPosition - startPosition);
 		}
 		else if (m_currentChar == '\0')
 		{
 			// TODO: Handle errors
-			*output = m_input->substr(startPosition, m_currentPosition - startPosition);
+			*p_output = m_input->substr(startPosition, m_currentPosition - startPosition);
 		}
 	}
 
-	bool Lexer::isLetter(char character)
+	bool Lexer::isLetter(char p_character)
 	{
-		return isalpha(character);
+		return isalpha(p_character);
 	}
 
-	bool Lexer::isDigit(char character)
+	bool Lexer::isDigit(char p_character)
 	{
-		return isdigit(character);
+		return isdigit(p_character);
 	}
 	
-	bool Lexer::validIdentifierChar(char character)
+	bool Lexer::validIdentifierChar(char p_character)
 	{
-		return isLetter(character) || character == '_';
+		return isLetter(p_character) || p_character == '_';
 	}
 
 	char Lexer::peekChar()

@@ -9,14 +9,14 @@
 
 namespace evaluator
 {
-	std::shared_ptr<object::Object> logBuiltIn(std::vector<std::shared_ptr<object::Object>>* params)
+	std::shared_ptr<object::Object> logBuiltIn(std::vector<std::shared_ptr<object::Object>>* p_params)
 	{
 		std::ostringstream outputStringStream;
 
-		for (int i = 0; i < params->size(); i++)
+		for (int i = 0; i < p_params->size(); i++)
 		{
-			outputStringStream << params->at(i)->Inspect();
-			if (i != params->size() - 1)
+			outputStringStream << p_params->at(i)->Inspect();
+			if (i != p_params->size() - 1)
 			{
 				outputStringStream << " ";
 			}
@@ -35,16 +35,16 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> sizeBuiltIn(std::vector<std::shared_ptr<object::Object>>* params)
+	std::shared_ptr<object::Object> sizeBuiltIn(std::vector<std::shared_ptr<object::Object>>* p_params)
 	{
-		if (params->size() != 1)
+		if (p_params->size() != 1)
 		{
 			std::ostringstream error;
-			error << "Expected 1 argument, got " << params->size() << ".";
+			error << "Expected 1 argument, got " << p_params->size() << ".";
 			return createError(error.str());
 		}
 
-		std::shared_ptr<object::Object> objectToSize = params->front();
+		std::shared_ptr<object::Object> objectToSize = p_params->front();
 		switch (objectToSize->Type()) {
 		case object::COLLECTION:
 		{
@@ -61,7 +61,7 @@ namespace evaluator
 		default:
 		{
 			std::ostringstream error;
-			error << "Argument to `size` not supported, got " << object::objectTypeToString.at(objectToSize->Type()) << ".";
+			error << "Argument to `size` not supported, got " << object::c_objectTypeToString.at(objectToSize->Type()) << ".";
 			return createError(error.str());
 		}
 		}

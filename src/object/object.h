@@ -20,7 +20,7 @@ namespace object
 		BUILTIN_FUNCTION,
 	};
 
-	const std::map<ObjectType, std::string> objectTypeToString =
+	const std::map<ObjectType, std::string> c_objectTypeToString =
 	{
 		{INTEGER, "integer"},
 		{FLOAT, "float"},
@@ -36,7 +36,7 @@ namespace object
 		{BUILTIN_FUNCTION, "BUILTIN_FUNCTION"},
 	};
 
-	const std::map<token::TokenType, ObjectType> nodeTypeToObjectType =
+	const std::map<token::TokenType, ObjectType> c_nodeTypeToObjectType =
 	{
 		{token::INTEGER_TYPE, INTEGER},
 		{token::FLOAT_TYPE, FLOAT},
@@ -58,19 +58,19 @@ namespace object
 	{
 	public:
 		Environment();
-		Environment(std::shared_ptr<Environment> m_outer);
+		Environment(std::shared_ptr<Environment> p_outer);
 
 		// Gets value of identifier, looking through outer layers as welll.
-		std::shared_ptr<Object> getIdentifier(std::string* identifier);
+		std::shared_ptr<Object> getIdentifier(std::string* p_identifier);
 
 		// Gets value of identifier only in the current level of environment.
-		std::shared_ptr<Object> getLocalIdentifier(std::string* identifier);
+		std::shared_ptr<Object> getLocalIdentifier(std::string* p_identifier);
 
 		// Assigns value to identifier in this level of environment.
-		void setIdentifier(std::string* identifier, std::shared_ptr<Object> value);
+		void setIdentifier(std::string* p_identifier, std::shared_ptr<Object> p_value);
 
 		// Checks outer level for identifier for assignment.
-		void reassignIdentifier(std::string* identifier, std::shared_ptr<Object> value);
+		void reassignIdentifier(std::string* p_identifier, std::shared_ptr<Object> p_value);
 	private:
 		std::map<std::string, std::shared_ptr<Object>> m_store;
 		std::shared_ptr<Environment> m_outer;
@@ -80,7 +80,7 @@ namespace object
 	{
 	public:
 		Integer();
-		Integer(int value);
+		Integer(int p_value);
 		ObjectType Type();
 		std::string Inspect();
 		int m_value;
@@ -90,7 +90,7 @@ namespace object
 	{
 	public:
 		Float();
-		Float(float value);
+		Float(float p_value);
 		ObjectType Type();
 		std::string Inspect();
 		float m_value;
@@ -100,7 +100,7 @@ namespace object
 	{
 	public:
 		Boolean();
-		Boolean(bool value);
+		Boolean(bool p_value);
 		ObjectType Type();
 		std::string Inspect();
 		bool m_value;
@@ -110,7 +110,7 @@ namespace object
 	{
 	public:
 		Character();
-		Character(char value);
+		Character(char p_value);
 		ObjectType Type();
 		std::string Inspect();
 
@@ -121,11 +121,11 @@ namespace object
 	{
 	public:
 		Collection();
-		Collection(ObjectType collection_type, std::vector<std::shared_ptr<Object>> value);
+		Collection(ObjectType p_collection_type, std::vector<std::shared_ptr<Object>> p_value);
 		ObjectType Type();
 		std::string Inspect();
 
-		ObjectType m_collection_type;
+		ObjectType m_collectionType;
 		std::vector<std::shared_ptr<Object>> m_values;
 	};
 
@@ -137,12 +137,12 @@ namespace object
 		};
 	public:
 		Dictionary();
-		Dictionary(ObjectType keyType, ObjectType valueType, std::vector<std::shared_ptr<Object>> keys, std::vector<std::shared_ptr<Object>> values);
+		Dictionary(ObjectType p_keyType, ObjectType p_valueType, std::vector<std::shared_ptr<Object>> p_keys, std::vector<std::shared_ptr<Object>> p_values);
 		ObjectType Type();
 		std::string Inspect();
 
-		ObjectType m_key_type;
-		ObjectType m_value_type;
+		ObjectType m_keyType;
+		ObjectType m_valueType;
 		std::map<std::shared_ptr<Object>, std::shared_ptr<Object>, ObjCmp> m_map;
 	};
 
@@ -150,7 +150,7 @@ namespace object
 	{
 	public:
 		String();
-		String(std::string* value);
+		String(std::string* p_value);
 		ObjectType Type();
 		std::string Inspect();
 
@@ -168,22 +168,22 @@ namespace object
 	class Return : public Object
 	{
 	public:
-		Return(std::shared_ptr<Object> return_value);
+		Return(std::shared_ptr<Object> p_returnValue);
 		ObjectType Type();
 		std::string Inspect();
 		
-		std::shared_ptr<Object> m_return_value;
+		std::shared_ptr<Object> m_returnValue;
 	};
 
 	class Function : public Object
 	{
 	public:
-		Function(ObjectType functionType, std::shared_ptr<ast::DeclareFunctionStatement> functionDeclaration, std::shared_ptr<Environment> environment);
+		Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment);
 		ObjectType Type();
 		std::string Inspect();
 
-		ObjectType m_function_type;
-		std::shared_ptr<ast::Identifier> m_function_name;
+		ObjectType m_functionType;
+		std::shared_ptr<ast::Identifier> m_functionName;
 		std::vector<std::shared_ptr<ast::DeclareVariableStatement>> m_parameters;
 		std::shared_ptr<ast::BlockStatement> m_body;
 		std::shared_ptr<Environment> m_environment;
@@ -192,11 +192,11 @@ namespace object
 	class Error : public Object
 	{
 	public:
-		Error(std::string error_message);
+		Error(std::string p_errorMessage);
 		ObjectType Type();
 		std::string Inspect();
 
-		std::string m_error_message;
+		std::string m_errorMessage;
 	};
 
 	class Builtin : public Object

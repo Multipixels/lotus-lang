@@ -318,7 +318,7 @@ a || b;
     {
         token::Token token = lexer.nextToken();
 
-        EXPECT_EQ(token::tokenTypeToString.at(token.m_type), token::tokenTypeToString.at(tests[i].first))
+        EXPECT_EQ(token::c_tokenTypeToString.at(token.m_type), token::c_tokenTypeToString.at(tests[i].first))
             << "Test #" << i << '\n';
         EXPECT_EQ(token.m_literal, tests[i].second)
             << "Test #" << i << '\n';
@@ -369,7 +369,7 @@ TEST(LexerTest, NumericalValues)
     {
         token::Token token = lexer.nextToken();
 
-        EXPECT_EQ(token::tokenTypeToString.at(token.m_type), token::tokenTypeToString.at(tests[i].first))
+        EXPECT_EQ(token::c_tokenTypeToString.at(token.m_type), token::c_tokenTypeToString.at(tests[i].first))
             << "Test #" << i << '\n';
         EXPECT_EQ(token.m_literal, tests[i].second)
             << "Test #" << i << '\n';

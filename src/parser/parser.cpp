@@ -5,8 +5,8 @@
 
 namespace parser
 {
-	Parser::Parser(lexer::Lexer lexer)
-		: m_lexer(lexer)
+	Parser::Parser(lexer::Lexer p_lexer)
+		: m_lexer(p_lexer)
 	{
 		nextToken();
 		nextToken();
@@ -66,34 +66,34 @@ namespace parser
 		m_peekToken = m_lexer.nextToken();
 	}
 
-	bool Parser::expectPeek(token::TokenType tokenType)
+	bool Parser::expectPeek(token::TokenType p_tokenType)
 	{
-		if (m_peekToken.m_type == tokenType)
+		if (m_peekToken.m_type == p_tokenType)
 		{
 			nextToken();
 			return true;
 		}
 
-		expectedPeekError(tokenType);
+		expectedPeekError(p_tokenType);
 		return false;
 	}
 
-	bool Parser::currentTokenIs(token::TokenType token)
+	bool Parser::currentTokenIs(token::TokenType p_token)
 	{
-		return m_currentToken.m_type == token;
+		return m_currentToken.m_type == p_token;
 	}
 
-	bool Parser::peekTokenIs(token::TokenType token) 
+	bool Parser::peekTokenIs(token::TokenType p_token) 
 	{
-		return m_peekToken.m_type == token;
+		return m_peekToken.m_type == p_token;
 	}
 
 	Parser::Precedence Parser::peekPrecedence()
 	{
 		// Check if precedence table has token, and if it does, return precedence of it.
-		if (precedenceOfTokenType.count(m_peekToken.m_type) >= 1)
+		if (c_precedenceOfTokenType.count(m_peekToken.m_type) >= 1)
 		{
-			return precedenceOfTokenType.at(m_peekToken.m_type);
+			return c_precedenceOfTokenType.at(m_peekToken.m_type);
 		}
 
 		return LOWEST;
@@ -102,31 +102,31 @@ namespace parser
 	Parser::Precedence Parser::currentPrecedence()
 	{
 		// Check if precedence table has token, and if it does, return precedence of it.
-		if (precedenceOfTokenType.count(m_currentToken.m_type) >= 1)
+		if (c_precedenceOfTokenType.count(m_currentToken.m_type) >= 1)
 		{
-			return precedenceOfTokenType.at(m_currentToken.m_type);
+			return c_precedenceOfTokenType.at(m_currentToken.m_type);
 		}
 
 		return LOWEST;
 	}
 
-	void Parser::expectedPeekError(token::TokenType expectedToken)
+	void Parser::expectedPeekError(token::TokenType p_expectedToken)
 	{
 		std::ostringstream error;
 
-		error << "Expected " << token::tokenTypeToString.at(expectedToken)
-			<< ". Got " << token::tokenTypeToString.at(m_peekToken.m_type)
+		error << "Expected " << token::c_tokenTypeToString.at(p_expectedToken)
+			<< ". Got " << token::c_tokenTypeToString.at(m_peekToken.m_type)
 			<< " instead.";
 
 		m_errors.push_back(error.str());
 	}
 
-	void Parser::noPrefixParseFunction(token::TokenType operatorError)
+	void Parser::noPrefixParseFunction(token::TokenType p_operatorError)
 	{
 		std::ostringstream error;
 
 		error << "No prefix function defined for " 
-			<< token::tokenTypeToString.at(operatorError)
+			<< token::c_tokenTypeToString.at(p_operatorError)
 			<< ".";
 
 		m_errors.push_back(error.str());
@@ -615,7 +615,7 @@ namespace parser
 		return statement;
 	}
 
-	std::shared_ptr<ast::Expression> Parser::parseExpression(Precedence precedence)
+	std::shared_ptr<ast::Expression> Parser::parseExpression(Precedence p_precedence)
 	{
 		PrefixParseFunction prefix;
 		if (m_prefixParseFunctions.count(m_currentToken.m_type) >= 1)
@@ -631,7 +631,7 @@ namespace parser
 		// Dereference this member function pointer and call it
 		std::shared_ptr<ast::Expression> leftExpression = (this->*prefix)();
 
-		while (!peekTokenIs(token::SEMICOLON) && precedence < peekPrecedence())
+		while (!peekTokenIs(token::SEMICOLON) && p_precedence < peekPrecedence())
 		{
 			InfixParseFunction infix = m_infixParseFunctions.at(m_peekToken.m_type);
 			
@@ -657,22 +657,22 @@ namespace parser
 
 		nextToken();
 
-		expression->m_right_expression = parseExpression(PREFIX);
+		expression->m_rightExpression = parseExpression(PREFIX);
 
 		return expression;
 	}
 
-	std::shared_ptr<ast::Expression> Parser::parseInfixExpression(std::shared_ptr<ast::Expression> leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseInfixExpression(std::shared_ptr<ast::Expression> p_leftExpression)
 	{
 		std::shared_ptr<ast::InfixExpression> expression(new ast::InfixExpression);
 
 		expression->m_token = m_currentToken;
 		expression->m_operator = m_currentToken.m_literal;
-		expression->m_left_expression = leftExpression;
+		expression->m_leftExpression = p_leftExpression;
 
 		Precedence precedence = currentPrecedence();
 		nextToken();
-		expression->m_right_expression = parseExpression(precedence);
+		expression->m_rightExpression = parseExpression(precedence);
 
 		return expression;
 	}
@@ -777,21 +777,21 @@ namespace parser
 		return expression;
 	}
 
-	std::shared_ptr<ast::Expression> Parser::parseCallExpression(std::shared_ptr<ast::Expression> leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseCallExpression(std::shared_ptr<ast::Expression> p_leftExpression)
 	{
 		std::shared_ptr<ast::CallExpression> expression(new ast::CallExpression);
 		expression->m_token = m_currentToken;
-		expression->m_function = leftExpression;
+		expression->m_function = p_leftExpression;
 		parseLiterals(&expression->m_parameters, token::COMMA, token::RPARENTHESIS);
 
 		return expression;
 	}
 
-	std::shared_ptr<ast::Expression> Parser::parseIndexExpression(std::shared_ptr<ast::Expression> leftExpression)
+	std::shared_ptr<ast::Expression> Parser::parseIndexExpression(std::shared_ptr<ast::Expression> p_leftExpression)
 	{
 		std::shared_ptr<ast::IndexExpression> expression(new ast::IndexExpression);
 		expression->m_token = m_currentToken;
-		expression->m_collection = leftExpression;
+		expression->m_collection = p_leftExpression;
 
 		nextToken();
 		expression->m_index = parseExpression(LOWEST);
@@ -804,17 +804,17 @@ namespace parser
 		return expression;
 	}
 
-	void Parser::registerPrefixFunction(token::TokenType tokenType, PrefixParseFunction prefixParseFunction)
+	void Parser::registerPrefixFunction(token::TokenType p_tokenType, PrefixParseFunction p_prefixParseFunction)
 	{
-		m_prefixParseFunctions[tokenType] = prefixParseFunction;
+		m_prefixParseFunctions[p_tokenType] = p_prefixParseFunction;
 	}
 
-	void Parser::registerInfixFunction(token::TokenType tokenType, InfixParseFunction infixParseFunction)
+	void Parser::registerInfixFunction(token::TokenType p_tokenType, InfixParseFunction p_infixParseFunction)
 	{
-		m_infixParseFunctions[tokenType] = infixParseFunction;
+		m_infixParseFunctions[p_tokenType] = p_infixParseFunction;
 	}
 
-	void Parser::parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>>* parameters)
+	void Parser::parseParameters(std::vector<std::shared_ptr<ast::DeclareVariableStatement>>* p_parameters)
 	{
 		while (!peekTokenIs(token::RPARENTHESIS))
 		{
@@ -825,7 +825,7 @@ namespace parser
 
 			if (!expectPeek(token::IDENTIFIER))
 			{
-				parameters->push_back(NULL);
+				p_parameters->push_back(NULL);
 				continue;
 			}
 
@@ -838,31 +838,31 @@ namespace parser
 				nextToken();
 			}
 
-			parameters->push_back(statement);
+			p_parameters->push_back(statement);
 		}
 	}
 
-	void Parser::parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender)
+	void Parser::parseLiterals(std::vector<std::shared_ptr<ast::Expression>>* p_destination, token::TokenType p_separator, token::TokenType p_ender)
 	{
-		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
+		while (!peekTokenIs(p_ender) && m_currentToken.m_type != token::END_OF_FILE)
 		{
 			nextToken();
 
 			std::shared_ptr<ast::Expression> statement = parseExpression(LOWEST);
 
-			if (peekTokenIs(separator))
+			if (peekTokenIs(p_separator))
 			{
 				nextToken();
 			}
 
-			destination->push_back(statement);
+			p_destination->push_back(statement);
 		}
 		nextToken();
 	}
 
-	void Parser::parseKeyValuePairs(std::map<std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* destination, token::TokenType separator, token::TokenType ender)
+	void Parser::parseKeyValuePairs(std::map<std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>>* p_destination, token::TokenType p_separator, token::TokenType p_ender)
 	{
-		while (!peekTokenIs(ender) && m_currentToken.m_type != token::END_OF_FILE)
+		while (!peekTokenIs(p_ender) && m_currentToken.m_type != token::END_OF_FILE)
 		{
 			nextToken();
 
@@ -875,12 +875,12 @@ namespace parser
 
 			std::shared_ptr<ast::Expression> value = parseExpression(LOWEST);
 
-			if (peekTokenIs(separator))
+			if (peekTokenIs(p_separator))
 			{
 				nextToken();
 			}
 
-			destination->emplace(key, value);
+			p_destination->emplace(key, value);
 		}
 		nextToken();
 	}

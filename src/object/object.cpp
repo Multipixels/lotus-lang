@@ -13,50 +13,50 @@ namespace object
 
 	Environment::Environment()
 		: m_outer(NULL) {}
-	Environment::Environment(std::shared_ptr<Environment> outer)
-		: m_outer(outer) {}
+	Environment::Environment(std::shared_ptr<Environment> p_outer)
+		: m_outer(p_outer) {}
 
-	std::shared_ptr<Object> Environment::getIdentifier(std::string* identifier)
+	std::shared_ptr<Object> Environment::getIdentifier(std::string* p_identifier)
 	{
-		if (m_store.count(*identifier) > 0)
+		if (m_store.count(*p_identifier) > 0)
 		{
-			return m_store.at(*identifier);
+			return m_store.at(*p_identifier);
 		}
 
 		if (m_outer != NULL)
 		{
-			return m_outer->getIdentifier(identifier);
+			return m_outer->getIdentifier(p_identifier);
 		}
 
 		return NULL;
 	}
 
-	std::shared_ptr<Object> Environment::getLocalIdentifier(std::string* identifier)
+	std::shared_ptr<Object> Environment::getLocalIdentifier(std::string* p_identifier)
 	{
-		if (m_store.count(*identifier) > 0)
+		if (m_store.count(*p_identifier) > 0)
 		{
-			return m_store.at(*identifier);
+			return m_store.at(*p_identifier);
 		}
 
 		return NULL;
 	}
 
-	void Environment::setIdentifier(std::string* identifier, std::shared_ptr<Object> value)
+	void Environment::setIdentifier(std::string* p_identifier, std::shared_ptr<Object> p_value)
 	{
-		m_store[*identifier] = value;
+		m_store[*p_identifier] = p_value;
 	}
 
-	void Environment::reassignIdentifier(std::string* identifier, std::shared_ptr<Object> value)
+	void Environment::reassignIdentifier(std::string* p_identifier, std::shared_ptr<Object> p_value)
 	{
-		if (m_store.count(*identifier) > 0)
+		if (m_store.count(*p_identifier) > 0)
 		{
-			m_store[*identifier] = value;
+			m_store[*p_identifier] = p_value;
 		}
 		else
 		{
 			if(m_outer != NULL)
 			{
-				m_outer->reassignIdentifier(identifier, value);
+				m_outer->reassignIdentifier(p_identifier, p_value);
 			}
 		}
 	}
@@ -66,8 +66,8 @@ namespace object
 	{
 	}
 
-	Integer::Integer(int value)
-		: m_value(value)
+	Integer::Integer(int p_value)
+		: m_value(p_value)
 	{
 	}
 
@@ -89,8 +89,8 @@ namespace object
 	{
 	}
 
-	Float::Float(float value)
-		: m_value(value)
+	Float::Float(float p_value)
+		: m_value(p_value)
 	{
 	}
 
@@ -112,8 +112,8 @@ namespace object
 	{
 	}
 
-	Boolean::Boolean(bool value)
-		: m_value(value)
+	Boolean::Boolean(bool p_value)
+		: m_value(p_value)
 	{
 	}
 
@@ -124,7 +124,10 @@ namespace object
 
 	std::string Boolean::Inspect()
 	{
-		if (m_value) return "true";
+		if (m_value)
+		{
+			return "true";
+		}
 		return "false";
 	}
 
@@ -133,8 +136,8 @@ namespace object
 	{
 	}
 
-	Character::Character(char value)
-		: m_value(value)
+	Character::Character(char p_value)
+		: m_value(p_value)
 	{
 	}
 
@@ -152,12 +155,12 @@ namespace object
 	}
 
 	Collection::Collection()
-		: m_collection_type(NULL_TYPE)
+		: m_collectionType(NULL_TYPE)
 	{
 	}
 
-	Collection::Collection(ObjectType collection_type, std::vector<std::shared_ptr<Object>> value)
-		: m_collection_type(collection_type), m_values(value)
+	Collection::Collection(ObjectType p_collectionType, std::vector<std::shared_ptr<Object>> p_value)
+		: m_collectionType(p_collectionType), m_values(p_value)
 	{
 	}
 
@@ -181,38 +184,38 @@ namespace object
 		return output.str();
 	}
 
-	bool Dictionary::ObjCmp::operator()(std::shared_ptr<Object> lhs, std::shared_ptr<Object> rhs) const
+	bool Dictionary::ObjCmp::operator()(std::shared_ptr<Object> p_lhs, std::shared_ptr<Object> p_rhs) const
 	{
-		switch (lhs->Type()) {
+		switch (p_lhs->Type()) {
 		case INTEGER:
 		{
-			if (rhs->Type() != INTEGER) return true;
-			std::shared_ptr<Integer> lhsI = std::static_pointer_cast<Integer>(lhs);
-			std::shared_ptr<Integer> rhsI = std::static_pointer_cast<Integer>(rhs);
+			if (p_rhs->Type() != INTEGER) return true;
+			std::shared_ptr<Integer> lhsI = std::static_pointer_cast<Integer>(p_lhs);
+			std::shared_ptr<Integer> rhsI = std::static_pointer_cast<Integer>(p_rhs);
 
 			return lhsI->m_value < rhsI->m_value;
 		}
 		case FLOAT:
 		{
-			if (rhs->Type() != FLOAT) return true;
-			std::shared_ptr<Float> lhsF = std::static_pointer_cast<Float>(lhs);
-			std::shared_ptr<Float> rhsF = std::static_pointer_cast<Float>(rhs);
+			if (p_rhs->Type() != FLOAT) return true;
+			std::shared_ptr<Float> lhsF = std::static_pointer_cast<Float>(p_lhs);
+			std::shared_ptr<Float> rhsF = std::static_pointer_cast<Float>(p_rhs);
 
 			return lhsF->m_value < rhsF->m_value;
 		}
 		case BOOLEAN:
 		{
-			if (rhs->Type() != BOOLEAN) return true;
-			std::shared_ptr<Boolean> lhsB = std::static_pointer_cast<Boolean>(lhs);
-			std::shared_ptr<Boolean> rhsB = std::static_pointer_cast<Boolean>(rhs);
+			if (p_rhs->Type() != BOOLEAN) return true;
+			std::shared_ptr<Boolean> lhsB = std::static_pointer_cast<Boolean>(p_lhs);
+			std::shared_ptr<Boolean> rhsB = std::static_pointer_cast<Boolean>(p_rhs);
 
 			return lhsB->m_value < rhsB->m_value;
 		}
 		case CHARACTER:
 		{
-			if (rhs->Type() != CHARACTER) return true;
-			std::shared_ptr<Character> lhsC = std::static_pointer_cast<Character>(lhs);
-			std::shared_ptr<Character> rhsC = std::static_pointer_cast<Character>(rhs);
+			if (p_rhs->Type() != CHARACTER) return true;
+			std::shared_ptr<Character> lhsC = std::static_pointer_cast<Character>(p_lhs);
+			std::shared_ptr<Character> rhsC = std::static_pointer_cast<Character>(p_rhs);
 
 			return lhsC->m_value < rhsC->m_value;
 		}
@@ -224,17 +227,16 @@ namespace object
 	}
 
 	Dictionary::Dictionary()
-		: m_key_type(NULL_TYPE), m_value_type(NULL_TYPE)
+		: m_keyType(NULL_TYPE), m_valueType(NULL_TYPE)
 	{
 	}
 
-	Dictionary::Dictionary(ObjectType keyType, ObjectType valueType, std::vector<std::shared_ptr<Object>> keys, std::vector<std::shared_ptr<Object>> values)
-		: m_key_type(keyType), m_value_type(valueType)
+	Dictionary::Dictionary(ObjectType p_keyType, ObjectType p_valueType, std::vector<std::shared_ptr<Object>> p_keys, std::vector<std::shared_ptr<Object>> p_values)
+		: m_keyType(p_keyType), m_valueType(p_valueType)
 	{
-		for (int i = 0; i < keys.size(); i++)
+		for (int i = 0; i < p_keys.size(); i++)
 		{
-			// https://en.cppreference.com/w/cpp/utility/functional/less
-			m_map.emplace(keys.at(i), values.at(i));
+			m_map.emplace(p_keys.at(i), p_values.at(i));
 		}
 	}
 
@@ -267,8 +269,8 @@ namespace object
 	{
 	}
 
-	String::String(std::string *value)
-		: m_value(*value)
+	String::String(std::string *p_value)
+		: m_value(*p_value)
 	{
 	}
 
@@ -294,8 +296,8 @@ namespace object
 		return "null";
 	}
 
-	Return::Return(std::shared_ptr<Object> return_value)
-		: m_return_value(return_value)
+	Return::Return(std::shared_ptr<Object> p_returnValue)
+		: m_returnValue(p_returnValue)
 	{
 	}
 
@@ -306,16 +308,16 @@ namespace object
 
 	std::string Return::Inspect()
 	{
-		return m_return_value->Inspect();
+		return m_returnValue->Inspect();
 	}
 
-	Function::Function(ObjectType functionType, std::shared_ptr<ast::DeclareFunctionStatement> functionDeclaration, std::shared_ptr<Environment> environment)
-		: m_function_type(functionType)
-		, m_function_name(&functionDeclaration->m_name)
-		, m_body(functionDeclaration->m_body->m_body)
-		, m_environment(environment)
+	Function::Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment)
+		: m_functionType(p_functionType)
+		, m_functionName(&p_functionDeclaration->m_name)
+		, m_body(p_functionDeclaration->m_body->m_body)
+		, m_environment(p_environment)
 	{
-		m_parameters = functionDeclaration->m_parameters;
+		m_parameters = p_functionDeclaration->m_parameters;
 	}
 
 	ObjectType Function::Type()
@@ -327,7 +329,7 @@ namespace object
 	{
 		std::ostringstream output;
 
-		output << objectTypeToString.at(m_function_type) << "(";
+		output << c_objectTypeToString.at(m_functionType) << "(";
 
 		for (int i = 0; i < m_parameters.size(); i++)
 		{
@@ -340,8 +342,8 @@ namespace object
 		return output.str();
 	}
 
-	Error::Error(std::string error_message)
-		: m_error_message(error_message)
+	Error::Error(std::string p_errorMessage)
+		: m_errorMessage(p_errorMessage)
 	{
 	}
 
@@ -353,13 +355,13 @@ namespace object
 	std::string Error::Inspect()
 	{
 		std::ostringstream output;
-		output << "Evaluation Error: " << m_error_message;
+		output << "Evaluation Error: " << m_errorMessage;
 		return output.str();
 	}
 
 
-	Builtin::Builtin(Builtin::BuiltinFunctionPointer fn)
-		: m_function(fn)
+	Builtin::Builtin(Builtin::BuiltinFunctionPointer p_fn)
+		: m_function(p_fn)
 	{
 	}
 

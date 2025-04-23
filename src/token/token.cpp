@@ -8,17 +8,17 @@ namespace token
 		m_literal = "ILLEGAL";
 	}
 
-	Token::Token(TokenType tokenType, std::string literal)
+	Token::Token(TokenType p_tokenType, std::string p_literal)
 	{
-		m_type = tokenType;
-		m_literal = literal;
+		m_type = p_tokenType;
+		m_literal = p_literal;
 	}
 
-	TokenType LookupIdentifier(std::string* identifier)
+	TokenType lookupIdentifier(std::string* p_identifier)
 	{
-		if (keywordToTokenType.count(*identifier) > 0) 
+		if (c_keywordToTokenType.count(*p_identifier) > 0) 
 		{
-			return keywordToTokenType.at(*identifier);
+			return c_keywordToTokenType.at(*p_identifier);
 		}
 		return IDENTIFIER;
 	}

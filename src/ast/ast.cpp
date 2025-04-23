@@ -58,17 +58,17 @@ namespace ast
 
 	std::string FloatLiteral::TokenLiteral()
 	{
-		std::ostringstream outputString;
-		outputString << stof(m_token.m_literal);
+		std::ostringstream output;
+		output << stof(m_token.m_literal);
 
-		return outputString.str();
+		return output.str();
 	}
 	std::string FloatLiteral::String()
 	{
-		std::ostringstream outputString;
-		outputString << m_value;
+		std::ostringstream output;
+		output << m_value;
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string BooleanLiteral::TokenLiteral()
@@ -98,20 +98,20 @@ namespace ast
 
 	std::string CollectionLiteral::String()
 	{
-		std::ostringstream outputString;
+		std::ostringstream output;
 
-		outputString << "[";
+		output << "[";
 
 		for (int i = 0; i < m_values.size(); i++)
 		{
-			outputString << m_values[i]->String();
+			output << m_values[i]->String();
 
-			if (i != m_values.size() - 1) outputString << ", ";
+			if (i != m_values.size() - 1) output << ", ";
 		}
 		
-		outputString << "]";
+		output << "]";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string DictionaryLiteral::TokenLiteral()
@@ -121,22 +121,22 @@ namespace ast
 
 	std::string DictionaryLiteral::String()
 	{
-		std::ostringstream outputString;
+		std::ostringstream output;
 
-		outputString << "{";
+		output << "{";
 
 		std::map<std::shared_ptr<Expression>, std::shared_ptr<Expression>>::iterator it;
 		for (it = m_map.begin(); it != m_map.end(); it++)
 		{
-			outputString << it->first->String() << ": "
+			output << it->first->String() << ": "
 				<< it->second->String();
 
-			if (std::next(it) != m_map.end()) outputString << ", ";
+			if (std::next(it) != m_map.end()) output << ", ";
 		}
 
-		outputString << "}";
+		output << "}";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string StringLiteral::TokenLiteral()
@@ -146,18 +146,18 @@ namespace ast
 
 	std::string StringLiteral::String()
 	{
-		std::ostringstream outputString;
+		std::ostringstream output;
 
-		outputString << '"';
+		output << '"';
 
 		for (int i = 0; i < m_stringCollection->m_values.size(); i++)
 		{
-			outputString << m_stringCollection->m_values[i]->String()[1];
+			output << m_stringCollection->m_values[i]->String()[1];
 		}
 
-		outputString << '"';
+		output << '"';
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string FunctionLiteral::TokenLiteral()
@@ -166,13 +166,13 @@ namespace ast
 	}
 	std::string FunctionLiteral::String()
 	{
-		std::ostringstream outputString;
+		std::ostringstream output;
 
-		outputString << "{" << std::endl
+		output << "{" << std::endl
 			<< m_body->String()
 			<< "}" << std::endl;
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string PrefixExpression::TokenLiteral()
@@ -181,11 +181,11 @@ namespace ast
 	}
 	std::string PrefixExpression::String()
 	{
-		std::ostringstream outputString;
-		outputString << "(" << m_operator
-			<< m_right_expression->String() << ")";
+		std::ostringstream output;
+		output << "(" << m_operator
+			<< m_rightExpression->String() << ")";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string InfixExpression::TokenLiteral()
@@ -194,14 +194,14 @@ namespace ast
 	}
 	std::string InfixExpression::String()
 	{
-		std::ostringstream outputString;
-		outputString << "("
-			<< m_left_expression->String()
+		std::ostringstream output;
+		output << "("
+			<< m_leftExpression->String()
 			<< " " << m_operator << " "
-			<< m_right_expression->String()
+			<< m_rightExpression->String()
 			<< ")";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string CallExpression::TokenLiteral()
@@ -210,22 +210,22 @@ namespace ast
 	}
 	std::string CallExpression::String()
 	{
-		std::ostringstream outputString;
-		outputString << m_function->String()
+		std::ostringstream output;
+		output << m_function->String()
 			<< "(";
 
 		for (int i = 0; i < m_parameters.size(); i++)
 		{
-			outputString << m_parameters[i]->String();
+			output << m_parameters[i]->String();
 			if (i != m_parameters.size() - 1)
 			{
-				outputString << ", ";
+				output << ", ";
 			}
 		}
 
-		outputString << ")";
+		output << ")";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string IndexExpression::TokenLiteral()
@@ -234,11 +234,11 @@ namespace ast
 	}
 	std::string IndexExpression::String()
 	{
-		std::ostringstream outputString;
-		outputString << "(" << m_collection->String()
+		std::ostringstream output;
+		output << "(" << m_collection->String()
 			<< "[" << m_index->String() << "])";
 
-		return outputString.str();
+		return output.str();
 	}
 
 	std::string DeclareVariableStatement::TokenLiteral()

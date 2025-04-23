@@ -6,5 +6,5 @@ namespace repl
 	int Start();
 
 	// Runs a file.
-	int Run(const char* fileName);
+	int Run(const char* p_fileName);
 }

@@ -70,7 +70,7 @@ namespace token
 		IDENTIFIER,
 	};
 
-	const std::map<TokenType, std::string> tokenTypeToString =
+	const std::map<TokenType, std::string> c_tokenTypeToString =
 	{
 		{ILLEGAL, "ILLEGAL"},
 		{ILLEGAL_NUMERIC, "ILLEGAL_NUMERIC"},
@@ -123,7 +123,7 @@ namespace token
 		{IDENTIFIER, "IDENTIFIER"},
 	};
 
-	const std::map<std::string, TokenType> keywordToTokenType =
+	const std::map<std::string, TokenType> c_keywordToTokenType =
 	{ 
 		{"integer", INTEGER_TYPE},
 		{"boolean", BOOLEAN_TYPE},
@@ -150,8 +150,8 @@ namespace token
 		std::string m_literal;
 
 		Token();
-		Token(TokenType tokenType, std::string m_literal);
+		Token(TokenType p_tokenType, std::string p_literal);
 	};
 
-	TokenType LookupIdentifier(std::string *identifier);
+	TokenType lookupIdentifier(std::string *p_identifier);
 }
