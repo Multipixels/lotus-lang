@@ -6,20 +6,25 @@
 
 namespace evaluator
 {
+	extern std::chrono::steady_clock::time_point g_timeout;
+
 	// Evaluates a node
-	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout = std::chrono::steady_clock::time_point());
+	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates a program
-	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
-
-	// Evaluates a block statement
-	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
-
-	// Evaluates a list of expressions
-	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
+	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates an identifier
 	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a collection literal node
+	std::shared_ptr<object::Object> evaluateCollectionLiteralNode(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a block statement
+	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a list of expressions
+	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates a prefix expression
 	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject);
@@ -46,10 +51,10 @@ namespace evaluator
 	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression);
 
 	// Evaluates a function call
-	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
+	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates an indexing on collections, strings, or dictionaries
-	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout);
+	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment);
 
 	// Reassigns value in a collection
 	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject);
@@ -58,7 +63,7 @@ namespace evaluator
 	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject);
 
 	// Applies a function call to a function
-	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments, std::chrono::steady_clock::time_point p_timeout);
+	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments);
 
 	// Helper function to extend a function's environment
 	std::shared_ptr<object::Environment> extendFunctionEnvironment(std::shared_ptr<object::Function> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments);

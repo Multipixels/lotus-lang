@@ -19,8 +19,8 @@ void run(std::string p_input, int p_timeout = 0) {
     }
     if (parser.m_errors.size() > 0) return;
 
-    std::chrono::steady_clock::time_point timeoutValue = std::chrono::steady_clock::now() + std::chrono::milliseconds(p_timeout);
-    object::Object* output = evaluator::evaluate(program, &environment, timeoutValue);
+    evaluator::g_timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(p_timeout);
+    object::Object* output = evaluator::evaluate(program, &environment);
 
     // Output only if you get an error
     if (output->Type() == object::ERROR)

@@ -6,9 +6,11 @@
 
 namespace evaluator
 {
-	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	std::chrono::steady_clock::time_point g_timeout = std::chrono::steady_clock::time_point();
+
+	std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::Node> p_node, std::shared_ptr<object::Environment> p_environment)
 	{
-		if (p_timeout != std::chrono::steady_clock::time_point() && p_timeout < std::chrono::steady_clock::now())
+		if (g_timeout != std::chrono::steady_clock::time_point() && g_timeout < std::chrono::steady_clock::now())
 		{
 			std::ostringstream error;
 			error << "Evaluation of the program timed out.";
@@ -21,7 +23,7 @@ namespace evaluator
 		{
 		case ast::PROGRAM_NODE:
 		{
-			return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment, p_timeout);
+			return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment);
 		}
 		case ast::IDENTIFIER_NODE:
 		{
@@ -29,7 +31,7 @@ namespace evaluator
 		}
 		case ast::BLOCK_STATEMENT_NODE:
 		{
-			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment, p_timeout);
+			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment);
 		}
 		case ast::INTEGER_LITERAL_NODE:
 		{
@@ -58,32 +60,7 @@ namespace evaluator
 		case ast::COLLECTION_LITERAL_NODE:
 		{
 			std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(p_node);
-
-			if (collectionLiteral->m_values.size() == 0)
-			{
-				return std::shared_ptr<object::Collection>(new object::Collection(object::NULL_TYPE, {}));
-			}
-
-			std::shared_ptr<object::Collection> object(new object::Collection);
-
-			for (int i = 0; i < collectionLiteral->m_values.size(); i++)
-			{
-				std::shared_ptr<object::Object> evaluatedItem = evaluate(collectionLiteral->m_values[i], p_environment, p_timeout);
-
-				if (evaluatedItem->Type() == object::ERROR) return evaluatedItem;
-
-				if (object->m_collectionType != object::NULL_TYPE && evaluatedItem->Type() != object->m_collectionType)
-				{
-					std::ostringstream error;
-					error << "The collection " << p_node->String() << " must have uniform typing of elements.";
-					return createError(error.str());
-				}
-
-				if (object->m_collectionType == object::NULL_TYPE) object->m_collectionType = evaluatedItem->Type();
-				object->m_values.push_back(evaluatedItem);
-			}
-
-			return object;
+			return evaluateCollectionLiteralNode(collectionLiteral, p_environment);
 		}
 		case ast::DICTIONARY_LITERAL_NODE:
 		{
@@ -100,7 +77,7 @@ namespace evaluator
 			for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
 			{
 				// Checking the key
-				std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, p_environment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, p_environment);
 				if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
 
 				if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
@@ -128,7 +105,7 @@ namespace evaluator
 				}
 
 				// Checking the value
-				std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, p_environment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, p_environment);
 				if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
 
 				if (object->m_valueType != object::NULL_TYPE && evaluatedValue->Type() != object->m_valueType)
@@ -165,7 +142,7 @@ namespace evaluator
 		{
 			std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>(p_node);
 
-			std::shared_ptr<object::Object> rightObject = evaluate(prefixExpression->m_rightExpression, p_environment, p_timeout);
+			std::shared_ptr<object::Object> rightObject = evaluate(prefixExpression->m_rightExpression, p_environment);
 			if (rightObject->Type() == object::ERROR) return rightObject;
 
 			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
@@ -185,7 +162,7 @@ namespace evaluator
 					return createError(error.str());
 				}
 
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
+				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment);
 
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
@@ -206,13 +183,13 @@ namespace evaluator
 			{
 				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(infixExpression->m_leftExpression);
 				
-				std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, p_environment, p_timeout);
+				std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, p_environment);
 				if (object->Type() == object::ERROR) return object;
 
-				std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, p_environment, p_timeout);
+				std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, p_environment);
 				if (indexObject->Type() == object::ERROR) return indexObject;
 
-				std::shared_ptr<object::Object> valueObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
+				std::shared_ptr<object::Object> valueObject = evaluate(infixExpression->m_rightExpression, p_environment);
 				if (valueObject->Type() == object::ERROR) return valueObject;
 
 				switch (object->Type()) {
@@ -240,10 +217,10 @@ namespace evaluator
 			}
 			else
 			{
-				std::shared_ptr<object::Object> leftObject = evaluate(infixExpression->m_leftExpression, p_environment, p_timeout);
+				std::shared_ptr<object::Object> leftObject = evaluate(infixExpression->m_leftExpression, p_environment);
 				if (leftObject->Type() == object::ERROR) return leftObject;
 
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment, p_timeout);
+				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment);
 				if (rightObject->Type() == object::ERROR) return rightObject;
 
 				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
@@ -252,12 +229,12 @@ namespace evaluator
 		case ast::CALL_EXPRESSION_NODE:
 		{
 			std::shared_ptr<ast::CallExpression> callExpression = std::static_pointer_cast<ast::CallExpression>(p_node);
-			return evaluateCallExpression(callExpression, p_environment, p_timeout);
+			return evaluateCallExpression(callExpression, p_environment);
 		}
 		case ast::INDEX_EXPRESSION_NODE:
 		{
 			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_node);
-			return evaluateIndexExpression(indexExpression, p_environment, p_timeout);
+			return evaluateIndexExpression(indexExpression, p_environment);
 		}
 		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
 		{
@@ -270,7 +247,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareVariableStatement->m_value, p_environment, p_timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareVariableStatement->m_value, p_environment);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -301,7 +278,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareCollectionStatement->m_value, p_environment, p_timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareCollectionStatement->m_value, p_environment);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -343,7 +320,7 @@ namespace evaluator
 				return createError(error.str());
 			}
 
-			std::shared_ptr<object::Object> object = evaluate(declareDictionaryStatement->m_value, p_environment, p_timeout);
+			std::shared_ptr<object::Object> object = evaluate(declareDictionaryStatement->m_value, p_environment);
 
 			if (object->Type() == object::ERROR)
 			{
@@ -399,10 +376,10 @@ namespace evaluator
 		case ast::RETURN_STATEMENT_NODE:
 		{
 			std::shared_ptr<ast::ReturnStatement> returnStatement = std::static_pointer_cast<ast::ReturnStatement>(p_node);
-			return std::shared_ptr<object::Object>(new object::Return(evaluate(returnStatement->m_returnValue, p_environment, p_timeout)));
+			return std::shared_ptr<object::Object>(new object::Return(evaluate(returnStatement->m_returnValue, p_environment)));
 		}
 		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(p_node)->m_expression, p_environment, p_timeout);
+			return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(p_node)->m_expression, p_environment);
 		case ast::IF_STATEMENT_NODE:
 		{
 			std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(p_node);
@@ -411,10 +388,10 @@ namespace evaluator
 			if (ifStatement->m_condition == NULL)
 			{
 				std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
-				return evaluate(ifStatement->m_consequence, ifEnvironment, p_timeout);
+				return evaluate(ifStatement->m_consequence, ifEnvironment);
 			}
 
-			std::shared_ptr<object::Object> evaluatedCondition = evaluate(ifStatement->m_condition, p_environment, p_timeout);
+			std::shared_ptr<object::Object> evaluatedCondition = evaluate(ifStatement->m_condition, p_environment);
 
 			if (evaluatedCondition->Type() == object::ERROR)
 			{
@@ -433,11 +410,11 @@ namespace evaluator
 
 			if (truthyBoolean->m_value)
 			{
-				return evaluate(ifStatement->m_consequence, ifEnvironment, p_timeout);
+				return evaluate(ifStatement->m_consequence, ifEnvironment);
 			}
 			else if (ifStatement->m_alternative != NULL)
 			{
-				return evaluate(ifStatement->m_alternative, ifEnvironment, p_timeout);
+				return evaluate(ifStatement->m_alternative, ifEnvironment);
 			}
 			else
 			{
@@ -451,7 +428,7 @@ namespace evaluator
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(whileStatement->m_condition, p_environment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(whileStatement->m_condition, p_environment);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -466,7 +443,7 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -480,7 +457,7 @@ namespace evaluator
 			std::shared_ptr<ast::DoWhileStatement> doWhileStatement = std::static_pointer_cast<ast::DoWhileStatement>(p_node);
 			std::shared_ptr<object::Environment> doWhileEnvironment(new object::Environment(p_environment));
 
-			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, p_timeout);
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
 			if (evaluatedConsequence->Type() == object::ERROR)
 			{
 				return evaluatedConsequence;
@@ -488,7 +465,7 @@ namespace evaluator
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(doWhileStatement->m_condition, p_environment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(doWhileStatement->m_condition, p_environment);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -503,7 +480,7 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
@@ -518,7 +495,7 @@ namespace evaluator
 			std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(p_environment));
 			std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
 
-			std::shared_ptr<object::Object> evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment, p_timeout);
+			std::shared_ptr<object::Object> evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment);
 			if (evaluatedInitialization->Type() == object::ERROR)
 			{
 				return evaluatedInitialization;
@@ -526,7 +503,7 @@ namespace evaluator
 
 			while (true)
 			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment);
 				if (evaluatedCondition->Type() == object::ERROR)
 				{
 					return evaluatedCondition;
@@ -541,13 +518,13 @@ namespace evaluator
 				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
 				if (!truthyBoolean->m_value) break;
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR)
 				{
 					return evaluatedConsequence;
 				}
 
-				std::shared_ptr<object::Object> evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment);
 				if (evaluatedUpdation->Type() == object::ERROR)
 				{
 					return evaluatedUpdation;
@@ -561,7 +538,7 @@ namespace evaluator
 			std::shared_ptr<ast::IterateStatement> iterateStatement = std::static_pointer_cast<ast::IterateStatement>(p_node);
 			std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(p_environment));
 
-			std::shared_ptr<object::Object> evaluatedCollection = evaluate(iterateStatement->m_collection, p_environment, p_timeout);
+			std::shared_ptr<object::Object> evaluatedCollection = evaluate(iterateStatement->m_collection, p_environment);
 			if (evaluatedCollection->Type() == object::ERROR)
 			{
 				return evaluatedCollection;
@@ -580,7 +557,7 @@ namespace evaluator
 			{
 				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
 
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment, p_timeout);
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 			}
 
@@ -591,13 +568,13 @@ namespace evaluator
 		return NULL;
 	}
 
-	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment)
 	{
 		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
 
 		for (int i = 0; i < p_program->m_statements.size(); i++)
 		{
-			result = evaluate(p_program->m_statements[i], p_environment, p_timeout);
+			result = evaluate(p_program->m_statements[i], p_environment);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -614,13 +591,60 @@ namespace evaluator
 		return result;
 	}
 
-	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment) 
+	{
+		std::shared_ptr<object::Object> result = p_environment->getIdentifier(&(p_identifier->m_name));
+		if (result != NULL)
+		{
+			return result;
+		}
+
+		if (c_builtins.find(p_identifier->m_name) != c_builtins.end()) {
+			return c_builtins.at(p_identifier->m_name);
+		}
+
+		std::ostringstream error;
+		error << "'" << p_identifier->m_name << "' is not defined.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateCollectionLiteralNode(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		if (p_collectionLiteral->m_values.size() == 0)
+		{
+			return std::shared_ptr<object::Collection>(new object::Collection(object::NULL_TYPE, {}));
+		}
+
+		std::shared_ptr<object::Collection> object(new object::Collection);
+
+		for (int i = 0; i < p_collectionLiteral->m_values.size(); i++)
+		{
+			std::shared_ptr<object::Object> evaluatedItem = evaluate(p_collectionLiteral->m_values[i], p_environment);
+
+			if (evaluatedItem->Type() == object::ERROR) return evaluatedItem;
+
+			if (object->m_collectionType != object::NULL_TYPE && evaluatedItem->Type() != object->m_collectionType)
+			{
+				std::ostringstream error;
+				error << "The collection " << p_collectionLiteral->String() << " must have uniform typing of elements.";
+				return createError(error.str());
+			}
+
+			if (object->m_collectionType == object::NULL_TYPE) object->m_collectionType = evaluatedItem->Type();
+			object->m_values.push_back(evaluatedItem);
+		}
+
+		return object;
+	}
+
+
+	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment)
 	{
 		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
 
 		for (int i = 0; i < p_blockStatements->m_statements.size(); i++)
 		{
-			result = evaluate(p_blockStatements->m_statements[i], p_environment, p_timeout);
+			result = evaluate(p_blockStatements->m_statements[i], p_environment);
 
 			if (result != NULL && result->Type() == object::RETURN)
 			{
@@ -637,11 +661,11 @@ namespace evaluator
 	}
 
 
-	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment)
 	{
 		for (int i = 0; i < p_source->size(); i++)
 		{
-			std::shared_ptr<object::Object> evaluatedExpression = evaluate((*p_source)[i], p_environment, p_timeout);
+			std::shared_ptr<object::Object> evaluatedExpression = evaluate((*p_source)[i], p_environment);
 
 			if (evaluatedExpression->Type() == object::ERROR)
 			{
@@ -651,22 +675,6 @@ namespace evaluator
 			}
 			(*p_destination).push_back(evaluatedExpression);
 		}
-	}
-
-	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment) {
-		std::shared_ptr<object::Object> result = p_environment->getIdentifier(&(p_identifier->m_name));
-		if (result != NULL)
-		{
-			return result;
-		}
-
-		if (c_builtins.find(p_identifier->m_name) != c_builtins.end()) {
-			return c_builtins.at(p_identifier->m_name);
-		}
-
-		std::ostringstream error;
-		error << "'" << p_identifier->m_name << "' is not defined.";
-		return createError(error.str());
 	}
 
 	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject)
@@ -849,16 +857,16 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment)
 	{
-		std::shared_ptr<object::Object> expression = evaluate(p_callExpression->m_function, p_environment, p_timeout);
+		std::shared_ptr<object::Object> expression = evaluate(p_callExpression->m_function, p_environment);
 		if (expression->Type() == object::ERROR)
 		{
 			return expression;
 		}
 
 		std::vector<std::shared_ptr<object::Object>> evaluatedArguments;
-		evaluateExpressions(&p_callExpression->m_parameters, &evaluatedArguments, p_environment, p_timeout);
+		evaluateExpressions(&p_callExpression->m_parameters, &evaluatedArguments, p_environment);
 
 		if (evaluatedArguments.size() == 1 && evaluatedArguments[0]->Type() == object::ERROR)
 		{
@@ -902,7 +910,7 @@ namespace evaluator
 			return createError(error.str());
 		}
 
-		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments, p_timeout);
+		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments);
 
 		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
 		{
@@ -923,13 +931,13 @@ namespace evaluator
 		return output;
 	}
 
-	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment, std::chrono::steady_clock::time_point p_timeout)
+	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment)
 	{
 		// Evaluate expression and apply index to it
-		std::shared_ptr<object::Object> expression = evaluate(p_indexExpression->m_collection, p_environment, p_timeout);
+		std::shared_ptr<object::Object> expression = evaluate(p_indexExpression->m_collection, p_environment);
 
 		// Get index
-		std::shared_ptr<object::Object> indexObject = evaluate(p_indexExpression->m_index, p_environment, p_timeout);
+		std::shared_ptr<object::Object> indexObject = evaluate(p_indexExpression->m_index, p_environment);
 		if (indexObject->Type() == object::ERROR) return indexObject;
 
 		if (expression->Type() != object::DICTIONARY && indexObject->Type() != object::INTEGER)
@@ -1043,7 +1051,7 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments, std::chrono::steady_clock::time_point p_timeout)
+	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments)
 	{
 		switch (p_function->Type())
 		{
@@ -1055,7 +1063,7 @@ namespace evaluator
 		case object::FUNCTION:
 		{
 			std::shared_ptr<object::Environment> extendedEnvironment = extendFunctionEnvironment(std::static_pointer_cast<object::Function>(p_function), p_arguments);
-			std::shared_ptr<object::Object> evaluated = evaluate(std::static_pointer_cast<object::Function>(p_function)->m_body, extendedEnvironment, p_timeout);
+			std::shared_ptr<object::Object> evaluated = evaluate(std::static_pointer_cast<object::Function>(p_function)->m_body, extendedEnvironment);
 			return unwrapReturnValue(evaluated);
 		}
 		}
