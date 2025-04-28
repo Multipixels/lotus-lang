@@ -22,122 +22,25 @@ namespace evaluator
 		switch (p_node->Type())
 		{
 		case ast::PROGRAM_NODE:
-		{
 			return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment);
-		}
 		case ast::IDENTIFIER_NODE:
-		{
 			return evaluateIdentifier(std::static_pointer_cast<ast::Identifier>(p_node), p_environment);
-		}
 		case ast::BLOCK_STATEMENT_NODE:
-		{
 			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment);
-		}
 		case ast::INTEGER_LITERAL_NODE:
-		{
-			std::shared_ptr<object::Integer> object(new object::Integer);
-			object->m_value = std::static_pointer_cast<ast::IntegerLiteral>(p_node)->m_value;
-			return object;
-		}
+			return evaluateIntegerLiteral(std::static_pointer_cast<ast::IntegerLiteral>(p_node), p_environment);
 		case ast::FLOAT_LITERAL_NODE:
-		{
-			std::shared_ptr<object::Float> object(new object::Float);
-			object->m_value = std::static_pointer_cast<ast::FloatLiteral>(p_node)->m_value;
-			return object;
-		}
+			return evaluateFloatLiteral(std::static_pointer_cast<ast::FloatLiteral>(p_node), p_environment);
 		case ast::BOOLEAN_LITERAL_NODE:
-		{
-			std::shared_ptr<object::Boolean> object(new object::Boolean);
-			object->m_value = std::static_pointer_cast<ast::BooleanLiteral>(p_node)->m_value;
-			return object;
-		}
+			return evaluateBooleanLiteral(std::static_pointer_cast<ast::BooleanLiteral>(p_node), p_environment);
 		case ast::CHARACTER_LITERAL_NODE:
-		{
-			std::shared_ptr<object::Character> object(new object::Character);
-			object->m_value = std::static_pointer_cast<ast::CharacterLiteral>(p_node)->m_value;
-			return object;
-		}
+			return evaluateCharacterLiteral(std::static_pointer_cast<ast::CharacterLiteral>(p_node), p_environment);
 		case ast::COLLECTION_LITERAL_NODE:
-		{
-			std::shared_ptr<ast::CollectionLiteral> collectionLiteral = std::static_pointer_cast<ast::CollectionLiteral>(p_node);
-			return evaluateCollectionLiteralNode(collectionLiteral, p_environment);
-		}
+			return evaluateCollectionLiteral(std::static_pointer_cast<ast::CollectionLiteral>(p_node), p_environment);
 		case ast::DICTIONARY_LITERAL_NODE:
-		{
-			std::shared_ptr<ast::DictionaryLiteral> dictionaryLiteral = std::static_pointer_cast<ast::DictionaryLiteral>(p_node);
-
-			if (dictionaryLiteral->m_map.size() == 0)
-			{
-				return std::shared_ptr<object::Dictionary>(new object::Dictionary);
-			}
-
-			std::shared_ptr<object::Dictionary> object(new object::Dictionary);
-		
-			std::map < std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>> ::iterator it;
-			for (it = dictionaryLiteral->m_map.begin(); it != dictionaryLiteral->m_map.end(); it++)
-			{
-				// Checking the key
-				std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, p_environment);
-				if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
-
-				if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
-					evaluatedKey->Type() != object::BOOLEAN && evaluatedKey->Type() != object::CHARACTER)
-				{
-					std::ostringstream error;
-					error << "Invalid dictionary key type. " << 
-						object::c_objectTypeToString.at(evaluatedKey->Type()) << " is not a hashable type.";
-					return createError(error.str());
-				}
-
-				if (object->m_keyType != object::NULL_TYPE && evaluatedKey->Type() != object->m_keyType)
-				{
-					std::ostringstream error;
-					error << "Dictionary has mismatching key types.";
-					return createError(error.str());
-				}
-
-				if (object->m_keyType == object::NULL_TYPE) object->m_keyType = evaluatedKey->Type();
-				if (object->m_map.find(evaluatedKey) != object->m_map.end())
-				{
-					std::ostringstream error;
-					error << "Dictionary initialized with duplicate key.";
-					return createError(error.str());
-				}
-
-				// Checking the value
-				std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, p_environment);
-				if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
-
-				if (object->m_valueType != object::NULL_TYPE && evaluatedValue->Type() != object->m_valueType)
-				{
-					std::ostringstream error;
-					error << "Dictionary has mismatching value types.";
-					return createError(error.str());
-				}
-
-				if (object->m_valueType == object::NULL_TYPE) object->m_valueType = evaluatedValue->Type();
-
-				// Storing key value pair
-				object->m_map.emplace(evaluatedKey, evaluatedValue);
-			}
-
-			return object;
-		}
+			return evaluateDictionaryLiteral(std::static_pointer_cast<ast::DictionaryLiteral>(p_node), p_environment);
 		case ast::STRING_LITERAL_NODE:
-		{
-			std::stringstream value;
-
-			for (int i = 0; i < (std::static_pointer_cast<ast::StringLiteral>(p_node))->m_stringCollection->m_values.size(); i++)
-			{
-				// Take expressoin from string collection and cast to character literal pointer
-				std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>((std::static_pointer_cast<ast::StringLiteral>(p_node))->m_stringCollection->m_values[i]);
-				value << characterLiteral->m_value;
-			}
-
-			std::string valueStr = value.str();
-			std::shared_ptr<object::String> object(new object::String(&valueStr));
-			return object;
-		}
+			return evaluateStringLiteral(std::static_pointer_cast<ast::StringLiteral>(p_node), p_environment);
 		case ast::PREFIX_EXPRESSION_NODE:
 		{
 			std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>(p_node);
@@ -608,7 +511,59 @@ namespace evaluator
 		return createError(error.str());
 	}
 
-	std::shared_ptr<object::Object> evaluateCollectionLiteralNode(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment)
+	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
+
+		for (int i = 0; i < p_blockStatements->m_statements.size(); i++)
+		{
+			result = evaluate(p_blockStatements->m_statements[i], p_environment);
+
+			if (result != NULL && result->Type() == object::RETURN)
+			{
+				return result;
+			}
+
+			if (result != NULL && result->Type() == object::ERROR)
+			{
+				return result;
+			}
+		}
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateIntegerLiteral(std::shared_ptr<ast::IntegerLiteral> p_integerLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Integer> object(new object::Integer);
+		object->m_value = p_integerLiteral->m_value;
+		return object;
+	}
+
+	std::shared_ptr<object::Object> evaluateFloatLiteral(std::shared_ptr<ast::FloatLiteral> p_floatLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Float> object(new object::Float);
+		object->m_value = p_floatLiteral->m_value;
+		return object;
+	}
+
+	std::shared_ptr<object::Object> evaluateBooleanLiteral(std::shared_ptr<ast::BooleanLiteral> p_booleanLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		if (p_booleanLiteral->m_value)
+		{
+			return object::TRUE_OBJECT;
+		}
+		return object::FALSE_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateCharacterLiteral(std::shared_ptr<ast::CharacterLiteral> p_characterLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Character> object(new object::Character);
+		object->m_value = p_characterLiteral->m_value;
+		return object;
+	}
+
+	std::shared_ptr<object::Object> evaluateCollectionLiteral(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment)
 	{
 		if (p_collectionLiteral->m_values.size() == 0)
 		{
@@ -637,29 +592,81 @@ namespace evaluator
 		return object;
 	}
 
-
-	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment)
+	std::shared_ptr<object::Object> evaluateDictionaryLiteral(std::shared_ptr<ast::DictionaryLiteral> p_dictionaryLiteral, std::shared_ptr<object::Environment> p_environment)
 	{
-		std::shared_ptr<object::Object> result = object::NULL_OBJECT;
-
-		for (int i = 0; i < p_blockStatements->m_statements.size(); i++)
+		if (p_dictionaryLiteral->m_map.size() == 0)
 		{
-			result = evaluate(p_blockStatements->m_statements[i], p_environment);
-
-			if (result != NULL && result->Type() == object::RETURN)
-			{
-				return result;
-			}
-
-			if (result != NULL && result->Type() == object::ERROR)
-			{
-				return result;
-			}
+			return std::shared_ptr<object::Dictionary>(new object::Dictionary);
 		}
 
-		return object::NULL_OBJECT;
+		std::shared_ptr<object::Dictionary> object(new object::Dictionary);
+
+		std::map < std::shared_ptr<ast::Expression>, std::shared_ptr<ast::Expression>> ::iterator it;
+		for (it = p_dictionaryLiteral->m_map.begin(); it != p_dictionaryLiteral->m_map.end(); it++)
+		{
+			// Checking the key
+			std::shared_ptr<object::Object> evaluatedKey = evaluate(it->first, p_environment);
+			if (evaluatedKey->Type() == object::ERROR) return evaluatedKey;
+
+			if (evaluatedKey->Type() != object::INTEGER && evaluatedKey->Type() != object::FLOAT &&
+				evaluatedKey->Type() != object::BOOLEAN && evaluatedKey->Type() != object::CHARACTER)
+			{
+				std::ostringstream error;
+				error << "Invalid dictionary key type. " <<
+					object::c_objectTypeToString.at(evaluatedKey->Type()) << " is not a hashable type.";
+				return createError(error.str());
+			}
+
+			if (object->m_keyType != object::NULL_TYPE && evaluatedKey->Type() != object->m_keyType)
+			{
+				std::ostringstream error;
+				error << "Dictionary has mismatching key types.";
+				return createError(error.str());
+			}
+
+			if (object->m_keyType == object::NULL_TYPE) object->m_keyType = evaluatedKey->Type();
+			if (object->m_map.find(evaluatedKey) != object->m_map.end())
+			{
+				std::ostringstream error;
+				error << "Dictionary initialized with duplicate key.";
+				return createError(error.str());
+			}
+
+			// Checking the value
+			std::shared_ptr<object::Object> evaluatedValue = evaluate(it->second, p_environment);
+			if (evaluatedValue->Type() == object::ERROR) return evaluatedValue;
+
+			if (object->m_valueType != object::NULL_TYPE && evaluatedValue->Type() != object->m_valueType)
+			{
+				std::ostringstream error;
+				error << "Dictionary has mismatching value types.";
+				return createError(error.str());
+			}
+
+			if (object->m_valueType == object::NULL_TYPE) object->m_valueType = evaluatedValue->Type();
+
+			// Storing key value pair
+			object->m_map.emplace(evaluatedKey, evaluatedValue);
+		}
+
+		return object;
 	}
 
+	std::shared_ptr<object::Object> evaluateStringLiteral(std::shared_ptr<ast::StringLiteral> p_stringLiteral, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::stringstream value;
+
+		for (int i = 0; i < p_stringLiteral->m_stringCollection->m_values.size(); i++)
+		{
+			// Take expression from string collection and cast to character literal pointer
+			std::shared_ptr<ast::CharacterLiteral> characterLiteral = std::static_pointer_cast<ast::CharacterLiteral>(p_stringLiteral->m_stringCollection->m_values[i]);
+			value << characterLiteral->m_value;
+		}
+
+		std::string valueStr = value.str();
+		std::shared_ptr<object::String> object(new object::String(&valueStr));
+		return object;
+	}
 
 	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment)
 	{

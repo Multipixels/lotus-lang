@@ -17,11 +17,29 @@ namespace evaluator
 	// Evaluates an identifier
 	std::shared_ptr<object::Object> evaluateIdentifier(std::shared_ptr<ast::Identifier> p_identifier, std::shared_ptr<object::Environment> p_environment);
 
-	// Evaluates a collection literal node
-	std::shared_ptr<object::Object> evaluateCollectionLiteralNode(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment);
-
 	// Evaluates a block statement
 	std::shared_ptr<object::Object> evaluateBlockStatement(std::shared_ptr<ast::BlockStatement> p_blockStatements, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an integer literal
+	std::shared_ptr<object::Object> evaluateIntegerLiteral(std::shared_ptr<ast::IntegerLiteral> p_integerLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an float literal
+	std::shared_ptr<object::Object> evaluateFloatLiteral(std::shared_ptr<ast::FloatLiteral> p_floatLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an boolean literal
+	std::shared_ptr<object::Object> evaluateBooleanLiteral(std::shared_ptr<ast::BooleanLiteral> p_booleanLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an character literal
+	std::shared_ptr<object::Object> evaluateCharacterLiteral(std::shared_ptr<ast::CharacterLiteral> p_characterLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a collection literal node
+	std::shared_ptr<object::Object> evaluateCollectionLiteral(std::shared_ptr<ast::CollectionLiteral> p_collectionLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a dictionary literal node
+	std::shared_ptr<object::Object> evaluateDictionaryLiteral(std::shared_ptr<ast::DictionaryLiteral> p_dictionaryLiteral, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a string literal node
+	std::shared_ptr<object::Object> evaluateStringLiteral(std::shared_ptr<ast::StringLiteral> p_stringLiteral, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates a list of expressions
 	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment);
