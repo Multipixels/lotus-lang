@@ -214,4 +214,6 @@ namespace object
 	extern std::shared_ptr<Null> NULL_OBJECT;
 	extern std::shared_ptr<Boolean> TRUE_OBJECT;
 	extern std::shared_ptr<Boolean> FALSE_OBJECT;
+
+	std::shared_ptr<Boolean> getBoolean(bool condition);
 }

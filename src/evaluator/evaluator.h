@@ -45,10 +45,10 @@ namespace evaluator
 	void evaluateExpressions(std::vector<std::shared_ptr<ast::Expression>>* p_source, std::vector<std::shared_ptr<object::Object>>* p_destination, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates a prefix expression
-	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject);
+	std::shared_ptr<object::Object> evaluatePrefixExpression(std::shared_ptr<ast::PrefixExpression> p_prefixOperator, std::shared_ptr<object::Environment> p_environment);
 	
 	// Evaluates an infix expression
-	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Object> p_rightObject);
+	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment);
 
 	// Evaluates an integer infix expression
 	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Integer> p_rightObject);

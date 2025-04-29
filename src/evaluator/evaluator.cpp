@@ -42,98 +42,11 @@ namespace evaluator
 		case ast::STRING_LITERAL_NODE:
 			return evaluateStringLiteral(std::static_pointer_cast<ast::StringLiteral>(p_node), p_environment);
 		case ast::PREFIX_EXPRESSION_NODE:
-		{
-			std::shared_ptr<ast::PrefixExpression> prefixExpression = std::static_pointer_cast<ast::PrefixExpression>(p_node);
-
-			std::shared_ptr<object::Object> rightObject = evaluate(prefixExpression->m_rightExpression, p_environment);
-			if (rightObject->Type() == object::ERROR) return rightObject;
-
-			return evaluatePrefixExpression(&prefixExpression->m_operator, rightObject);
-		}
+			return evaluatePrefixExpression(std::static_pointer_cast<ast::PrefixExpression>(p_node), p_environment);
 		case ast::INFIX_EXPRESSION_NODE:
-		{
-			std::shared_ptr<ast::InfixExpression> infixExpression = std::static_pointer_cast<ast::InfixExpression>(p_node);
-
-			if (infixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE && infixExpression->m_operator == "=")
-			{
-				std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(infixExpression->m_leftExpression);
-				std::shared_ptr<object::Object> savedValue = p_environment->getIdentifier(&identifier->m_name);
-				if (savedValue == NULL)
-				{
-					std::ostringstream error;
-					error << "'" << identifier->m_name << "' is not defined.";
-					return createError(error.str());
-				}
-
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment);
-
-				if (rightObject->Type() == object::ERROR) return rightObject;
-
-				if (savedValue->Type() != rightObject->Type())
-				{
-					std::ostringstream error;
-					error << "Cannot assign '" << identifier->m_name << "' of type '"
-						<< object::c_objectTypeToString.at(savedValue->Type()) << "' a value of type '"
-						<< object::c_objectTypeToString.at(rightObject->Type()) << "'.";
-					return createError(error.str());
-				}
-
-				p_environment->reassignIdentifier(&identifier->m_name, rightObject);
-
-				return object::NULL_OBJECT;
-			}
-			else if (infixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE && infixExpression->m_operator == "=")
-			{
-				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(infixExpression->m_leftExpression);
-				
-				std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, p_environment);
-				if (object->Type() == object::ERROR) return object;
-
-				std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, p_environment);
-				if (indexObject->Type() == object::ERROR) return indexObject;
-
-				std::shared_ptr<object::Object> valueObject = evaluate(infixExpression->m_rightExpression, p_environment);
-				if (valueObject->Type() == object::ERROR) return valueObject;
-
-				switch (object->Type()) {
-				case object::COLLECTION:
-				{
-					return collectionValueReassignment(std::static_pointer_cast<object::Collection>(object), indexObject, valueObject);
-				}
-				case object::DICTIONARY:
-				{
-					return dictionaryValueReassignment(std::static_pointer_cast<object::Dictionary>(object), indexObject, valueObject);
-				}
-				case object::STRING:
-				{
-					std::ostringstream error;
-					error << "Strings are immutable.";
-					return createError(error.str());
-				}
-				default:
-				{
-					std::ostringstream error;
-					error << "This should be unreachable.";
-					return createError(error.str());
-				}
-				}
-			}
-			else
-			{
-				std::shared_ptr<object::Object> leftObject = evaluate(infixExpression->m_leftExpression, p_environment);
-				if (leftObject->Type() == object::ERROR) return leftObject;
-
-				std::shared_ptr<object::Object> rightObject = evaluate(infixExpression->m_rightExpression, p_environment);
-				if (rightObject->Type() == object::ERROR) return rightObject;
-
-				return evaluateInfixExpression(leftObject, &infixExpression->m_operator, rightObject);
-			}
-		}
+			return evaluateInfixExpression(std::static_pointer_cast<ast::InfixExpression>(p_node), p_environment);
 		case ast::CALL_EXPRESSION_NODE:
-		{
-			std::shared_ptr<ast::CallExpression> callExpression = std::static_pointer_cast<ast::CallExpression>(p_node);
-			return evaluateCallExpression(callExpression, p_environment);
-		}
+			return evaluateCallExpression(std::static_pointer_cast<ast::CallExpression>(p_node), p_environment);
 		case ast::INDEX_EXPRESSION_NODE:
 		{
 			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_node);
@@ -468,7 +381,7 @@ namespace evaluator
 		}
 		}
 
-		return NULL;
+		return createError("Encountered an unexpected AST node");
 	}
 
 	std::shared_ptr<object::Object> evaluateProgram(std::shared_ptr<ast::Program> p_program, std::shared_ptr<object::Environment> p_environment)
@@ -478,16 +391,12 @@ namespace evaluator
 		for (int i = 0; i < p_program->m_statements.size(); i++)
 		{
 			result = evaluate(p_program->m_statements[i], p_environment);
+			if (result->Type() == object::ERROR) return result;
 
-			if (result != NULL && result->Type() == object::RETURN)
+			if (result->Type() == object::RETURN)
 			{
 				std::shared_ptr<object::Return> returnObj = std::static_pointer_cast<object::Return>(result);
 				return returnObj->m_returnValue;
-			}
-
-			if (result != NULL && result->Type() == object::ERROR)
-			{
-				return result;
 			}
 		}
 
@@ -684,131 +593,17 @@ namespace evaluator
 		}
 	}
 
-	std::shared_ptr<object::Object> evaluatePrefixExpression(std::string* p_prefixOperator, std::shared_ptr<object::Object> p_rightObject)
+	std::shared_ptr<object::Object> evaluatePrefixExpression(std::shared_ptr<ast::PrefixExpression> p_prefixExpression, std::shared_ptr<object::Environment> p_environment)
 	{
+		std::shared_ptr<object::Object> rightObject = evaluate(p_prefixExpression->m_rightExpression, p_environment);
+		if (rightObject->Type() == object::ERROR) return rightObject;
+
 		// TODO: Change operator to an enum for performance gain
-		if (*p_prefixOperator == "!") return evaluateBangOperatorExpression(p_rightObject);
-		if (*p_prefixOperator == "-") return evaluateMinusPrefixOperatorExpression(p_rightObject);
+		if (p_prefixExpression->m_operator == "!") return evaluateBangOperatorExpression(rightObject);
+		if (p_prefixExpression->m_operator == "-") return evaluateMinusPrefixOperatorExpression(rightObject);
 
 		std::ostringstream error;
-		error << *p_prefixOperator << object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
-		return createError(error.str());
-	}
-
-	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<object::Object> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Object> p_rightObject)
-	{
-		switch (p_leftObject->Type())
-		{
-		case object::INTEGER:
-		{
-			if (p_rightObject->Type() == object::INTEGER)
-				return evaluateIntegerInfixExpression(
-					std::static_pointer_cast<object::Integer>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Integer>(p_rightObject));
-			if (p_rightObject->Type() == object::FLOAT)
-				return evaluateFloatInfixExpression(
-					std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(p_leftObject)->m_value)), p_infixOperator, std::static_pointer_cast<object::Float>(p_rightObject));
-			break;
-		}
-		case object::FLOAT:
-		{
-			if (p_rightObject->Type() == object::INTEGER)
-				return evaluateFloatInfixExpression(
-					std::static_pointer_cast<object::Float>(p_leftObject), p_infixOperator, std::shared_ptr<object::Float>(new object::Float(std::static_pointer_cast<object::Integer>(p_rightObject)->m_value)));
-			if (p_rightObject->Type() == object::FLOAT)
-				return evaluateFloatInfixExpression(
-					std::static_pointer_cast<object::Float>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Float>(p_rightObject));
-			break;
-		}
-		case object::BOOLEAN:
-		{
-			if (p_rightObject->Type() == object::BOOLEAN)
-				return evaluateBooleanInfixExpression(
-					std::static_pointer_cast<object::Boolean>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Boolean>(p_rightObject));
-			break;
-		}
-		case object::CHARACTER:
-		{
-			if (p_rightObject->Type() == object::CHARACTER)
-				return evaluateCharacterInfixExpression(
-					std::static_pointer_cast<object::Character>(p_leftObject), p_infixOperator, std::static_pointer_cast<object::Character>(p_rightObject));
-			break;
-		}
-		}
-
-		std::ostringstream error;
-		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
-			<< ' ' << *p_infixOperator << ' '
-			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
-		return createError(error.str());
-	}
-
-	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Integer> p_rightObject)
-	{
-		// TODO: Change operator to an enum for performance gain
-		if (*p_infixOperator == "+") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value + p_rightObject->m_value));
-		if (*p_infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value - p_rightObject->m_value));
-		if (*p_infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value * p_rightObject->m_value));
-		if (*p_infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
-		if (*p_infixOperator == "<") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value < p_rightObject->m_value));
-		if (*p_infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value <= p_rightObject->m_value));
-		if (*p_infixOperator == ">") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value > p_rightObject->m_value));
-		if (*p_infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value >= p_rightObject->m_value));
-		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
-		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
-
-		std::ostringstream error;
-		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
-			<< ' ' << *p_infixOperator << ' '
-			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
-		return createError(error.str());
-	}
-
-	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Float> p_rightObject)
-	{
-		// TODO: Change operator to an enum for performance gain
-		if (*p_infixOperator == "+")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value + p_rightObject->m_value));
-		if (*p_infixOperator == "-")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value - p_rightObject->m_value));
-		if (*p_infixOperator == "*")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value * p_rightObject->m_value));
-		if (*p_infixOperator == "/")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value / p_rightObject->m_value));
-		if (*p_infixOperator == "<")  return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value < p_rightObject->m_value));
-		if (*p_infixOperator == "<=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value <= p_rightObject->m_value));
-		if (*p_infixOperator == ">")  return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value > p_rightObject->m_value));
-		if (*p_infixOperator == ">=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value >= p_rightObject->m_value));
-		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
-		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
-
-		std::ostringstream error;
-		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
-			<< ' ' << *p_infixOperator << ' '
-			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
-		return createError(error.str());
-	}
-
-	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Boolean> p_rightObject)
-	{
-		// TODO: Change operator to an enum for performance gain
-		if (*p_infixOperator == "&&") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value && p_rightObject->m_value));
-		if (*p_infixOperator == "||") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value || p_rightObject->m_value));
-		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
-		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
-
-		std::ostringstream error;
-		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
-			<< ' ' << *p_infixOperator << ' '
-			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
-		return createError(error.str());
-	}
-
-	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Character> p_rightObject)
-	{
-		// TODO: Change operator to an enum for performance gain
-		if (*p_infixOperator == "==") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value == p_rightObject->m_value));
-		if (*p_infixOperator == "!=") return std::shared_ptr<object::Boolean>(new object::Boolean(p_leftObject->m_value != p_rightObject->m_value));
-
-		std::ostringstream error;
-		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
-			<< ' ' << *p_infixOperator << ' '
-			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
+		error << p_prefixExpression->m_operator << object::c_objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 
@@ -861,6 +656,195 @@ namespace evaluator
 
 		std::ostringstream error;
 		error << "'-" << object::c_objectTypeToString.at(p_expression->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment)
+	{
+		// identifier = newValue;
+		if (p_infixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE && p_infixExpression->m_operator == "=")
+		{
+			std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(p_infixExpression->m_leftExpression);
+			std::shared_ptr<object::Object> savedValue = p_environment->getIdentifier(&identifier->m_name);
+			if (savedValue == NULL)
+			{
+				std::ostringstream error;
+				error << "'" << identifier->m_name << "' is not defined.";
+				return createError(error.str());
+			}
+
+			std::shared_ptr<object::Object> rightObject = evaluate(p_infixExpression->m_rightExpression, p_environment);
+
+			if (rightObject->Type() == object::ERROR) return rightObject;
+
+			if (savedValue->Type() != rightObject->Type())
+			{
+				std::ostringstream error;
+				error << "Cannot assign '" << identifier->m_name << "' of type '"
+					<< object::c_objectTypeToString.at(savedValue->Type()) << "' a value of type '"
+					<< object::c_objectTypeToString.at(rightObject->Type()) << "'.";
+				return createError(error.str());
+			}
+
+			p_environment->reassignIdentifier(&identifier->m_name, rightObject);
+
+			return object::NULL_OBJECT;
+		}
+
+		// variables[index] = newValue;
+		else if (p_infixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE && p_infixExpression->m_operator == "=")
+		{
+			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_infixExpression->m_leftExpression);
+
+			std::shared_ptr<object::Object> object = evaluate(indexExpression->m_collection, p_environment);
+			if (object->Type() == object::ERROR) return object;
+
+			std::shared_ptr<object::Object> indexObject = evaluate(indexExpression->m_index, p_environment);
+			if (indexObject->Type() == object::ERROR) return indexObject;
+
+			std::shared_ptr<object::Object> valueObject = evaluate(p_infixExpression->m_rightExpression, p_environment);
+			if (valueObject->Type() == object::ERROR) return valueObject;
+
+			switch (object->Type()) {
+			case object::COLLECTION:
+				return collectionValueReassignment(std::static_pointer_cast<object::Collection>(object), indexObject, valueObject);
+			case object::DICTIONARY:
+				return dictionaryValueReassignment(std::static_pointer_cast<object::Dictionary>(object), indexObject, valueObject);
+			case object::STRING:
+				return createError("Strings are immutable.");
+			default:
+				return createError("This should be an unreachable piece of code.");
+			}
+		}
+
+		// General infix expressions
+		std::shared_ptr<object::Object> leftObject = evaluate(p_infixExpression->m_leftExpression, p_environment);
+		if (leftObject->Type() == object::ERROR) return leftObject;
+
+		std::shared_ptr<object::Object> rightObject = evaluate(p_infixExpression->m_rightExpression, p_environment);
+		if (rightObject->Type() == object::ERROR) return rightObject;
+
+		switch (leftObject->Type())
+		{
+		case object::INTEGER:
+		{
+			if (rightObject->Type() == object::INTEGER)
+			{
+				return evaluateIntegerInfixExpression(std::static_pointer_cast<object::Integer>(leftObject), &p_infixExpression->m_operator, std::static_pointer_cast<object::Integer>(rightObject));
+			}
+			if (rightObject->Type() == object::FLOAT)
+			{
+				std::shared_ptr<object::Float> castedInteger(new object::Float(std::static_pointer_cast<object::Integer>(leftObject)->m_value));
+				return evaluateFloatInfixExpression(castedInteger, &p_infixExpression->m_operator, std::static_pointer_cast<object::Float>(rightObject));
+			}
+			break;
+		}
+		case object::FLOAT:
+		{
+			if (rightObject->Type() == object::INTEGER)
+			{
+				std::shared_ptr<object::Float> castedInteger(new object::Float(std::static_pointer_cast<object::Integer>(rightObject)->m_value));
+				return evaluateFloatInfixExpression(std::static_pointer_cast<object::Float>(leftObject), &p_infixExpression->m_operator, castedInteger);
+			}
+			if (rightObject->Type() == object::FLOAT)
+			{
+				return evaluateFloatInfixExpression(std::static_pointer_cast<object::Float>(leftObject), &p_infixExpression->m_operator, std::static_pointer_cast<object::Float>(rightObject));
+			}
+			break;
+		}
+		case object::BOOLEAN:
+		{
+			if (rightObject->Type() == object::BOOLEAN)
+			{
+				return evaluateBooleanInfixExpression(std::static_pointer_cast<object::Boolean>(leftObject), &p_infixExpression->m_operator, std::static_pointer_cast<object::Boolean>(rightObject));
+			}
+			break;
+		}
+		case object::CHARACTER:
+		{
+			if (rightObject->Type() == object::CHARACTER)
+			{
+				return evaluateCharacterInfixExpression(std::static_pointer_cast<object::Character>(leftObject), &p_infixExpression->m_operator, std::static_pointer_cast<object::Character>(rightObject));
+			}
+			break;
+		}
+		}
+
+		std::ostringstream error;
+		error << "'" << object::c_objectTypeToString.at(leftObject->Type())
+			<< ' ' << *&p_infixExpression->m_operator << ' '
+			<< object::c_objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateIntegerInfixExpression(std::shared_ptr<object::Integer> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Integer> p_rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*p_infixOperator == "+") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value + p_rightObject->m_value));
+		if (*p_infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value - p_rightObject->m_value));
+		if (*p_infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value * p_rightObject->m_value));
+		if (*p_infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
+
+		if (*p_infixOperator == "<")  return object::getBoolean(p_leftObject->m_value < p_rightObject->m_value);
+		if (*p_infixOperator == "<=") return object::getBoolean(p_leftObject->m_value <= p_rightObject->m_value);
+		if (*p_infixOperator == ">")  return object::getBoolean(p_leftObject->m_value > p_rightObject->m_value);
+		if (*p_infixOperator == ">=") return object::getBoolean(p_leftObject->m_value >= p_rightObject->m_value);
+		if (*p_infixOperator == "==") return object::getBoolean(p_leftObject->m_value == p_rightObject->m_value);
+		if (*p_infixOperator == "!=") return object::getBoolean(p_leftObject->m_value != p_rightObject->m_value);
+
+		std::ostringstream error;
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Float> p_rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*p_infixOperator == "+")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value + p_rightObject->m_value));
+		if (*p_infixOperator == "-")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value - p_rightObject->m_value));
+		if (*p_infixOperator == "*")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value * p_rightObject->m_value));
+		if (*p_infixOperator == "/")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value / p_rightObject->m_value));
+		if (*p_infixOperator == "<")  return object::getBoolean(p_leftObject->m_value < p_rightObject->m_value);
+		if (*p_infixOperator == "<=") return object::getBoolean(p_leftObject->m_value <= p_rightObject->m_value);
+		if (*p_infixOperator == ">")  return object::getBoolean(p_leftObject->m_value > p_rightObject->m_value);
+		if (*p_infixOperator == ">=") return object::getBoolean(p_leftObject->m_value >= p_rightObject->m_value);
+		if (*p_infixOperator == "==") return object::getBoolean(p_leftObject->m_value == p_rightObject->m_value);
+		if (*p_infixOperator == "!=") return object::getBoolean(p_leftObject->m_value != p_rightObject->m_value);
+
+		std::ostringstream error;
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateBooleanInfixExpression(std::shared_ptr<object::Boolean> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Boolean> p_rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*p_infixOperator == "&&") return object::getBoolean(p_leftObject->m_value && p_rightObject->m_value);
+		if (*p_infixOperator == "||") return object::getBoolean(p_leftObject->m_value || p_rightObject->m_value);
+		if (*p_infixOperator == "==") return object::getBoolean(p_leftObject->m_value == p_rightObject->m_value);
+		if (*p_infixOperator == "!=") return object::getBoolean(p_leftObject->m_value != p_rightObject->m_value);
+
+		std::ostringstream error;
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
+		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluateCharacterInfixExpression(std::shared_ptr<object::Character> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Character> p_rightObject)
+	{
+		// TODO: Change operator to an enum for performance gain
+		if (*p_infixOperator == "==") return object::getBoolean(p_leftObject->m_value == p_rightObject->m_value);
+		if (*p_infixOperator == "!=") return object::getBoolean(p_leftObject->m_value != p_rightObject->m_value);
+
+		std::ostringstream error;
+		error << "'" << object::c_objectTypeToString.at(p_leftObject->Type())
+			<< ' ' << *p_infixOperator << ' '
+			<< object::c_objectTypeToString.at(p_rightObject->Type()) << "\' is not supported.";
 		return createError(error.str());
 	}
 

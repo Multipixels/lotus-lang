@@ -376,4 +376,15 @@ namespace object
 		output << "builtin function";
 		return output.str();
 	}
+
+
+
+	std::shared_ptr<Boolean> getBoolean(bool condition)
+	{
+		if (condition)
+		{
+			return TRUE_OBJECT;
+		}
+		return FALSE_OBJECT;
+	}
 }
