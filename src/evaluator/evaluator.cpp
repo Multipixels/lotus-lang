@@ -954,7 +954,6 @@ namespace evaluator
 	std::shared_ptr<object::Object> evaluateForStatement(std::shared_ptr<ast::ForStatement> p_forStatement, std::shared_ptr<object::Environment> p_environment)
 	{
 		std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(p_environment));
-		std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
 
 		std::shared_ptr<object::Object> evaluatedInitialization = evaluate(p_forStatement->m_initialization, forConditionEnvironment);
 		if (evaluatedInitialization->Type() == object::ERROR)
@@ -964,6 +963,7 @@ namespace evaluator
 
 		while (true)
 		{
+			std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
 			std::shared_ptr<object::Object> evaluatedCondition = evaluate(p_forStatement->m_condition, forConditionEnvironment);
 			if (evaluatedCondition->Type() == object::ERROR)
 			{

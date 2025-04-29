@@ -554,6 +554,7 @@ TEST(EvaluatorTest, ForLoop)
 		{"integer myInt = 5; for(; myInt < 5; myInt = myInt + 1;) { myInt = myInt + 1; } myInt;", 5},
 		{"integer myInt = 5; for(; myInt < 10; myInt = myInt + 1;) { myInt = myInt + 1; } myInt;", 11},
 		{"integer myInt = 5; for(; myInt < 10; ;) { myInt = myInt + 1; } myInt;", 10},
+		{"integer myInt = 0; for(integer i = 0; i < 5; i = i + 1;) { integer myInteger = i + 1; myInt = myInt + myInteger; } myInt;", 15},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
