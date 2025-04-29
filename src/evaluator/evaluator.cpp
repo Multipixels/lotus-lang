@@ -12,373 +12,38 @@ namespace evaluator
 	{
 		if (g_timeout != std::chrono::steady_clock::time_point() && g_timeout < std::chrono::steady_clock::now())
 		{
-			std::ostringstream error;
-			error << "Evaluation of the program timed out.";
-			return createError(error.str());
+			return createError("Evaluation of the program timed out.");
 		}
 
 		if (p_node == NULL) return object::NULL_OBJECT;
 
 		switch (p_node->Type())
 		{
-		case ast::PROGRAM_NODE:
-			return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment);
-		case ast::IDENTIFIER_NODE:
-			return evaluateIdentifier(std::static_pointer_cast<ast::Identifier>(p_node), p_environment);
-		case ast::BLOCK_STATEMENT_NODE:
-			return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment);
-		case ast::INTEGER_LITERAL_NODE:
-			return evaluateIntegerLiteral(std::static_pointer_cast<ast::IntegerLiteral>(p_node), p_environment);
-		case ast::FLOAT_LITERAL_NODE:
-			return evaluateFloatLiteral(std::static_pointer_cast<ast::FloatLiteral>(p_node), p_environment);
-		case ast::BOOLEAN_LITERAL_NODE:
-			return evaluateBooleanLiteral(std::static_pointer_cast<ast::BooleanLiteral>(p_node), p_environment);
-		case ast::CHARACTER_LITERAL_NODE:
-			return evaluateCharacterLiteral(std::static_pointer_cast<ast::CharacterLiteral>(p_node), p_environment);
-		case ast::COLLECTION_LITERAL_NODE:
-			return evaluateCollectionLiteral(std::static_pointer_cast<ast::CollectionLiteral>(p_node), p_environment);
-		case ast::DICTIONARY_LITERAL_NODE:
-			return evaluateDictionaryLiteral(std::static_pointer_cast<ast::DictionaryLiteral>(p_node), p_environment);
-		case ast::STRING_LITERAL_NODE:
-			return evaluateStringLiteral(std::static_pointer_cast<ast::StringLiteral>(p_node), p_environment);
-		case ast::PREFIX_EXPRESSION_NODE:
-			return evaluatePrefixExpression(std::static_pointer_cast<ast::PrefixExpression>(p_node), p_environment);
-		case ast::INFIX_EXPRESSION_NODE:
-			return evaluateInfixExpression(std::static_pointer_cast<ast::InfixExpression>(p_node), p_environment);
-		case ast::CALL_EXPRESSION_NODE:
-			return evaluateCallExpression(std::static_pointer_cast<ast::CallExpression>(p_node), p_environment);
-		case ast::INDEX_EXPRESSION_NODE:
-		{
-			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_node);
-			return evaluateIndexExpression(indexExpression, p_environment);
-		}
-		case ast::DECLARE_VARIABLE_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::DeclareVariableStatement> declareVariableStatement = std::static_pointer_cast<ast::DeclareVariableStatement>(p_node);
-
-			if (p_environment->getLocalIdentifier(&declareVariableStatement->m_name.m_name) != NULL)
-			{
-				std::ostringstream error;
-				error << "Redefinition of '" << declareVariableStatement->m_name.m_name << "'.";
-				return createError(error.str());
-			}
-
-			std::shared_ptr<object::Object> object = evaluate(declareVariableStatement->m_value, p_environment);
-
-			if (object->Type() == object::ERROR)
-			{
-				return object;
-			}
-
-			if (declareVariableStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
-			{
-				std::ostringstream error;
-				error << "'" << declareVariableStatement->m_name.m_name
-					<< "' is defined as type '" << declareVariableStatement->m_token.m_literal
-					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
-				return createError(error.str());
-			}
-
-			p_environment->setIdentifier(&declareVariableStatement->m_name.m_name, object);
-
-			return object::NULL_OBJECT;
-		}
-		case ast::DECLARE_COLLECTION_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::DeclareCollectionStatement> declareCollectionStatement = std::static_pointer_cast<ast::DeclareCollectionStatement>(p_node);
-
-			if (p_environment->getLocalIdentifier(&declareCollectionStatement->m_name.m_name) != NULL)
-			{
-				std::ostringstream error;
-				error << "Redefinition of '" << declareCollectionStatement->m_name.m_name << "'.";
-				return createError(error.str());
-			}
-
-			std::shared_ptr<object::Object> object = evaluate(declareCollectionStatement->m_value, p_environment);
-
-			if (object->Type() == object::ERROR)
-			{
-				return object;
-			}
-
-			if (declareCollectionStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
-			{
-				std::ostringstream error;
-				error << "'" << declareCollectionStatement->m_name.m_name
-					<< "' is defined as type '" << declareCollectionStatement->m_token.m_literal
-					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
-				return createError(error.str());
-			}
-
-			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(object);
-
-			if (collection->m_collectionType != object::NULL_TYPE && declareCollectionStatement->m_typeToken.m_literal != object::c_objectTypeToString.at(collection->m_collectionType))
-			{
-				std::ostringstream error;
-				error << "'" << declareCollectionStatement->m_name.m_name
-					<< "' is a collection of '" << declareCollectionStatement->m_typeToken.m_literal
-					<< "'s, but got a collection of type '" << object::c_objectTypeToString.at(collection->m_collectionType) << "'s.";
-				return createError(error.str());
-			}
-
-			p_environment->setIdentifier(&declareCollectionStatement->m_name.m_name, object);
-
-			return object::NULL_OBJECT;
-		}
-		case ast::DECLARE_DICTIONARY_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::DeclareDictionaryStatement> declareDictionaryStatement = std::static_pointer_cast<ast::DeclareDictionaryStatement>(p_node);
-
-			if (p_environment->getLocalIdentifier(&declareDictionaryStatement->m_name.m_name) != NULL)
-			{
-				std::ostringstream error;
-				error << "Redefinition of '" << declareDictionaryStatement->m_name.m_name << "'.";
-				return createError(error.str());
-			}
-
-			std::shared_ptr<object::Object> object = evaluate(declareDictionaryStatement->m_value, p_environment);
-
-			if (object->Type() == object::ERROR)
-			{
-				return object;
-			}
-
-			if (declareDictionaryStatement->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
-			{
-				std::ostringstream error;
-				error << "'" << declareDictionaryStatement->m_name.m_name
-					<< "' is defined as type '" << declareDictionaryStatement->m_token.m_literal
-					<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
-				return createError(error.str());
-			}
-
-			std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(object);
-
-			if (dictionary->m_keyType != object::NULL_TYPE && 
-				(declareDictionaryStatement->m_keyTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_keyType) || 
-				 declareDictionaryStatement->m_valueTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_valueType)))
-			{
-				std::ostringstream error;
-				error << "'" << declareDictionaryStatement->m_name.m_name
-					<< "' is a dictionary of <" << declareDictionaryStatement->m_keyTypeToken.m_literal << ", " << declareDictionaryStatement->m_valueTypeToken.m_literal
-					<< "> pairs, but got a dictionary of type <" 
-					<< object::c_objectTypeToString.at(dictionary->m_keyType) << ", " << object::c_objectTypeToString.at(dictionary->m_valueType) << "> pairs.";
-				return createError(error.str());
-			}
-
-			p_environment->setIdentifier(&declareDictionaryStatement->m_name.m_name, object);
-
-			return object::NULL_OBJECT;
-		}
-		case ast::DECLARE_FUNCTION_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::DeclareFunctionStatement> declareFunctionStatement = std::static_pointer_cast<ast::DeclareFunctionStatement>(p_node);
-
-			if (object::c_nodeTypeToObjectType.count(declareFunctionStatement->m_token.m_type) == 0)
-			{
-				std::ostringstream error;
-				error << "'" << declareFunctionStatement->m_token.m_literal
-					<< "' is not a valid function type.";
-				return createError(error.str());
-			}
-
-			object::ObjectType functionType = object::c_nodeTypeToObjectType.at(declareFunctionStatement->m_token.m_type);
-			std::shared_ptr<object::Function> result(new object::Function(functionType, declareFunctionStatement, p_environment));
-
-			p_environment->setIdentifier(&declareFunctionStatement->m_name.m_name, result);
-
-			return object::NULL_OBJECT;
-		}
-		case ast::RETURN_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::ReturnStatement> returnStatement = std::static_pointer_cast<ast::ReturnStatement>(p_node);
-			return std::shared_ptr<object::Object>(new object::Return(evaluate(returnStatement->m_returnValue, p_environment)));
-		}
-		case ast::EXPRESSION_STATEMENT_NODE:
-			return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(p_node)->m_expression, p_environment);
-		case ast::IF_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::IfStatement> ifStatement = std::static_pointer_cast<ast::IfStatement>(p_node);
-
-			// Treat as else caluse
-			if (ifStatement->m_condition == NULL)
-			{
-				std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
-				return evaluate(ifStatement->m_consequence, ifEnvironment);
-			}
-
-			std::shared_ptr<object::Object> evaluatedCondition = evaluate(ifStatement->m_condition, p_environment);
-
-			if (evaluatedCondition->Type() == object::ERROR)
-			{
-				return evaluatedCondition;
-			}
-
-			std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
-
-			if (truthy->Type() == object::ERROR)
-			{
-				return truthy;
-			}
-
-			std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
-			std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
-
-			if (truthyBoolean->m_value)
-			{
-				return evaluate(ifStatement->m_consequence, ifEnvironment);
-			}
-			else if (ifStatement->m_alternative != NULL)
-			{
-				return evaluate(ifStatement->m_alternative, ifEnvironment);
-			}
-			else
-			{
-				return object::NULL_OBJECT;
-			}
-		}
-		case ast::WHILE_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::WhileStatement> whileStatement = std::static_pointer_cast<ast::WhileStatement>(p_node);
-			std::shared_ptr<object::Environment> whileEnvironment(new object::Environment(p_environment));
-
-			while (true)
-			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(whileStatement->m_condition, p_environment);
-				if (evaluatedCondition->Type() == object::ERROR)
-				{
-					return evaluatedCondition;
-				}
-
-				std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
-				if (truthy->Type() == object::ERROR)
-				{
-					return truthy;
-				}
-
-				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
-				if (!truthyBoolean->m_value) break;
-
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(whileStatement->m_consequence, whileEnvironment);
-				if (evaluatedConsequence->Type() == object::ERROR)
-				{
-					return evaluatedConsequence;
-				}
-			}
-
-			return object::NULL_OBJECT;
-		}
-		case ast::DO_WHILE_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::DoWhileStatement> doWhileStatement = std::static_pointer_cast<ast::DoWhileStatement>(p_node);
-			std::shared_ptr<object::Environment> doWhileEnvironment(new object::Environment(p_environment));
-
-			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
-			if (evaluatedConsequence->Type() == object::ERROR)
-			{
-				return evaluatedConsequence;
-			}
-
-			while (true)
-			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(doWhileStatement->m_condition, p_environment);
-				if (evaluatedCondition->Type() == object::ERROR)
-				{
-					return evaluatedCondition;
-				}
-
-				std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
-				if (truthy->Type() == object::ERROR)
-				{
-					return truthy;
-				}
-
-				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
-				if (!truthyBoolean->m_value) break;
-
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(doWhileStatement->m_consequence, doWhileEnvironment);
-				if (evaluatedConsequence->Type() == object::ERROR)
-				{
-					return evaluatedConsequence;
-				}
-			}
-
-			return object::NULL_OBJECT;
-		}
-		case ast::FOR_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::ForStatement> forStatement = std::static_pointer_cast<ast::ForStatement>(p_node);
-			std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(p_environment));
-			std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
-
-			std::shared_ptr<object::Object> evaluatedInitialization = evaluate(forStatement->m_initialization, forConditionEnvironment);
-			if (evaluatedInitialization->Type() == object::ERROR)
-			{
-				return evaluatedInitialization;
-			}
-
-			while (true)
-			{
-				std::shared_ptr<object::Object> evaluatedCondition = evaluate(forStatement->m_condition, forConditionEnvironment);
-				if (evaluatedCondition->Type() == object::ERROR)
-				{
-					return evaluatedCondition;
-				}
-
-				std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
-				if (truthy->Type() == object::ERROR)
-				{
-					return truthy;
-				}
-
-				std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
-				if (!truthyBoolean->m_value) break;
-
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(forStatement->m_consequence, forEnvironment);
-				if (evaluatedConsequence->Type() == object::ERROR)
-				{
-					return evaluatedConsequence;
-				}
-
-				std::shared_ptr<object::Object> evaluatedUpdation = evaluate(forStatement->m_updation, forConditionEnvironment);
-				if (evaluatedUpdation->Type() == object::ERROR)
-				{
-					return evaluatedUpdation;
-				}
-			}
-
-			return object::NULL_OBJECT;
-		}
-		case ast::ITERATE_STATEMENT_NODE:
-		{
-			std::shared_ptr<ast::IterateStatement> iterateStatement = std::static_pointer_cast<ast::IterateStatement>(p_node);
-			std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(p_environment));
-
-			std::shared_ptr<object::Object> evaluatedCollection = evaluate(iterateStatement->m_collection, p_environment);
-			if (evaluatedCollection->Type() == object::ERROR)
-			{
-				return evaluatedCollection;
-			}
-
-			if (evaluatedCollection->Type() != object::COLLECTION)
-			{
-				std::ostringstream error;
-				error << "Expected to see a collection to iterate over. Instead got a(n) '"
-					<< object::c_objectTypeToString.at(evaluatedCollection->Type()) << "'.";
-				return createError(error.str());
-			}
-			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(evaluatedCollection);
-
-			for (std::shared_ptr<object::Object> value : collection->m_values)
-			{
-				iterateEnvironment->setIdentifier(&iterateStatement->m_var->m_name, value);
-
-				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(iterateStatement->m_consequence, iterateEnvironment);
-				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
-			}
-
-			return object::NULL_OBJECT;
-		}
+			case ast::PROGRAM_NODE:                      return evaluateProgram(std::static_pointer_cast<ast::Program>(p_node), p_environment);
+			case ast::IDENTIFIER_NODE:                   return evaluateIdentifier(std::static_pointer_cast<ast::Identifier>(p_node), p_environment);
+			case ast::BLOCK_STATEMENT_NODE:              return evaluateBlockStatement(std::static_pointer_cast<ast::BlockStatement>(p_node), p_environment);
+			case ast::INTEGER_LITERAL_NODE:              return evaluateIntegerLiteral(std::static_pointer_cast<ast::IntegerLiteral>(p_node), p_environment);
+			case ast::FLOAT_LITERAL_NODE:                return evaluateFloatLiteral(std::static_pointer_cast<ast::FloatLiteral>(p_node), p_environment);
+			case ast::BOOLEAN_LITERAL_NODE:              return evaluateBooleanLiteral(std::static_pointer_cast<ast::BooleanLiteral>(p_node), p_environment);
+			case ast::CHARACTER_LITERAL_NODE:            return evaluateCharacterLiteral(std::static_pointer_cast<ast::CharacterLiteral>(p_node), p_environment);
+			case ast::COLLECTION_LITERAL_NODE:           return evaluateCollectionLiteral(std::static_pointer_cast<ast::CollectionLiteral>(p_node), p_environment);
+			case ast::DICTIONARY_LITERAL_NODE:           return evaluateDictionaryLiteral(std::static_pointer_cast<ast::DictionaryLiteral>(p_node), p_environment);
+			case ast::STRING_LITERAL_NODE:               return evaluateStringLiteral(std::static_pointer_cast<ast::StringLiteral>(p_node), p_environment);
+			case ast::PREFIX_EXPRESSION_NODE:            return evaluatePrefixExpression(std::static_pointer_cast<ast::PrefixExpression>(p_node), p_environment);
+			case ast::INFIX_EXPRESSION_NODE:             return evaluateInfixExpression(std::static_pointer_cast<ast::InfixExpression>(p_node), p_environment);
+			case ast::CALL_EXPRESSION_NODE:              return evaluateCallExpression(std::static_pointer_cast<ast::CallExpression>(p_node), p_environment);
+			case ast::INDEX_EXPRESSION_NODE:             return evaluateIndexExpression(std::static_pointer_cast<ast::IndexExpression>(p_node), p_environment);
+			case ast::DECLARE_VARIABLE_STATEMENT_NODE:   return evaluateDeclareVariable(std::static_pointer_cast<ast::DeclareVariableStatement>(p_node), p_environment);
+			case ast::DECLARE_COLLECTION_STATEMENT_NODE: return evaluateDeclareCollection(std::static_pointer_cast<ast::DeclareCollectionStatement>(p_node), p_environment);
+			case ast::DECLARE_DICTIONARY_STATEMENT_NODE: return evaluateDeclareDictionary(std::static_pointer_cast<ast::DeclareDictionaryStatement>(p_node), p_environment);
+			case ast::DECLARE_FUNCTION_STATEMENT_NODE:   return evaluateDeclareFunction(std::static_pointer_cast<ast::DeclareFunctionStatement>(p_node), p_environment);
+			case ast::RETURN_STATEMENT_NODE:             return evaluateReturnStatement(std::static_pointer_cast<ast::ReturnStatement>(p_node), p_environment);
+			case ast::EXPRESSION_STATEMENT_NODE:         return evaluate(std::static_pointer_cast<ast::ExpressionStatement>(p_node)->m_expression, p_environment);
+			case ast::IF_STATEMENT_NODE:                 return evaluateIfStatement(std::static_pointer_cast<ast::IfStatement>(p_node), p_environment);
+			case ast::WHILE_STATEMENT_NODE:              return evaluateWhileStatement(std::static_pointer_cast<ast::WhileStatement>(p_node), p_environment);
+			case ast::DO_WHILE_STATEMENT_NODE:           return evaluateDoWhileStatement(std::static_pointer_cast<ast::DoWhileStatement>(p_node), p_environment);
+			case ast::FOR_STATEMENT_NODE:                return evaluateForStatement(std::static_pointer_cast<ast::ForStatement>(p_node), p_environment);
+			case ast::ITERATE_STATEMENT_NODE:            return evaluateIterateStatement(std::static_pointer_cast<ast::IterateStatement>(p_node), p_environment);
 		}
 
 		return createError("Encountered an unexpected AST node");
@@ -528,17 +193,13 @@ namespace evaluator
 
 			if (object->m_keyType != object::NULL_TYPE && evaluatedKey->Type() != object->m_keyType)
 			{
-				std::ostringstream error;
-				error << "Dictionary has mismatching key types.";
-				return createError(error.str());
+				return createError("Dictionary has mismatching key types.");
 			}
 
 			if (object->m_keyType == object::NULL_TYPE) object->m_keyType = evaluatedKey->Type();
 			if (object->m_map.find(evaluatedKey) != object->m_map.end())
 			{
-				std::ostringstream error;
-				error << "Dictionary initialized with duplicate key.";
-				return createError(error.str());
+				return createError("Dictionary initialized with duplicate key.");
 			}
 
 			// Checking the value
@@ -547,9 +208,7 @@ namespace evaluator
 
 			if (object->m_valueType != object::NULL_TYPE && evaluatedValue->Type() != object->m_valueType)
 			{
-				std::ostringstream error;
-				error << "Dictionary has mismatching value types.";
-				return createError(error.str());
+				return createError("Dictionary has mismatching value types.");
 			}
 
 			if (object->m_valueType == object::NULL_TYPE) object->m_valueType = evaluatedValue->Type();
@@ -848,6 +507,54 @@ namespace evaluator
 		return createError(error.str());
 	}
 
+	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject)
+	{
+		if (p_indexObject->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << p_indexObject->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		std::shared_ptr<object::Integer> index = std::static_pointer_cast<object::Integer>(p_indexObject);
+
+		if (index->m_value < 0)
+		{
+			std::ostringstream error;
+			error << "Invalid index: '" << index->Inspect() << "'";
+			return createError(error.str());
+		}
+
+		if (index->m_value >= (p_collection->m_values.size())) return createError("Index out of bounds.");
+
+		if (p_valueObject->Type() != p_collection->m_collectionType)
+		{
+			std::ostringstream error;
+			error << "'The collection has values of type '" << object::c_objectTypeToString.at(p_collection->m_collectionType)
+				<< "'. Got value of type '" << object::c_objectTypeToString.at(p_valueObject->Type()) << "'.";
+			return createError(error.str());
+		}
+
+		p_collection->m_values[index->m_value] = p_valueObject;
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject)
+	{
+		if (p_keyObject->Type() != p_dictionary->m_keyType)
+		{
+			std::ostringstream error;
+			error << "Dictionary has keys of type: '" <<
+				object::c_objectTypeToString.at(p_dictionary->m_keyType) <<
+				"'. Got type: '" << object::c_objectTypeToString.at(p_keyObject->Type()) << "'";
+			return createError(error.str());
+		}
+
+		p_dictionary->m_map[p_keyObject] = p_valueObject;
+		return object::NULL_OBJECT;
+	}
+
+
 	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment)
 	{
 		std::shared_ptr<object::Object> expression = evaluate(p_callExpression->m_function, p_environment);
@@ -995,50 +702,326 @@ namespace evaluator
 	}
 
 
-	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject)
+	std::shared_ptr<object::Object> evaluateDeclareVariable(std::shared_ptr<ast::DeclareVariableStatement> p_declareVariable, std::shared_ptr<object::Environment> p_environment)
 	{
-		if (p_indexObject->Type() != object::INTEGER)
+		if (p_environment->getLocalIdentifier(&p_declareVariable->m_name.m_name) != NULL)
 		{
 			std::ostringstream error;
-			error << "Invalid index: '" << p_indexObject->Inspect() << "'";
+			error << "Redefinition of '" << p_declareVariable->m_name.m_name << "'.";
 			return createError(error.str());
 		}
 
-		std::shared_ptr<object::Integer> index = std::static_pointer_cast<object::Integer>(p_indexObject);
+		std::shared_ptr<object::Object> object = evaluate(p_declareVariable->m_value, p_environment);
 
-		if (index->m_value < 0)
+		if (object->Type() == object::ERROR)
+		{
+			return object;
+		}
+
+		if (p_declareVariable->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
 		{
 			std::ostringstream error;
-			error << "Invalid index: '" << index->Inspect() << "'";
+			error << "'" << p_declareVariable->m_name.m_name
+				<< "' is defined as type '" << p_declareVariable->m_token.m_literal
+				<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
 			return createError(error.str());
 		}
 
-		if (index->m_value >= (p_collection->m_values.size())) return createError("Index out of bounds.");
+		p_environment->setIdentifier(&p_declareVariable->m_name.m_name, object);
 
-		if (p_valueObject->Type() != p_collection->m_collectionType)
-		{
-			std::ostringstream error;
-			error << "'The collection has values of type '" << object::c_objectTypeToString.at(p_collection->m_collectionType)
-				<< "'. Got value of type '" << object::c_objectTypeToString.at(p_valueObject->Type()) << "'.";
-			return createError(error.str());
-		}
-
-		p_collection->m_values[index->m_value] = p_valueObject;
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject)
+
+	std::shared_ptr<object::Object> evaluateDeclareCollection(std::shared_ptr<ast::DeclareCollectionStatement> p_declareCollection, std::shared_ptr<object::Environment> p_environment)
 	{
-		if (p_keyObject->Type() != p_dictionary->m_keyType)
+		if (p_environment->getLocalIdentifier(&p_declareCollection->m_name.m_name) != NULL)
 		{
 			std::ostringstream error;
-			error << "Dictionary has keys of type: '" <<
-				object::c_objectTypeToString.at(p_dictionary->m_keyType) <<
-				"'. Got type: '" << object::c_objectTypeToString.at(p_keyObject->Type()) << "'";
+			error << "Redefinition of '" << p_declareCollection->m_name.m_name << "'.";
 			return createError(error.str());
 		}
 
-		p_dictionary->m_map[p_keyObject] = p_valueObject;
+		std::shared_ptr<object::Object> object = evaluate(p_declareCollection->m_value, p_environment);
+
+		if (object->Type() == object::ERROR)
+		{
+			return object;
+		}
+
+		if (p_declareCollection->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
+		{
+			std::ostringstream error;
+			error << "'" << p_declareCollection->m_name.m_name
+				<< "' is defined as type '" << p_declareCollection->m_token.m_literal
+				<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
+			return createError(error.str());
+		}
+
+		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(object);
+
+		if (collection->m_collectionType != object::NULL_TYPE && p_declareCollection->m_typeToken.m_literal != object::c_objectTypeToString.at(collection->m_collectionType))
+		{
+			std::ostringstream error;
+			error << "'" << p_declareCollection->m_name.m_name
+				<< "' is a collection of '" << p_declareCollection->m_typeToken.m_literal
+				<< "'s, but got a collection of type '" << object::c_objectTypeToString.at(collection->m_collectionType) << "'s.";
+			return createError(error.str());
+		}
+
+		p_environment->setIdentifier(&p_declareCollection->m_name.m_name, object);
+
+		return object::NULL_OBJECT;
+	}
+
+
+	std::shared_ptr<object::Object> evaluateDeclareDictionary(std::shared_ptr<ast::DeclareDictionaryStatement> p_declareDictionary, std::shared_ptr<object::Environment> p_environment)
+	{
+		if (p_environment->getLocalIdentifier(&p_declareDictionary->m_name.m_name) != NULL)
+		{
+			std::ostringstream error;
+			error << "Redefinition of '" << p_declareDictionary->m_name.m_name << "'.";
+			return createError(error.str());
+		}
+
+		std::shared_ptr<object::Object> object = evaluate(p_declareDictionary->m_value, p_environment);
+
+		if (object->Type() == object::ERROR)
+		{
+			return object;
+		}
+
+		if (p_declareDictionary->m_token.m_literal != object::c_objectTypeToString.at(object->Type()))
+		{
+			std::ostringstream error;
+			error << "'" << p_declareDictionary->m_name.m_name
+				<< "' is defined as type '" << p_declareDictionary->m_token.m_literal
+				<< "', not '" << (object::c_objectTypeToString.at(object->Type())) << "'.";
+			return createError(error.str());
+		}
+
+		std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(object);
+
+		if (dictionary->m_keyType != object::NULL_TYPE &&
+			(p_declareDictionary->m_keyTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_keyType) ||
+				p_declareDictionary->m_valueTypeToken.m_literal != object::c_objectTypeToString.at(dictionary->m_valueType)))
+		{
+			std::ostringstream error;
+			error << "'" << p_declareDictionary->m_name.m_name
+				<< "' is a dictionary of <" << p_declareDictionary->m_keyTypeToken.m_literal << ", " << p_declareDictionary->m_valueTypeToken.m_literal
+				<< "> pairs, but got a dictionary of type <"
+				<< object::c_objectTypeToString.at(dictionary->m_keyType) << ", " << object::c_objectTypeToString.at(dictionary->m_valueType) << "> pairs.";
+			return createError(error.str());
+		}
+
+		p_environment->setIdentifier(&p_declareDictionary->m_name.m_name, object);
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateDeclareFunction(std::shared_ptr<ast::DeclareFunctionStatement> p_declareFunction, std::shared_ptr<object::Environment> p_environment)
+	{
+		if (object::c_nodeTypeToObjectType.count(p_declareFunction->m_token.m_type) == 0)
+		{
+			std::ostringstream error;
+			error << "'" << p_declareFunction->m_token.m_literal
+				<< "' is not a valid function type.";
+			return createError(error.str());
+		}
+
+		object::ObjectType functionType = object::c_nodeTypeToObjectType.at(p_declareFunction->m_token.m_type);
+		std::shared_ptr<object::Function> result(new object::Function(functionType, p_declareFunction, p_environment));
+
+		p_environment->setIdentifier(&p_declareFunction->m_name.m_name, result);
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateReturnStatement(std::shared_ptr<ast::ReturnStatement> p_returnStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		return std::shared_ptr<object::Object>(new object::Return(evaluate(p_returnStatement->m_returnValue, p_environment)));
+	}
+
+	std::shared_ptr<object::Object> evaluateIfStatement(std::shared_ptr<ast::IfStatement> p_ifStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		// Treat as else caluse
+		if (p_ifStatement->m_condition == NULL)
+		{
+			std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
+			return evaluate(p_ifStatement->m_consequence, ifEnvironment);
+		}
+
+		std::shared_ptr<object::Object> evaluatedCondition = evaluate(p_ifStatement->m_condition, p_environment);
+
+		if (evaluatedCondition->Type() == object::ERROR)
+		{
+			return evaluatedCondition;
+		}
+
+		std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
+
+		if (truthy->Type() == object::ERROR)
+		{
+			return truthy;
+		}
+
+		std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
+		std::shared_ptr<object::Environment> ifEnvironment(new object::Environment(p_environment));
+
+		if (truthyBoolean->m_value)
+		{
+			return evaluate(p_ifStatement->m_consequence, ifEnvironment);
+		}
+		else if (p_ifStatement->m_alternative != NULL)
+		{
+			return evaluate(p_ifStatement->m_alternative, ifEnvironment);
+		}
+		else
+		{
+			return object::NULL_OBJECT;
+		}
+	}
+	
+	std::shared_ptr<object::Object> evaluateWhileStatement(std::shared_ptr<ast::WhileStatement> p_whileStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Environment> whileEnvironment(new object::Environment(p_environment));
+
+		while (true)
+		{
+			std::shared_ptr<object::Object> evaluatedCondition = evaluate(p_whileStatement->m_condition, p_environment);
+			if (evaluatedCondition->Type() == object::ERROR)
+			{
+				return evaluatedCondition;
+			}
+
+			std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
+			if (truthy->Type() == object::ERROR)
+			{
+				return truthy;
+			}
+
+			std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
+			if (!truthyBoolean->m_value) break;
+
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_whileStatement->m_consequence, whileEnvironment);
+			if (evaluatedConsequence->Type() == object::ERROR)
+			{
+				return evaluatedConsequence;
+			}
+		}
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateDoWhileStatement(std::shared_ptr<ast::DoWhileStatement> p_doWhileStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Environment> doWhileEnvironment(new object::Environment(p_environment));
+
+		std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_doWhileStatement->m_consequence, doWhileEnvironment);
+		if (evaluatedConsequence->Type() == object::ERROR)
+		{
+			return evaluatedConsequence;
+		}
+
+		while (true)
+		{
+			std::shared_ptr<object::Object> evaluatedCondition = evaluate(p_doWhileStatement->m_condition, p_environment);
+			if (evaluatedCondition->Type() == object::ERROR)
+			{
+				return evaluatedCondition;
+			}
+
+			std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
+			if (truthy->Type() == object::ERROR)
+			{
+				return truthy;
+			}
+
+			std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
+			if (!truthyBoolean->m_value) break;
+
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_doWhileStatement->m_consequence, doWhileEnvironment);
+			if (evaluatedConsequence->Type() == object::ERROR)
+			{
+				return evaluatedConsequence;
+			}
+		}
+
+		return object::NULL_OBJECT;
+	}
+
+	// Evaluates an while statement
+	std::shared_ptr<object::Object> evaluateForStatement(std::shared_ptr<ast::ForStatement> p_forStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Environment> forConditionEnvironment(new object::Environment(p_environment));
+		std::shared_ptr<object::Environment> forEnvironment(new object::Environment(forConditionEnvironment));
+
+		std::shared_ptr<object::Object> evaluatedInitialization = evaluate(p_forStatement->m_initialization, forConditionEnvironment);
+		if (evaluatedInitialization->Type() == object::ERROR)
+		{
+			return evaluatedInitialization;
+		}
+
+		while (true)
+		{
+			std::shared_ptr<object::Object> evaluatedCondition = evaluate(p_forStatement->m_condition, forConditionEnvironment);
+			if (evaluatedCondition->Type() == object::ERROR)
+			{
+				return evaluatedCondition;
+			}
+
+			std::shared_ptr<object::Object> truthy = isTruthy(evaluatedCondition);
+			if (truthy->Type() == object::ERROR)
+			{
+				return truthy;
+			}
+
+			std::shared_ptr<object::Boolean> truthyBoolean = std::static_pointer_cast<object::Boolean>(truthy);
+			if (!truthyBoolean->m_value) break;
+
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_forStatement->m_consequence, forEnvironment);
+			if (evaluatedConsequence->Type() == object::ERROR)
+			{
+				return evaluatedConsequence;
+			}
+
+			std::shared_ptr<object::Object> evaluatedUpdation = evaluate(p_forStatement->m_updation, forConditionEnvironment);
+			if (evaluatedUpdation->Type() == object::ERROR)
+			{
+				return evaluatedUpdation;
+			}
+		}
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateIterateStatement(std::shared_ptr<ast::IterateStatement> p_iterateStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(p_environment));
+
+		std::shared_ptr<object::Object> evaluatedCollection = evaluate(p_iterateStatement->m_collection, p_environment);
+		if (evaluatedCollection->Type() == object::ERROR)
+		{
+			return evaluatedCollection;
+		}
+
+		if (evaluatedCollection->Type() != object::COLLECTION)
+		{
+			std::ostringstream error;
+			error << "Expected to see a collection to iterate over. Instead got a(n) '"
+				<< object::c_objectTypeToString.at(evaluatedCollection->Type()) << "'.";
+			return createError(error.str());
+		}
+		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(evaluatedCollection);
+
+		for (std::shared_ptr<object::Object> value : collection->m_values)
+		{
+			iterateEnvironment->setIdentifier(&p_iterateStatement->m_var->m_name, value);
+
+			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
+			if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+		}
+
 		return object::NULL_OBJECT;
 	}
 

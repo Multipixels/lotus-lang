@@ -46,6 +46,12 @@ namespace evaluator
 
 	// Evaluates a prefix expression
 	std::shared_ptr<object::Object> evaluatePrefixExpression(std::shared_ptr<ast::PrefixExpression> p_prefixOperator, std::shared_ptr<object::Environment> p_environment);
+
+	// Applies bang operator
+	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> p_expression);
+
+	// Applies negative operator (prefix)
+	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression);
 	
 	// Evaluates an infix expression
 	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment);
@@ -62,11 +68,11 @@ namespace evaluator
 	// Evaluates an integer infix expression
 	std::shared_ptr<object::Object> evaluateFloatInfixExpression(std::shared_ptr<object::Float> p_leftObject, std::string* p_infixOperator, std::shared_ptr<object::Float> p_rightObject);
 
-	// Applies bang operator
-	std::shared_ptr<object::Object> evaluateBangOperatorExpression(std::shared_ptr<object::Object> p_expression);
+	// Reassigns value in a collection
+	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject);
 
-	// Applies negative operator (prefix)
-	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression);
+	// Reassigns value in a dictionary
+	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject);
 
 	// Evaluates a function call
 	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment);
@@ -74,11 +80,35 @@ namespace evaluator
 	// Evaluates an indexing on collections, strings, or dictionaries
 	std::shared_ptr<object::Object> evaluateIndexExpression(std::shared_ptr<ast::IndexExpression> p_indexExpression, std::shared_ptr<object::Environment> p_environment);
 
-	// Reassigns value in a collection
-	std::shared_ptr<object::Object> collectionValueReassignment(std::shared_ptr<object::Collection> p_collection, std::shared_ptr<object::Object> p_indexObject, std::shared_ptr<object::Object> p_valueObject);
+	// Evaluates a variable declaration
+	std::shared_ptr<object::Object> evaluateDeclareVariable(std::shared_ptr<ast::DeclareVariableStatement> p_declareVariable, std::shared_ptr<object::Environment> p_environment);
 
-	// Reassigns value in a dictionary
-	std::shared_ptr<object::Object> dictionaryValueReassignment(std::shared_ptr<object::Dictionary> p_dictionary, std::shared_ptr<object::Object> p_keyObject, std::shared_ptr<object::Object> p_valueObject);
+	// Evaluates a collection declaration
+	std::shared_ptr<object::Object> evaluateDeclareCollection(std::shared_ptr<ast::DeclareCollectionStatement> p_declareCollection, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a dictionary declaration
+	std::shared_ptr<object::Object> evaluateDeclareDictionary(std::shared_ptr<ast::DeclareDictionaryStatement> p_declareDictionary, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a function declaration
+	std::shared_ptr<object::Object> evaluateDeclareFunction(std::shared_ptr<ast::DeclareFunctionStatement> p_declareFunction, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates a return statement
+	std::shared_ptr<object::Object> evaluateReturnStatement(std::shared_ptr<ast::ReturnStatement> p_returnStatement, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an if statement
+	std::shared_ptr<object::Object> evaluateIfStatement(std::shared_ptr<ast::IfStatement> p_ifStatement, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an while statement
+	std::shared_ptr<object::Object> evaluateWhileStatement(std::shared_ptr<ast::WhileStatement> p_whileStatement, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an while statement
+	std::shared_ptr<object::Object> evaluateDoWhileStatement(std::shared_ptr<ast::DoWhileStatement> p_doWhileStatement, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an while statement
+	std::shared_ptr<object::Object> evaluateForStatement(std::shared_ptr<ast::ForStatement> p_forStatement, std::shared_ptr<object::Environment> p_environment);
+
+	// Evaluates an iterate statement
+	std::shared_ptr<object::Object> evaluateIterateStatement(std::shared_ptr<ast::IterateStatement> p_iterateStatement, std::shared_ptr<object::Environment> p_environment);
 
 	// Applies a function call to a function
 	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments);
