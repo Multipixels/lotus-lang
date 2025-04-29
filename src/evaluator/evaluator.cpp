@@ -578,7 +578,7 @@ namespace evaluator
 			if (p_callExpression->m_parameters.size() != function->m_parameters.size())
 			{
 				std::ostringstream error;
-				error << "'" << function->m_functionName->String() << "' was supplied with "
+				error << "'" << function->m_functionName.String() << "' was supplied with "
 					<< p_callExpression->m_parameters.size() << " argument(s) instead of "
 					<< function->m_parameters.size() << ".";
 				return createError(error.str());
@@ -592,7 +592,7 @@ namespace evaluator
 					error << "Parameter '" << function->m_parameters[i]->m_name.m_name << "' was supplied with a value of type '"
 						<< object::c_objectTypeToString.at(evaluatedArguments[i]->Type()) << "' instead of type '"
 						<< function->m_parameters[i]->m_token.m_literal << "' for the function call for '"
-						<< function->m_functionName->String() << "'.";
+						<< function->m_functionName.String() << "'.";
 					return createError(error.str());
 				}
 			}
@@ -609,11 +609,12 @@ namespace evaluator
 		}
 
 		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments);
+		if (output->Type() == object::ERROR) return output;
 
 		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
 		{
 			std::ostringstream error;
-			error << "'" << std::static_pointer_cast<object::Function>(expression)->m_functionName->String() << "' has no return value.";
+			error << "'" << std::static_pointer_cast<object::Function>(expression)->m_functionName.String() << "' has no return value.";
 			return createError(error.str());
 		}
 

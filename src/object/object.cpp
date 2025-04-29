@@ -313,7 +313,7 @@ namespace object
 
 	Function::Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment)
 		: m_functionType(p_functionType)
-		, m_functionName(&p_functionDeclaration->m_name)
+		, m_functionName(p_functionDeclaration->m_name)
 		, m_body(p_functionDeclaration->m_body->m_body)
 		, m_environment(p_environment)
 	{

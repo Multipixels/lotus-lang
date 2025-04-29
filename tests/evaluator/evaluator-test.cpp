@@ -373,7 +373,7 @@ TEST(EvaluatorTest, Function)
 	EXPECT_EQ(function->m_parameters[0]->m_token.m_literal, "integer");
 	EXPECT_EQ(function->m_parameters[0]->m_name.m_name, "x");
 
-	EXPECT_EQ(function->m_functionName->m_name, "myFunction");
+	EXPECT_EQ(function->m_functionName.m_name, "myFunction");
 	EXPECT_EQ(function->m_body->String(), "return (x + 2);\n");
 }
 
@@ -635,6 +635,8 @@ TEST(EvaluatorTest, Error)
 		{"float(integer x) integerFunction { return x; }; integerFunction(6);", "'integerFunction(6)' produced a value of type 'integer' instead of type 'float'."},
 		{"integer(integer x) integerFunction { return x; }; integerFunction(true);", "Parameter 'x' was supplied with a value of type 'boolean' instead of type 'integer' for the function call for 'integerFunction'."},
 		{"integer(integer x) integerFunction { x; }; integerFunction(6);", "'integerFunction' has no return value."},
+		{"integer(integer x) integerFunction { }; integerFunction(6);", "'integerFunction' has no return value."},
+		{"integer() integerFunction { }; integerFunction();", "'integerFunction' has no return value."},
 		{"integer myInt = 5; myInt = 6.5f; myInt;", "Cannot assign 'myInt' of type 'integer' a value of type 'float'."},
 		{"integer myInt = 5; if ('a') { myInt = 6; } myInt;", "'a' is not a valid truthy value."},
 		{"integer myInt = 5; integer myInt = 6;", "Redefinition of 'myInt'."},

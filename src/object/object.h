@@ -183,7 +183,7 @@ namespace object
 		std::string Inspect();
 
 		ObjectType m_functionType;
-		std::shared_ptr<ast::Identifier> m_functionName;
+		ast::Identifier m_functionName;
 		std::vector<std::shared_ptr<ast::DeclareVariableStatement>> m_parameters;
 		std::shared_ptr<ast::BlockStatement> m_body;
 		std::shared_ptr<Environment> m_environment;
