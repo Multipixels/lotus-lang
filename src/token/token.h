@@ -33,6 +33,7 @@ namespace token
 		COMMA,
 		COLON,
 		SEMICOLON,
+		DOT,
 
 		LPARENTHESIS,
 		RPARENTHESIS,
@@ -92,6 +93,7 @@ namespace token
 		{COMMA, "COMMA"},
 		{COLON, "COLON"},
 		{SEMICOLON, "SEMICOLON"},
+		{DOT, "DOT"},
 		{LPARENTHESIS, "LPARENTHESIS"},
 		{RPARENTHESIS, "RPARENTHESIS"},
 		{LBRACE, "LBRACE"},

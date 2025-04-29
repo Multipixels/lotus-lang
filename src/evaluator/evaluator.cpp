@@ -376,6 +376,24 @@ namespace evaluator
 			}
 		}
 
+		// member access
+		else if (p_infixExpression->m_operator == ".")
+		{
+			std::shared_ptr<object::Object> object = evaluate(p_infixExpression->m_leftExpression, p_environment);
+			if (object->Type() == object::ERROR) return object;
+
+			if (p_infixExpression->m_rightExpression->Type() != ast::IDENTIFIER_NODE)
+			{
+				std::ostringstream error;
+				error << "Expected to see a member variable or function, got " <<
+					p_infixExpression->m_rightExpression->String() << ".";
+				return createError(error.str());
+			}
+			std::shared_ptr<ast::Identifier> name = std::static_pointer_cast<ast::Identifier>(p_infixExpression->m_rightExpression);
+			
+			return object->Member(name->m_name);
+		}
+
 		// General infix expressions
 		std::shared_ptr<object::Object> leftObject = evaluate(p_infixExpression->m_leftExpression, p_environment);
 		if (leftObject->Type() == object::ERROR) return leftObject;

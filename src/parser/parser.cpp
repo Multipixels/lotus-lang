@@ -39,6 +39,7 @@ namespace parser
 		registerInfixFunction(token::ASSIGN, &Parser::parseInfixExpression);
 		registerInfixFunction(token::LPARENTHESIS, &Parser::parseCallExpression);
 		registerInfixFunction(token::LBRACKET, &Parser::parseIndexExpression);
+		registerInfixFunction(token::DOT, &Parser::parseInfixExpression);
 	}
 
 	std::shared_ptr<ast::Program> Parser::ParseProgram()

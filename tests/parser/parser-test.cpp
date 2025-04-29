@@ -523,13 +523,14 @@ TEST(ParserTest, OperatorPrecedence)
 		{"(5 + 6) * 7;", "((5 + 6) * 7);"},
 		{"(24+7) * -3 + (100/3);", "(((24 + 7) * (-3)) + (100 / 3));"},
 		{"24 * [1,2,3,4][2];", "(24 * ([1, 2, 3, 4][2]));"},
+		{"left.middle.right;", "((left . middle) . right);"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		lexer::Lexer lexer(&tests[i].input);
 		parser::Parser parser(lexer);
-		std::shared_ptr<ast::Program> program = parser.ParseProgram();
+		std::shared_ptr<ast::Program> program = parser.ParseProgram(); // cannot parse correctly
 		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
 
 		EXPECT_EQ(program->String(), tests[i].expected);

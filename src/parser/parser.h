@@ -38,6 +38,7 @@ namespace parser
 			PREFIX,			// -X or !x
 			CALL,			// function call
 			INDEX,			// collection indexing
+			MEMBER_ACCESS,  // dot operator
 		} Precedence;
 
 		const std::map<token::TokenType, Precedence> c_precedenceOfTokenType =
@@ -57,6 +58,7 @@ namespace parser
 			{token::AND, PRODUCT},
 			{token::LPARENTHESIS, CALL},
 			{token::LBRACKET, INDEX},
+			{token::DOT, MEMBER_ACCESS},
 		};
 
 		// Cycles through to the next token in the lexer

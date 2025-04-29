@@ -49,9 +49,12 @@ namespace object
 
 	class Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members;
 	public:
 		virtual ObjectType Type() = 0;
 		virtual std::string Inspect() = 0;
+		virtual std::shared_ptr<Object> Member(std::string m_memberName) = 0;
 	};
 
 	class Environment
@@ -78,52 +81,70 @@ namespace object
 
 	class Integer : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Integer();
 		Integer(int p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 		int m_value;
+
 	};
 
 	class Float : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Float();
 		Float(float p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
+
 		float m_value;
 	};
 
 	class Boolean : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Boolean();
 		Boolean(bool p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
+
 		bool m_value;
 	};
 
 	class Character : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Character();
 		Character(char p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		char m_value;
 	};
 
 	class Collection : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Collection();
 		Collection(ObjectType p_collection_type, std::vector<std::shared_ptr<Object>> p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		ObjectType m_collectionType;
 		std::vector<std::shared_ptr<Object>> m_values;
@@ -132,6 +153,8 @@ namespace object
 	class Dictionary : public Object
 	{
 	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
+
 		struct ObjCmp {
 			bool operator()(std::shared_ptr<Object> lhs, std::shared_ptr<Object> rhs) const;
 		};
@@ -140,6 +163,7 @@ namespace object
 		Dictionary(ObjectType p_keyType, ObjectType p_valueType, std::vector<std::shared_ptr<Object>> p_keys, std::vector<std::shared_ptr<Object>> p_values);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		ObjectType m_keyType;
 		ObjectType m_valueType;
@@ -148,39 +172,51 @@ namespace object
 
 	class String : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		String();
 		String(std::string* p_value);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		std::string m_value;
 	};
 
 	class Null : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Null();
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 	};
 
 	class Return : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Return(std::shared_ptr<Object> p_returnValue);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 		
 		std::shared_ptr<Object> m_returnValue;
 	};
 
 	class Function : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		ObjectType m_functionType;
 		ast::Identifier m_functionName;
@@ -191,22 +227,28 @@ namespace object
 
 	class Error : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		Error(std::string p_errorMessage);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		std::string m_errorMessage;
 	};
 
 	class Builtin : public Object
 	{
+	private:
+		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
 	public:
 		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*);
 
 		Builtin(BuiltinFunctionPointer fn);
 		ObjectType Type();
 		std::string Inspect();
+		std::shared_ptr<Object> Member(std::string m_memberName);
 
 		BuiltinFunctionPointer m_function;
 	};

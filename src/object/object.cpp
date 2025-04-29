@@ -4,6 +4,8 @@
 #include "ast.h"
 #include "object.h"
 #include "token.h"
+#include "evaluator.h"
+#include "builtinFunctions.h"
 
 namespace object
 {
@@ -84,6 +86,20 @@ namespace object
 		return output.str();
 	}
 
+	std::shared_ptr<Object> Integer::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
+
+
 	Float::Float()
 		: m_value(0)
 	{
@@ -105,6 +121,19 @@ namespace object
 		output << m_value;
 
 		return output.str();
+	}
+
+	std::shared_ptr<Object> Float::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 	Boolean::Boolean()
@@ -131,6 +160,19 @@ namespace object
 		return "false";
 	}
 
+	std::shared_ptr<Object> Boolean::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
+
 	Character::Character()
 		: m_value('\0')
 	{
@@ -152,6 +194,19 @@ namespace object
 		output << m_value;
 
 		return output.str();
+	}
+
+	std::shared_ptr<Object> Character::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 	Collection::Collection()
@@ -182,6 +237,19 @@ namespace object
 		output << "]";
 
 		return output.str();
+	}
+
+	std::shared_ptr<Object> Collection::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 	bool Dictionary::ObjCmp::operator()(std::shared_ptr<Object> p_lhs, std::shared_ptr<Object> p_rhs) const
@@ -264,6 +332,19 @@ namespace object
 		return output.str();
 	}
 
+	std::shared_ptr<Object> Dictionary::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
+
 	String::String()
 		: m_value("")
 	{
@@ -284,6 +365,19 @@ namespace object
 		return m_value;
 	}
 
+	std::shared_ptr<Object> String::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
+
 	Null::Null() {};
 
 	ObjectType Null::Type()
@@ -294,6 +388,19 @@ namespace object
 	std::string Null::Inspect()
 	{
 		return "null";
+	}
+
+	std::shared_ptr<Object> Null::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 	Return::Return(std::shared_ptr<Object> p_returnValue)
@@ -309,6 +416,19 @@ namespace object
 	std::string Return::Inspect()
 	{
 		return m_returnValue->Inspect();
+	}
+
+	std::shared_ptr<Object> Return::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 	Function::Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment)
@@ -342,6 +462,19 @@ namespace object
 		return output.str();
 	}
 
+	std::shared_ptr<Object> Function::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
+
 	Error::Error(std::string p_errorMessage)
 		: m_errorMessage(p_errorMessage)
 	{
@@ -357,6 +490,19 @@ namespace object
 		std::ostringstream output;
 		output << "Evaluation Error: " << m_errorMessage;
 		return output.str();
+	}
+
+	std::shared_ptr<Object> Error::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
+
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
 	}
 
 
@@ -377,7 +523,18 @@ namespace object
 		return output.str();
 	}
 
+	std::shared_ptr<Object> Builtin::Member(std::string m_memberName)
+	{
+		auto it = m_members.find(m_memberName);
+		if (it != m_members.end())
+		{
+			return m_members.at(m_memberName);
+		}
 
+		std::ostringstream error;
+		error << m_memberName << " is not a member variable or function for an object of type " << c_objectTypeToString.at(Type()) << ".";
+		return evaluator::createError(error.str());
+	}
 
 	std::shared_ptr<Boolean> getBoolean(bool condition)
 	{

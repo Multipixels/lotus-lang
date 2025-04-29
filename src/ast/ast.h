@@ -119,7 +119,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		int m_value;
+		int m_value = 0;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -132,7 +132,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		float m_value;
+		float m_value = 0;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -145,7 +145,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		bool m_value;
+		bool m_value = false;
 
 		std::string TokenLiteral();
 		std::string String();
@@ -158,7 +158,7 @@ namespace ast
 	{
 	public:
 		token::Token m_token;
-		char m_value;
+		char m_value = '?';
 
 		std::string TokenLiteral();
 		std::string String();

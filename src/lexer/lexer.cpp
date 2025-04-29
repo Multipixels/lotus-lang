@@ -111,6 +111,9 @@ namespace lexer
 		case ';':
 			token = token::Token(token::SEMICOLON, std::string{ m_currentChar });
 			break;
+		case '.':
+			token = token::Token(token::DOT, std::string{ m_currentChar });
+			break;
 		case '(':
 			token = token::Token(token::LPARENTHESIS, std::string{ m_currentChar });
 			break;

@@ -11,8 +11,8 @@ namespace evaluator
 
 	const std::map<std::string, std::shared_ptr<object::Object>> c_builtins =
 	{
-		{"log", std::shared_ptr<object::Object>(new object::Builtin(&logBuiltIn))},
-		{"size", std::shared_ptr<object::Object>(new object::Builtin(&sizeBuiltIn))},
+		{"log", std::make_shared<object::Builtin>(&logBuiltIn)},
+		{"size", std::make_shared<object::Builtin>(&sizeBuiltIn)},
 	};
 
 }
