@@ -91,6 +91,10 @@ namespace parser
 		// STATEMENTS
 
 		std::shared_ptr<ast::Statement> parseStatement();
+
+		// Removes the semicolon requirement for certain statements - used for 'for' statements
+		std::shared_ptr<ast::Statement> parseStatementNoSemicolon(); 
+
 		std::shared_ptr<ast::DeclareVariableStatement> parseVariableDeclaration();
 		std::shared_ptr<ast::DeclareCollectionStatement> parseCollectionDeclaration();
 		std::shared_ptr<ast::DeclareDictionaryStatement> parseDictionaryDeclaration();

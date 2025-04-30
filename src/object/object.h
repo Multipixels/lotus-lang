@@ -138,7 +138,10 @@ namespace object
 	class Collection : public Object
 	{
 	private:
-		const std::map<std::string, std::shared_ptr<Object>> m_members = {};
+		const std::map<std::string, std::shared_ptr<Object>> m_members =
+		{
+			{"size", std::make_shared<Integer>(m_values.size())}, // TODO
+		};
 	public:
 		Collection();
 		Collection(ObjectType p_collection_type, std::vector<std::shared_ptr<Object>> p_value);

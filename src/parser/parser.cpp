@@ -135,38 +135,67 @@ namespace parser
 
 	std::shared_ptr<ast::Statement> Parser::parseStatement()
 	{
+		std::shared_ptr<ast::Statement> output;
 		switch (m_currentToken.m_type)
 		{
 		case token::INTEGER_TYPE:
-			if (peekTokenIs(token::LPARENTHESIS))
-			{
-				return parseFunctionDeclaration();
-			}
-			return parseVariableDeclaration();
 		case token::FLOAT_TYPE:
-			if (peekTokenIs(token::LPARENTHESIS))
-			{
-				return parseFunctionDeclaration();
-			}
-			return parseVariableDeclaration();
 		case token::BOOLEAN_TYPE:
-			if (peekTokenIs(token::LPARENTHESIS))
-			{
-				return parseFunctionDeclaration();
-			}
-			return parseVariableDeclaration();
 		case token::CHARACTER_TYPE:
-			if (peekTokenIs(token::LPARENTHESIS))
-			{
-				return parseFunctionDeclaration();
-			}
-			return parseVariableDeclaration();
 		case token::STRING_TYPE:
 			if (peekTokenIs(token::LPARENTHESIS))
 			{
-				return parseFunctionDeclaration();
+				output = parseFunctionDeclaration();
 			}
-			return parseVariableDeclaration();
+			else
+			{
+				output = parseVariableDeclaration();
+				if (!expectPeek(token::SEMICOLON)) return NULL;
+			}
+			return output;
+
+		case token::COLLECTION_TYPE:
+			output = parseCollectionDeclaration();
+
+			if (!expectPeek(token::SEMICOLON)) return NULL;
+			return output;
+		case token::DICTIONARY_TYPE:
+			output = parseDictionaryDeclaration();
+
+			if (!expectPeek(token::SEMICOLON)) return NULL;
+			return output;
+		case token::RETURN:
+			return parseReturnStatement();
+		case token::IF:
+			return parseIfStatement();
+		case token::WHILE:
+			return parseWhileStatement();
+		case token::DO:
+			return parseDoWhileStatement();
+		case token::FOR:
+			return parseForStatement();
+		case token::ITERATE:
+			return parseIterateStatement();
+		default:
+			output = parseExpressionStatement();
+
+			if (!expectPeek(token::SEMICOLON)) return NULL;
+			return output;
+		}
+	}
+
+	std::shared_ptr<ast::Statement> Parser::parseStatementNoSemicolon()
+	{
+		std::shared_ptr<ast::Statement> output;
+		switch (m_currentToken.m_type)
+		{
+		case token::INTEGER_TYPE:
+		case token::FLOAT_TYPE:
+		case token::BOOLEAN_TYPE:
+		case token::CHARACTER_TYPE:
+		case token::STRING_TYPE:
+			if (peekTokenIs(token::LPARENTHESIS)) return parseFunctionDeclaration();
+			else return parseVariableDeclaration();
 		case token::COLLECTION_TYPE:
 			return parseCollectionDeclaration();
 		case token::DICTIONARY_TYPE:
@@ -204,7 +233,6 @@ namespace parser
 		// Declaration without assignment
 		if (peekTokenIs(token::SEMICOLON))
 		{
-			nextToken();
 			return statement;
 		}
 
@@ -216,11 +244,6 @@ namespace parser
 		nextToken();
 
 		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
 
 		return statement;
 	};
@@ -254,7 +277,6 @@ namespace parser
 		// Declaration without assignment
 		if (peekTokenIs(token::SEMICOLON))
 		{
-			nextToken();
 			return statement;
 		}
 
@@ -266,11 +288,6 @@ namespace parser
 		nextToken();
 
 		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
 
 		return statement;
 	};
@@ -312,7 +329,6 @@ namespace parser
 		// Declaration without assignment
 		if (peekTokenIs(token::SEMICOLON))
 		{
-			nextToken();
 			return statement;
 		}
 
@@ -324,11 +340,6 @@ namespace parser
 		nextToken();
 
 		statement->m_value = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
 
 		return statement;
 	};
@@ -391,11 +402,6 @@ namespace parser
 		std::shared_ptr<ast::ExpressionStatement> statement(new ast::ExpressionStatement);
 		statement->m_token = m_currentToken;
 		statement->m_expression = parseExpression(LOWEST);
-
-		if (!expectPeek(token::SEMICOLON))
-		{
-			return NULL;
-		}
 
 		return statement;
 	}
@@ -557,13 +563,20 @@ namespace parser
 		}
 		nextToken();
 
-		statement->m_initialization = parseStatement();
+		if (!currentTokenIs(token::SEMICOLON)) statement->m_initialization = parseStatement();
 		nextToken();
 
 		statement->m_condition = parseStatement();
-		nextToken();
 
-		statement->m_updation = parseStatement();
+		if (peekTokenIs(token::RPARENTHESIS)) 
+		{
+			statement->m_updation = NULL;
+		}
+		else
+		{
+			nextToken();
+			statement->m_updation = parseStatementNoSemicolon();
+		}
 
 		if (!expectPeek(token::RPARENTHESIS))
 		{

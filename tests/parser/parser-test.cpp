@@ -880,7 +880,7 @@ true;
 TEST(ParserTest, ForStatement)
 {
 	std::string input = R"(
-for (integer i = 0; i < 10; i = i + 1;) {
+for (integer i = 0; i < 10; i = i + 1) {
 	5;
 	true;
 }
@@ -1376,7 +1376,7 @@ do {
 
 } while (someTruthValue);
 
-for (integer i = 0; i < 10; i = i + 1;) {
+for (integer i = 0; i < 10; i = i + 1) {
 
 }
 
