@@ -211,13 +211,14 @@ namespace object
 	class Builtin : public Object
 	{
 	public:
-		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*);
+		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*, object::Object*);
 
-		Builtin(BuiltinFunctionPointer p_fn);
+		Builtin(BuiltinFunctionPointer p_fn, Object* p_object = 0);
 		ObjectType Type();
 		std::string Inspect();
 
 		BuiltinFunctionPointer m_function;
+		Object* m_object; // Refers to "parent" object. myCollection.append() for example.
 	};
 
 	extern std::shared_ptr<Null> NULL_OBJECT;

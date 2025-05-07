@@ -176,6 +176,9 @@ namespace object
 			{"size", [&]() {
 				return std::make_shared<object::Integer>(m_values.size());
 			}},
+			{"append", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
+			}},
 		};
 	}
 
@@ -185,6 +188,9 @@ namespace object
 		m_members = {
 			{"size", [&]() {
 				return std::make_shared<object::Integer>(m_values.size());
+			}},
+			{"append", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
 			}},
 		};
 	}
@@ -398,8 +404,9 @@ namespace object
 		return output.str();
 	}
 
-	Builtin::Builtin(Builtin::BuiltinFunctionPointer p_fn)
+	Builtin::Builtin(Builtin::BuiltinFunctionPointer p_fn, Object* p_object)
 		: m_function(p_fn)
+		, m_object(p_object)
 	{
 	}
 

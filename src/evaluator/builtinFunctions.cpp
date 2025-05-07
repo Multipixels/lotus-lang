@@ -9,8 +9,13 @@
 
 namespace evaluator
 {
-	std::shared_ptr<object::Object> logBuiltIn(std::vector<std::shared_ptr<object::Object>>* p_params)
+	std::shared_ptr<object::Object> logBuiltin(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
 	{
+		if (p_object != 0)
+		{
+			return createError("Did not expect to see a parent object for `log`.");
+		}
+
 		std::ostringstream outputStringStream;
 
 		for (int i = 0; i < p_params->size(); i++)
@@ -35,37 +40,42 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> sizeBuiltIn(std::vector<std::shared_ptr<object::Object>>* p_params)
+	std::shared_ptr<object::Object> collectionAppend(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
 	{
+		if (p_object == 0)
+		{
+			return createError("Expected to see a parent object for collection `append`.");
+		}
+
+		if (p_object->Type() != object::COLLECTION)
+		{
+			return createError("Expected a collection to append to.");
+		}
+
 		if (p_params->size() != 1)
 		{
 			std::ostringstream error;
-			error << "Expected 1 argument, got " << p_params->size() << ".";
+			error << "Expected 1 parameter, got " << p_params->size() << ".";
 			return createError(error.str());
+
 		}
 
-		std::shared_ptr<object::Object> objectToSize = p_params->front();
-		switch (objectToSize->Type()) {
-		case object::COLLECTION:
-		{
-			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(objectToSize);
-			int size = collection->m_values.size();
-			return std::shared_ptr<object::Integer>(new object::Integer(size));
-		}
-		case object::STRING:
-		{
-			std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(objectToSize);
-			int size = string->m_value.length();
-			return std::shared_ptr<object::Integer>(new object::Integer(size));
-		}
-		default:
+		object::Collection* collection = (object::Collection*)(p_object);
+		std::shared_ptr<object::Object> item = (*p_params)[0];
+
+		if (item->Type() != collection->m_collectionType)
 		{
 			std::ostringstream error;
-			error << "Argument to `size` not supported, got " << object::c_objectTypeToString.at(objectToSize->Type()) << ".";
+			error << "Collection is of type `" << object::c_objectTypeToString.at(collection->m_collectionType)
+				<< "', but tried to append a value of type `" << object::c_objectTypeToString.at(item->Type())
+				<< "`.";
 			return createError(error.str());
 		}
-		}
+
+		collection->m_values.push_back(item);
 
 		return object::NULL_OBJECT;
+
+		// TODO: Create tests.
 	}
 }

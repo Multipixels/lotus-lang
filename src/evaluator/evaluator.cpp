@@ -1050,8 +1050,8 @@ namespace evaluator
 		{
 		case object::BUILTIN_FUNCTION:
 		{
-			std::shared_ptr<object::Object> evaluated = std::static_pointer_cast<object::Builtin>(p_function)->m_function(p_arguments);
-			return unwrapReturnValue(evaluated);
+			std::shared_ptr<object::Builtin> builtin = std::static_pointer_cast<object::Builtin>(p_function);
+			return unwrapReturnValue(builtin->m_function(p_arguments, builtin->m_object));
 		}
 		case object::FUNCTION:
 		{
