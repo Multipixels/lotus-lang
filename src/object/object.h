@@ -84,8 +84,6 @@ namespace object
 
 	class Integer : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Integer();
 		Integer(int p_value);
@@ -93,13 +91,10 @@ namespace object
 		std::string Inspect();
 
 		int m_value;
-
 	};
 
 	class Float : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Float();
 		Float(float p_value);
@@ -111,8 +106,6 @@ namespace object
 
 	class Boolean : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Boolean();
 		Boolean(bool p_value);
@@ -124,14 +117,11 @@ namespace object
 
 	class Character : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Character();
 		Character(char p_value);
 		ObjectType Type();
 		std::string Inspect();
-		
 
 		char m_value;
 	};
@@ -151,8 +141,6 @@ namespace object
 	class Dictionary : public Object
 	{
 	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
-
 		struct ObjCmp {
 			bool operator()(std::shared_ptr<Object> lhs, std::shared_ptr<Object> rhs) const;
 		};
@@ -169,8 +157,6 @@ namespace object
 
 	class String : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		String();
 		String(std::string* p_value);
@@ -182,8 +168,6 @@ namespace object
 
 	class Null : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Null();
 		ObjectType Type();
@@ -192,8 +176,6 @@ namespace object
 
 	class Return : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Return(std::shared_ptr<Object> p_returnValue);
 		ObjectType Type();
@@ -204,8 +186,6 @@ namespace object
 
 	class Function : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Function(ObjectType p_functionType, std::shared_ptr<ast::DeclareFunctionStatement> p_functionDeclaration, std::shared_ptr<Environment> p_environment);
 		ObjectType Type();
@@ -220,8 +200,6 @@ namespace object
 
 	class Error : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		Error(std::string p_errorMessage);
 		ObjectType Type();
@@ -232,8 +210,6 @@ namespace object
 
 	class Builtin : public Object
 	{
-	private:
-		const std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members = {};
 	public:
 		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*);
 

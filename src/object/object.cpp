@@ -254,6 +254,11 @@ namespace object
 	Dictionary::Dictionary()
 		: m_keyType(NULL_TYPE), m_valueType(NULL_TYPE)
 	{
+		m_members = {
+			{"size", [&]() {
+				return std::make_shared<object::Integer>(m_map.size());
+			}},
+		};
 	}
 
 	Dictionary::Dictionary(ObjectType p_keyType, ObjectType p_valueType, std::vector<std::shared_ptr<Object>> p_keys, std::vector<std::shared_ptr<Object>> p_values)
@@ -292,11 +297,21 @@ namespace object
 	String::String()
 		: m_value("")
 	{
+		m_members = {
+			{"length", [&]() {
+				return std::make_shared<object::Integer>(m_value.length());
+			}},
+		};
 	}
 
 	String::String(std::string *p_value)
 		: m_value(*p_value)
 	{
+		m_members = {
+			{"length", [&]() {
+				return std::make_shared<object::Integer>(m_value.length());
+			}},
+		};
 	}
 
 	ObjectType String::Type()
