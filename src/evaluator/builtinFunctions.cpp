@@ -89,10 +89,17 @@ namespace evaluator
 			return createError("Expected a collection to pop from.");
 		}
 
-		if (p_params->size() != 0)
+		if (p_params->size() >= 2)
 		{
 			std::ostringstream error;
-			error << "Expected 0 parameters, got " << p_params->size() << ".";
+			error << "Expected 0 or 1 parameters, got " << p_params->size() << ".";
+			return createError(error.str());
+		}
+
+		if (p_params->size() == 1 && (*p_params)[0]->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Expected an integer index to pop from, got " << object::c_objectTypeToString.at((*p_params)[0]->Type()) << ".";
 			return createError(error.str());
 		}
 
@@ -103,7 +110,21 @@ namespace evaluator
 			return createError("Cannot pop from an empty collection.");
 		}
 
-		collection->m_values.pop_back();
+		if (p_params->size() == 1 && ((*p_params)[0] < 0 || std::static_pointer_cast<object::Integer>((*p_params)[0])->m_value >= collection->m_values.size()))
+		{
+			std::ostringstream error;
+			error << "Attempted to pop an index that is out of bounds.";
+			return createError(error.str());
+		}
+
+		if (p_params->size() == 1)
+		{
+			collection->m_values.erase(collection->m_values.begin() + std::static_pointer_cast<object::Integer>((*p_params)[0])->m_value);
+		}
+		else
+		{
+			collection->m_values.pop_back();
+		}
 
 		return object::NULL_OBJECT;
 	}
