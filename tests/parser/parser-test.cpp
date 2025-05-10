@@ -786,7 +786,7 @@ float lol = 3.5;
 	EXPECT_EQ(elseIfStatement1->m_consequence->m_statements[1]->Type(), ast::RETURN_STATEMENT_NODE);
 
 	std::shared_ptr<ast::IfStatement> elseIfStatement2 = elseIfStatement1->m_alternative;
-	EXPECT_NO_FATAL_FAILURE(testInfixExpression(elseIfStatement2->m_condition, 3, "<", 5.5f), 0);
+	EXPECT_NO_FATAL_FAILURE(testInfixExpression(elseIfStatement2->m_condition, 3, "<", 5.5f));
 	ASSERT_EQ(elseIfStatement2->m_token.m_type, token::IF);
 	ASSERT_EQ(elseIfStatement2->m_consequence->m_statements.size(), 0);
 

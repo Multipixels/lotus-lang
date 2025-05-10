@@ -738,6 +738,31 @@ TEST(EvaluatorTest, BreakStatement)
 }
 
 
+TEST(EvaluatorTest, ContinueStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInteger = 0; integer i = 0; while(i < 10) {  i = i + 1; if(i > 5) { continue; } myInteger = myInteger + 1; } myInteger;", 5},
+		{"integer myInteger = 0; integer i = 0; do { i = i + 1; if(i > 5) { continue; } myInteger = myInteger + 1; } while(i < 10); myInteger;", 5},
+		{"integer myInteger = 0; for(integer i = 0; i < 10; i = i + 1) { if(i / 2 == 2) { log(i); continue; } myInteger = myInteger + 1; } myInteger;", 8},
+		{"integer myInteger = 0; iterate(value : [1, 2, 3, 4]) { if(value == 3) { continue; } myInteger = myInteger + value; } myInteger;", 7},
+
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+
 TEST(EvaluatorTest, Error)
 {
 	typedef struct TestCase
@@ -789,6 +814,8 @@ TEST(EvaluatorTest, Error)
 		{"dictionary<character, integer> myDictionary = {'a': 0, 'b': 1, 'c': 2}; collection<integer> myCollection = myDictionary.keys();", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
 		{"integer() myFunc { break; } while(true) { myFunc(); }", "Attempted to break outside a loop."},
 		{"break;", "Attempted to break outside a loop."},
+		{"integer() myFunc { continue; } while(true) { myFunc(); }", "Attempted to continue outside a loop."},
+		{"continue;", "Attempted to continue outside a loop."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

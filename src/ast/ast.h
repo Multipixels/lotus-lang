@@ -42,6 +42,7 @@ namespace ast
 		FOR_STATEMENT_NODE,
 		ITERATE_STATEMENT_NODE,
 		BREAK_STATEMENT_NODE,
+		CONTINUE_STATEMENT_NODE,
 	};
 
 	class Node
@@ -450,5 +451,17 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = BREAK_STATEMENT_NODE;
+	};
+
+	class ContinueStatement : public Statement
+	{
+	public:
+		token::Token m_token;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = CONTINUE_STATEMENT_NODE;
 	};
 }

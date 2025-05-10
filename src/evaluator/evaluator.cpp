@@ -45,6 +45,7 @@ namespace evaluator
 			case ast::FOR_STATEMENT_NODE:                return evaluateForStatement(std::static_pointer_cast<ast::ForStatement>(p_node), p_environment);
 			case ast::ITERATE_STATEMENT_NODE:            return evaluateIterateStatement(std::static_pointer_cast<ast::IterateStatement>(p_node), p_environment);
 			case ast::BREAK_STATEMENT_NODE:              return evaluateBreakStatement(std::static_pointer_cast<ast::BreakStatement>(p_node), p_environment);
+			case ast::CONTINUE_STATEMENT_NODE:           return evaluateContinueStatement(std::static_pointer_cast<ast::ContinueStatement>(p_node), p_environment);
 		}
 
 		return createError("Encountered an unexpected AST node");
@@ -68,6 +69,11 @@ namespace evaluator
 			if (result->Type() == object::BREAK)
 			{
 				return createError("Attempted to break outside a loop.");
+			}
+
+			if (result->Type() == object::CONTINUE)
+			{
+				return createError("Attempted to continue outside a loop.");
 			}
 		}
 
@@ -110,6 +116,11 @@ namespace evaluator
 			}
 
 			if (result != NULL && result->Type() == object::BREAK)
+			{
+				return result;
+			}
+
+			if (result != NULL && result->Type() == object::CONTINUE)
 			{
 				return result;
 			}
@@ -641,6 +652,7 @@ namespace evaluator
 		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments);
 		if (output->Type() == object::ERROR) return output;
 		if (output->Type() == object::BREAK) return createError("Attempted to break outside a loop.");
+		if (output->Type() == object::CONTINUE) return createError("Attempted to continue outside a loop.");
 
 		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
 		{
@@ -952,6 +964,10 @@ namespace evaluator
 			{
 				break;
 			}
+			else if (evaluatedConsequence->Type() == object::CONTINUE)
+			{
+				continue;
+			}
 			else if (evaluatedConsequence->Type() == object::RETURN)
 			{
 				return evaluatedConsequence;
@@ -973,6 +989,10 @@ namespace evaluator
 		else if (evaluatedConsequence->Type() == object::BREAK)
 		{
 			return object::NULL_OBJECT;
+		}
+		else if (evaluatedConsequence->Type() == object::CONTINUE)
+		{
+			; // just continue
 		}
 		else if (evaluatedConsequence->Type() == object::RETURN)
 		{
@@ -1004,6 +1024,10 @@ namespace evaluator
 			else if (evaluatedConsequence->Type() == object::BREAK)
 			{
 				break;
+			}
+			else if (evaluatedConsequence->Type() == object::CONTINUE)
+			{
+				continue;
 			}
 			else if (evaluatedConsequence->Type() == object::RETURN)
 			{
@@ -1058,6 +1082,10 @@ namespace evaluator
 			{
 				break;
 			}
+			else if (evaluatedConsequence->Type() == object::CONTINUE)
+			{
+				continue;
+			}
 			else if (evaluatedConsequence->Type() == object::RETURN)
 			{
 				return evaluatedConsequence;
@@ -1088,6 +1116,7 @@ namespace evaluator
 				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 				else if (evaluatedConsequence->Type() == object::BREAK) break;
+				else if (evaluatedConsequence->Type() == object::CONTINUE) continue;
 				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
 			}
 		}
@@ -1102,6 +1131,7 @@ namespace evaluator
 				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 				else if (evaluatedConsequence->Type() == object::BREAK) break;
+				else if (evaluatedConsequence->Type() == object::CONTINUE) continue;
 				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
 			}
 		}
@@ -1119,6 +1149,11 @@ namespace evaluator
 	std::shared_ptr<object::Object> evaluateBreakStatement(std::shared_ptr<ast::BreakStatement> p_breakStatement, std::shared_ptr<object::Environment> p_environment)
 	{
 		return object::BREAK_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateContinueStatement(std::shared_ptr<ast::ContinueStatement> p_continueStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		return object::CONTINUE_OBJECT;
 	}
 
 	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments)

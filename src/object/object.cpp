@@ -13,6 +13,7 @@ namespace object
 	std::shared_ptr<Boolean> TRUE_OBJECT = std::make_shared<object::Boolean>(true);
 	std::shared_ptr<Boolean> FALSE_OBJECT = std::make_shared<object::Boolean>(false);
 	std::shared_ptr<Break> BREAK_OBJECT = std::make_shared<object::Break>();
+	std::shared_ptr<Continue> CONTINUE_OBJECT = std::make_shared<object::Continue>();
 
 	std::shared_ptr<Object> Object::Member(std::string p_memberName)
 	{
@@ -473,6 +474,18 @@ namespace object
 	std::string Break::Inspect()
 	{
 		return "break";
+	}
+
+	Continue::Continue() {};
+
+	ObjectType Continue::Type()
+	{
+		return CONTINUE;
+	}
+
+	std::string Continue::Inspect()
+	{
+		return "continue";
 	}
 
 }

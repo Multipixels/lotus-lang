@@ -21,6 +21,7 @@ namespace object
 		ERROR,
 		BUILTIN_FUNCTION,
 		BREAK,
+		CONTINUE,
 	};
 
 	const std::map<ObjectType, std::string> c_objectTypeToString =
@@ -38,6 +39,7 @@ namespace object
 		{ERROR, "ERROR"},
 		{BUILTIN_FUNCTION, "BUILTIN_FUNCTION"},
 		{BREAK, "break"},
+		{CONTINUE, "continue"},
 	};
 
 	const std::map<token::TokenType, ObjectType> c_nodeTypeToObjectType =
@@ -51,6 +53,7 @@ namespace object
 		{token::STRING_TYPE, STRING},
 		{token::RETURN, RETURN},
 		{token::BREAK, BREAK},
+		{token::CONTINUE, CONTINUE},
 	};
 
 	class Object : public std::enable_shared_from_this<Object>
@@ -233,10 +236,19 @@ namespace object
 		std::string Inspect();
 	};
 
+	class Continue : public Object
+	{
+	public:
+		Continue();
+		ObjectType Type();
+		std::string Inspect();
+	};
+
 	extern std::shared_ptr<Null> NULL_OBJECT;
 	extern std::shared_ptr<Boolean> TRUE_OBJECT;
 	extern std::shared_ptr<Boolean> FALSE_OBJECT;
 	extern std::shared_ptr<Break> BREAK_OBJECT;
+	extern std::shared_ptr<Continue> CONTINUE_OBJECT;
 
 	std::shared_ptr<Boolean> getBoolean(bool condition);
 }

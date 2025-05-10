@@ -463,4 +463,13 @@ namespace ast
 	{
 		return "break;";
 	}
+
+	std::string ContinueStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string ContinueStatement::String()
+	{
+		return "continue;";
+	}
 }

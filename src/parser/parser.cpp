@@ -175,13 +175,14 @@ namespace parser
 
 			if (!expectPeek(token::SEMICOLON)) return NULL;
 			return output;
-		case token::RETURN:  return parseReturnStatement();
-		case token::IF:      return parseIfStatement();
-		case token::WHILE:   return parseWhileStatement();
-		case token::DO:      return parseDoWhileStatement();
-		case token::FOR:     return parseForStatement();
-		case token::ITERATE: return parseIterateStatement();
-		case token::BREAK:   return parseBreakStatement();
+		case token::RETURN:   return parseReturnStatement();
+		case token::IF:       return parseIfStatement();
+		case token::WHILE:    return parseWhileStatement();
+		case token::DO:       return parseDoWhileStatement();
+		case token::FOR:      return parseForStatement();
+		case token::ITERATE:  return parseIterateStatement();
+		case token::BREAK:    return parseBreakStatement();
+		case token::CONTINUE: return parseContinueStatement();
 		default:
 			output = parseExpressionStatement();
 
@@ -674,6 +675,19 @@ namespace parser
 	std::shared_ptr<ast::BreakStatement> Parser::parseBreakStatement()
 	{
 		std::shared_ptr<ast::BreakStatement> statement(new ast::BreakStatement);
+		statement->m_token = m_currentToken;
+
+		if (!expectPeek(token::SEMICOLON))
+		{
+			return NULL;
+		}
+
+		return statement;
+	}
+
+	std::shared_ptr<ast::ContinueStatement> Parser::parseContinueStatement()
+	{
+		std::shared_ptr<ast::ContinueStatement> statement(new ast::ContinueStatement);
 		statement->m_token = m_currentToken;
 
 		if (!expectPeek(token::SEMICOLON))
