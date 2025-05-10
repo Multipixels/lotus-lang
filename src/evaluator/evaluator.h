@@ -110,6 +110,9 @@ namespace evaluator
 	// Evaluates an iterate statement
 	std::shared_ptr<object::Object> evaluateIterateStatement(std::shared_ptr<ast::IterateStatement> p_iterateStatement, std::shared_ptr<object::Environment> p_environment);
 
+	// Evaluates break statements
+	std::shared_ptr<object::Object> evaluateBreakStatement(std::shared_ptr<ast::BreakStatement> p_breakStatement, std::shared_ptr<object::Environment> p_environment);
+
 	// Applies a function call to a function
 	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments);
 

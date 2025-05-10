@@ -20,6 +20,7 @@ namespace object
 		FUNCTION,
 		ERROR,
 		BUILTIN_FUNCTION,
+		BREAK,
 	};
 
 	const std::map<ObjectType, std::string> c_objectTypeToString =
@@ -36,6 +37,7 @@ namespace object
 		{FUNCTION, "FUNCTION"},
 		{ERROR, "ERROR"},
 		{BUILTIN_FUNCTION, "BUILTIN_FUNCTION"},
+		{BREAK, "break"},
 	};
 
 	const std::map<token::TokenType, ObjectType> c_nodeTypeToObjectType =
@@ -47,6 +49,8 @@ namespace object
 		{token::COLLECTION_TYPE, COLLECTION},
 		{token::DICTIONARY_TYPE, DICTIONARY},
 		{token::STRING_TYPE, STRING},
+		{token::RETURN, RETURN},
+		{token::BREAK, BREAK},
 	};
 
 	class Object : public std::enable_shared_from_this<Object>
@@ -221,9 +225,18 @@ namespace object
 		std::shared_ptr<Object> m_object; // Refers to "parent" object. myCollection.append() for example.
 	};
 
+	class Break : public Object
+	{
+	public:
+		Break();
+		ObjectType Type();
+		std::string Inspect();
+	};
+
 	extern std::shared_ptr<Null> NULL_OBJECT;
 	extern std::shared_ptr<Boolean> TRUE_OBJECT;
 	extern std::shared_ptr<Boolean> FALSE_OBJECT;
+	extern std::shared_ptr<Break> BREAK_OBJECT;
 
 	std::shared_ptr<Boolean> getBoolean(bool condition);
 }

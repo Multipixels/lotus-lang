@@ -454,4 +454,13 @@ namespace ast
 
 		return output.str();
 	}
+
+	std::string BreakStatement::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string BreakStatement::String()
+	{
+		return "break;";
+	}
 }

@@ -69,6 +69,9 @@ namespace token
 		STRING_LITERAL,
 
 		IDENTIFIER,
+
+		// Loop controls
+		BREAK,
 	};
 
 	const std::map<TokenType, std::string> c_tokenTypeToString =
@@ -123,6 +126,7 @@ namespace token
 		{CHARACTER_LITERAL, "CHARACTER_LITERAL"},
 		{STRING_LITERAL, "STRING_LITERAL"},
 		{IDENTIFIER, "IDENTIFIER"},
+		{BREAK, "BREAK"},
 	};
 
 	const std::map<std::string, TokenType> c_keywordToTokenType =
@@ -143,6 +147,7 @@ namespace token
 		{"return", RETURN},
 		{"true", TRUE_LITERAL},
 		{"false", FALSE_LITERAL},
+		{"break", BREAK},
 	};
 
 	class Token 

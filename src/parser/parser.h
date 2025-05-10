@@ -111,6 +111,7 @@ namespace parser
 		std::shared_ptr<ast::DoWhileStatement> parseDoWhileStatement();
 		std::shared_ptr<ast::ForStatement> parseForStatement();
 		std::shared_ptr<ast::IterateStatement> parseIterateStatement();
+		std::shared_ptr<ast::BreakStatement> parseBreakStatement();
 
 		// EXPRESSIONS
 

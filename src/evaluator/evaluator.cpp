@@ -44,6 +44,7 @@ namespace evaluator
 			case ast::DO_WHILE_STATEMENT_NODE:           return evaluateDoWhileStatement(std::static_pointer_cast<ast::DoWhileStatement>(p_node), p_environment);
 			case ast::FOR_STATEMENT_NODE:                return evaluateForStatement(std::static_pointer_cast<ast::ForStatement>(p_node), p_environment);
 			case ast::ITERATE_STATEMENT_NODE:            return evaluateIterateStatement(std::static_pointer_cast<ast::IterateStatement>(p_node), p_environment);
+			case ast::BREAK_STATEMENT_NODE:              return evaluateBreakStatement(std::static_pointer_cast<ast::BreakStatement>(p_node), p_environment);
 		}
 
 		return createError("Encountered an unexpected AST node");
@@ -62,6 +63,11 @@ namespace evaluator
 			{
 				std::shared_ptr<object::Return> returnObj = std::static_pointer_cast<object::Return>(result);
 				return returnObj->m_returnValue;
+			}
+
+			if (result->Type() == object::BREAK)
+			{
+				return createError("Attempted to break outside a loop.");
 			}
 		}
 
@@ -99,6 +105,11 @@ namespace evaluator
 			}
 
 			if (result != NULL && result->Type() == object::ERROR)
+			{
+				return result;
+			}
+
+			if (result != NULL && result->Type() == object::BREAK)
 			{
 				return result;
 			}
@@ -629,6 +640,7 @@ namespace evaluator
 
 		std::shared_ptr<object::Object> output = applyFunction(expression, &evaluatedArguments);
 		if (output->Type() == object::ERROR) return output;
+		if (output->Type() == object::BREAK) return createError("Attempted to break outside a loop.");
 
 		if (expression->Type() == object::FUNCTION && output->Type() == object::NULL_TYPE)
 		{
@@ -936,6 +948,14 @@ namespace evaluator
 			{
 				return evaluatedConsequence;
 			}
+			else if (evaluatedConsequence->Type() == object::BREAK)
+			{
+				break;
+			}
+			else if (evaluatedConsequence->Type() == object::RETURN)
+			{
+				return evaluatedConsequence;
+			}
 		}
 
 		return object::NULL_OBJECT;
@@ -947,6 +967,14 @@ namespace evaluator
 
 		std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_doWhileStatement->m_consequence, doWhileEnvironment);
 		if (evaluatedConsequence->Type() == object::ERROR)
+		{
+			return evaluatedConsequence;
+		}
+		else if (evaluatedConsequence->Type() == object::BREAK)
+		{
+			return object::NULL_OBJECT;
+		}
+		else if (evaluatedConsequence->Type() == object::RETURN)
 		{
 			return evaluatedConsequence;
 		}
@@ -970,6 +998,14 @@ namespace evaluator
 
 			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_doWhileStatement->m_consequence, doWhileEnvironment);
 			if (evaluatedConsequence->Type() == object::ERROR)
+			{
+				return evaluatedConsequence;
+			}
+			else if (evaluatedConsequence->Type() == object::BREAK)
+			{
+				break;
+			}
+			else if (evaluatedConsequence->Type() == object::RETURN)
 			{
 				return evaluatedConsequence;
 			}
@@ -1018,6 +1054,14 @@ namespace evaluator
 			{
 				return evaluatedUpdation;
 			}
+			else if (evaluatedConsequence->Type() == object::BREAK)
+			{
+				break;
+			}
+			else if (evaluatedConsequence->Type() == object::RETURN)
+			{
+				return evaluatedConsequence;
+			}
 		}
 
 		return object::NULL_OBJECT;
@@ -1043,6 +1087,8 @@ namespace evaluator
 
 				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+				else if (evaluatedConsequence->Type() == object::BREAK) break;
+				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
 			}
 		}
 		else if (evaluatedIterator->Type() == object::DICTIONARY)
@@ -1055,6 +1101,8 @@ namespace evaluator
 
 				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
 				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+				else if (evaluatedConsequence->Type() == object::BREAK) break;
+				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
 			}
 		}
 		else
@@ -1066,6 +1114,11 @@ namespace evaluator
 		}
 
 		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> evaluateBreakStatement(std::shared_ptr<ast::BreakStatement> p_breakStatement, std::shared_ptr<object::Environment> p_environment)
+	{
+		return object::BREAK_OBJECT;
 	}
 
 	std::shared_ptr<object::Object> applyFunction(std::shared_ptr<object::Object> p_function, std::vector<std::shared_ptr<object::Object>>* p_arguments)

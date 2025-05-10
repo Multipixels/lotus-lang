@@ -12,6 +12,7 @@ namespace object
 	std::shared_ptr<Null> NULL_OBJECT = std::make_shared<object::Null>();
 	std::shared_ptr<Boolean> TRUE_OBJECT = std::make_shared<object::Boolean>(true);
 	std::shared_ptr<Boolean> FALSE_OBJECT = std::make_shared<object::Boolean>(false);
+	std::shared_ptr<Break> BREAK_OBJECT = std::make_shared<object::Break>();
 
 	std::shared_ptr<Object> Object::Member(std::string p_memberName)
 	{
@@ -359,6 +360,7 @@ namespace object
 	{
 		return m_value;
 	}
+
 	Null::Null() {};
 
 	ObjectType Null::Type()
@@ -460,4 +462,17 @@ namespace object
 		}
 		return FALSE_OBJECT;
 	}
+	
+	Break::Break() {};
+
+	ObjectType Break::Type()
+	{
+		return BREAK;
+	}
+
+	std::string Break::Inspect()
+	{
+		return "break";
+	}
+
 }

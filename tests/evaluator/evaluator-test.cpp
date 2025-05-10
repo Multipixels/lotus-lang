@@ -316,6 +316,11 @@ TEST(EvaluatorTest, ReturnStatement)
 		{"return 5 + 10;", 15},
 		{"return 5 + 10; 9;", 15},
 		{"9; return 5 + 10; 9;", 15},
+		{"for(integer i = 0; i < 10; i = i + 1) { return i; }", 0},
+		{"integer i = 0; while(true) { return i; i = i + 1; }", 0},
+		{"integer i = 0; do { return i; i = i + 1; } while(true);", 0},
+		{"integer i = 0; iterate(value : [1,2,3]) { return value; } ", 1},
+		
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -708,6 +713,31 @@ TEST(EvaluatorTest, DictionaryMemberFunctions)
 }
 
 
+TEST(EvaluatorTest, BreakStatement)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInteger = 0; while(true) { myInteger = myInteger + 1; if(myInteger == 5) { break; } } myInteger;", 5},
+		{"integer myInteger = 0; do { myInteger = myInteger + 1; break; } while(true); myInteger;", 1},
+		{"integer myInteger = 0; for(integer i = 0; i < 10; i = i + 1) { myInteger = myInteger + 1; break; } myInteger;", 1},
+		{"integer myInteger = 0; iterate(value : [1, 2, 3, 4]) { myInteger = myInteger + 1; if(value == 3) { break; } } myInteger;", 3},
+
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+
 TEST(EvaluatorTest, Error)
 {
 	typedef struct TestCase
@@ -757,6 +787,8 @@ TEST(EvaluatorTest, Error)
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(-1, 10);", "Attempted to insert into an index that is out of bounds."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(4, 10);", "Attempted to insert into an index that is out of bounds."},
 		{"dictionary<character, integer> myDictionary = {'a': 0, 'b': 1, 'c': 2}; collection<integer> myCollection = myDictionary.keys();", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
+		{"integer() myFunc { break; } while(true) { myFunc(); }", "Attempted to break outside a loop."},
+		{"break;", "Attempted to break outside a loop."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

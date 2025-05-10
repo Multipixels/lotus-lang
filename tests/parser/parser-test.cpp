@@ -1377,7 +1377,7 @@ do {
 } while (someTruthValue);
 
 for (integer i = 0; i < 10; i = i + 1) {
-
+	break;
 }
 
 iterate(var : myCollection) {
@@ -1429,6 +1429,7 @@ do
 } while (someTruthValue);
 for (integer i = 0; (i < 10); (i = (i + 1));)
 {
+break;
 }
 iterate (var : myCollection)
 {
