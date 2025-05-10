@@ -679,12 +679,27 @@ TEST(EvaluatorTest, DictionaryMemberFunctions)
 	{
 		{R"(dictionary<integer, integer> myDictionary = {}; dictionary<integer, integer> returnValue = {0: myDictionary.size}; returnValue;)", {{"0", 0}}, object::INTEGER, object::INTEGER},
 		{R"(dictionary<character, integer> myDictionary = {'a': 3, 'b': 4}; dictionary<integer, integer> returnValue = {0: myDictionary.size}; returnValue;)", {{"0", 2}}, object::INTEGER, object::INTEGER},
+		{R"(dictionary<character, integer> myDictionary = {'a': 3, 'b': 4}; 
+			collection<character> keys = myDictionary.keys(); 
+			iterate(key : keys) { myDictionary[key]; } myDictionary;)", {{"a", 3}, {"b", 4}}, object::CHARACTER, object::INTEGER},
+		{R"(dictionary<character, integer> myDictionary = {'a': 3, 'b': 4}; 
+			collection<character> keys = myDictionary.keys(); 
+			collection<integer> values = myDictionary.values(); 
+			dictionary<integer, boolean> result = {};
+			iterate(value : values) { 
+				iterate(key : keys) {
+					if(myDictionary[key] == value) {
+						result[value] = true;
+					}
+				}
+			} 
+			result;)", {{"3", true}, {"4", true}}, object::INTEGER, object::BOOLEAN},
+
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
 		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
-
 		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(evaluated, &tests[i].expectedValue, tests[i].expectedKeyType, tests[i].expectedValueType));
 	}
 }
@@ -730,6 +745,7 @@ TEST(EvaluatorTest, Error)
 		{"{1: 2, 2: 3, 3: 4}['a'];", "Dictionary has keys of type: 'integer'. Got type: 'character'"},
 		{R"("this is a string".size;)", "size is not a member variable or function for an object of type string."},
 		{R"("this is a string".length();)", R"('("this is a string" . length)' is not a function.)"},
+		{"collection<integer> myCollection = [2, 3, 4]; myCollection.append(1, 2);", "Expected 1 parameter, got 2."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
 		{"collection<integer> myCollection = []; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.pop(-1);", "Attempted to pop an index that is out of bounds."},
@@ -737,6 +753,7 @@ TEST(EvaluatorTest, Error)
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(0, 'a');", "Collection is of type `integer', but tried to insert a value of type `character`."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(-1, 10);", "Attempted to insert into an index that is out of bounds."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(4, 10);", "Attempted to insert into an index that is out of bounds."},
+		{"dictionary<character, integer> myDictionary = {'a': 0, 'b': 1, 'c': 2}; collection<integer> myCollection = myDictionary.keys();", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

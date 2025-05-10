@@ -276,12 +276,30 @@ namespace object
 			{"size", [&]() {
 				return std::make_shared<object::Integer>(m_map.size());
 			}},
+			{"keys", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, this);
+			}},
+			{"values", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, this);
+			}},
 		};
 	}
 
 	Dictionary::Dictionary(ObjectType p_keyType, ObjectType p_valueType, std::vector<std::shared_ptr<Object>> p_keys, std::vector<std::shared_ptr<Object>> p_values)
 		: m_keyType(p_keyType), m_valueType(p_valueType)
 	{
+		m_members = {
+			{"size", [&]() {
+				return std::make_shared<object::Integer>(m_map.size());
+			}},
+			{"keys", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, this);
+			}},
+			{"values", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, this);
+			}},
+		};
+
 		for (int i = 0; i < p_keys.size(); i++)
 		{
 			m_map.emplace(p_keys.at(i), p_values.at(i));

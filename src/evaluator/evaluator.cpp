@@ -840,6 +840,9 @@ namespace evaluator
 
 		p_environment->setIdentifier(&p_declareDictionary->m_name.m_name, object);
 
+		dictionary->m_keyType = object::c_nodeTypeToObjectType.at(p_declareDictionary->m_keyTypeToken.m_type);
+		dictionary->m_valueType = object::c_nodeTypeToObjectType.at(p_declareDictionary->m_valueTypeToken.m_type);
+
 		return object::NULL_OBJECT;
 	}
 

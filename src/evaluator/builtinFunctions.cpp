@@ -131,7 +131,7 @@ namespace evaluator
 	{
 		if (p_object == 0)
 		{
-			return createError("Expected to see a parent object for collection `collection`.");
+			return createError("Expected to see a parent object for collection `insert`.");
 		}
 
 		if (p_object->Type() != object::COLLECTION)
@@ -177,5 +177,67 @@ namespace evaluator
 		collection->m_values.insert(collection->m_values.begin() + integerIndex->m_value, item);
 
 		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> dictionaryKeys(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	{
+		if (p_object == 0)
+		{
+			return createError("Expected to see a parent object for dictionary `keys`.");
+		}
+
+		if (p_object->Type() != object::DICTIONARY)
+		{
+			return createError("Expected a dictionary to get keys from.");
+		}
+
+		if (p_params->size() != 0)
+		{
+			std::ostringstream error;
+			error << "Expected 0 parameters, got " << p_params->size() << ".";
+			return createError(error.str());
+
+		}
+
+		object::Dictionary* dictionary = (object::Dictionary*)(p_object);
+
+		std::vector<std::shared_ptr<object::Object>> keys;
+		for (auto const& a : dictionary->m_map)
+		{
+			keys.push_back(a.first);
+		}
+
+		return std::make_shared<object::Collection>(dictionary->m_keyType, keys);
+	}
+
+	std::shared_ptr<object::Object> dictionaryValues(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	{
+		if (p_object == 0)
+		{
+			return createError("Expected to see a parent object for dictionary `values`.");
+		}
+
+		if (p_object->Type() != object::DICTIONARY)
+		{
+			return createError("Expected a dictionary to get values from.");
+		}
+
+		if (p_params->size() != 0)
+		{
+			std::ostringstream error;
+			error << "Expected 0 parameters, got " << p_params->size() << ".";
+			return createError(error.str());
+
+		}
+
+		object::Dictionary* dictionary = (object::Dictionary*)(p_object);
+
+		std::vector<std::shared_ptr<object::Object>> keys;
+		for (auto const& a : dictionary->m_map)
+		{
+			keys.push_back(a.second);
+		}
+
+		return std::make_shared<object::Collection>(dictionary->m_valueType, keys);
 	}
 }
