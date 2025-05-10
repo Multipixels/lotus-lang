@@ -112,9 +112,7 @@ namespace evaluator
 
 		if (p_params->size() == 1 && ((*p_params)[0] < 0 || std::static_pointer_cast<object::Integer>((*p_params)[0])->m_value >= collection->m_values.size()))
 		{
-			std::ostringstream error;
-			error << "Attempted to pop an index that is out of bounds.";
-			return createError(error.str());
+			return createError("Attempted to pop an index that is out of bounds.");
 		}
 
 		if (p_params->size() == 1)
@@ -125,6 +123,58 @@ namespace evaluator
 		{
 			collection->m_values.pop_back();
 		}
+
+		return object::NULL_OBJECT;
+	}
+
+	std::shared_ptr<object::Object> collectionInsert(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	{
+		if (p_object == 0)
+		{
+			return createError("Expected to see a parent object for collection `collection`.");
+		}
+
+		if (p_object->Type() != object::COLLECTION)
+		{
+			return createError("Expected a collection to insert into.");
+		}
+
+		if (p_params->size() != 2)
+		{
+			std::ostringstream error;
+			error << "Expected 2 parameters, got " << p_params->size() << ".";
+			return createError(error.str());
+
+		}
+
+		object::Collection* collection = (object::Collection*)(p_object);
+		std::shared_ptr<object::Object> index = (*p_params)[0];
+		std::shared_ptr<object::Object> item = (*p_params)[1];
+
+		if (index->Type() != object::INTEGER)
+		{
+			std::ostringstream error;
+			error << "Expected an integer index to insert into, got " << index->Type() << ".";
+			return createError(error.str());
+		}
+
+		std::shared_ptr<object::Integer> integerIndex = std::static_pointer_cast<object::Integer>(index);
+
+		if (integerIndex->m_value < 0 || integerIndex->m_value > collection->m_values.size())
+		{
+			return createError("Attempted to insert into an index that is out of bounds.");
+		}
+
+		if (item->Type() != collection->m_collectionType)
+		{
+			std::ostringstream error;
+			error << "Collection is of type `" << object::c_objectTypeToString.at(collection->m_collectionType)
+				<< "', but tried to insert a value of type `" << object::c_objectTypeToString.at(item->Type())
+				<< "`.";
+			return createError(error.str());
+		}
+
+		collection->m_values.insert(collection->m_values.begin() + integerIndex->m_value, item);
 
 		return object::NULL_OBJECT;
 	}

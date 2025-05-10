@@ -652,6 +652,9 @@ TEST(EvaluatorTest, CollectionMemberFunctions)
 		{R"(collection<integer> myCollection = [1]; myCollection.pop(); myCollection;)", {}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.pop(0); myCollection;)", {2, 3}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.pop(1); myCollection;)", {1, 3}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1]; myCollection.insert(0, 5); myCollection;)", {5, 1}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.insert(1, 10); myCollection;)", {1, 10, 2, 3}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.insert(3, 10); myCollection;)", {1, 2, 3, 10}, object::INTEGER},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -731,6 +734,9 @@ TEST(EvaluatorTest, Error)
 		{"collection<integer> myCollection = []; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.pop(-1);", "Attempted to pop an index that is out of bounds."},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.pop(3);", "Attempted to pop an index that is out of bounds."},
+		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(0, 'a');", "Collection is of type `integer', but tried to insert a value of type `character`."},
+		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(-1, 10);", "Attempted to insert into an index that is out of bounds."},
+		{"collection<integer> myCollection = [2, 3, 4]; myCollection.insert(4, 10);", "Attempted to insert into an index that is out of bounds."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

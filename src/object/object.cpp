@@ -182,6 +182,9 @@ namespace object
 			{"pop", [&]() {
 				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
 			}},
+			{"insert", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, this);
+			}},
 		};
 	}
 
@@ -197,6 +200,9 @@ namespace object
 			}},
 			{"pop", [&]() {
 				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
+			}},
+			{"insert", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, this);
 			}},
 		};
 	}

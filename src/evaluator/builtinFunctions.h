@@ -10,6 +10,7 @@ namespace evaluator
 
 	std::shared_ptr<object::Object> collectionAppend(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object);
 	std::shared_ptr<object::Object> collectionPop(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object);
+	std::shared_ptr<object::Object> collectionInsert(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object);
 
 	const std::map<std::string, std::shared_ptr<object::Builtin>> c_builtins =
 	{
