@@ -67,6 +67,17 @@ namespace parser
 		m_peekToken = m_lexer.nextToken();
 	}
 
+	bool Parser::expectCurrent(token::TokenType p_tokenType)
+	{
+		if (m_currentToken.m_type == p_tokenType)
+		{
+			return true;
+		}
+
+		expectedPeekError(p_tokenType);
+		return false;
+	}
+
 	bool Parser::expectPeek(token::TokenType p_tokenType)
 	{
 		if (m_peekToken.m_type == p_tokenType)
@@ -459,8 +470,13 @@ namespace parser
 			statement->m_alternative = parseElseStatement();
 			return statement;
 		}
-
 		statement->m_alternative = 0;
+		
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
+
 		return statement;
 	}
 
@@ -483,6 +499,11 @@ namespace parser
 		statement->m_condition = NULL;
 		statement->m_consequence = parseBlockStatement();
 		statement->m_alternative = NULL;
+
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
 
 		return statement;
 	}
@@ -511,6 +532,12 @@ namespace parser
 		}
 
 		statement->m_consequence = parseBlockStatement();
+
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
+
 		return statement;
 	}
 
@@ -525,6 +552,11 @@ namespace parser
 		}
 
 		statement->m_consequence = parseBlockStatement();
+
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
 
 		if (!expectPeek(token::WHILE))
 		{
@@ -590,6 +622,11 @@ namespace parser
 
 		statement->m_consequence = parseBlockStatement();
 
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
+
 		return statement;
 	}
 
@@ -625,6 +662,11 @@ namespace parser
 		}
 
 		statement->m_consequence = parseBlockStatement();
+
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
 
 		return statement;
 	}

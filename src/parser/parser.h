@@ -64,6 +64,9 @@ namespace parser
 		// Cycles through to the next token in the lexer
 		void nextToken();
 
+		// Checks if current token type is as expected. If it is, cycle to it
+		bool expectCurrent(token::TokenType p_tokenType);
+
 		// Checks if peek token type is as expected. If it is, cycle to it
 		bool expectPeek(token::TokenType p_tokenType);
 
