@@ -388,6 +388,11 @@ namespace parser
 		statement->m_body->m_token = m_currentToken;
 		statement->m_body->m_body = parseBlockStatement();
 
+		if (!expectCurrent(token::RBRACE))
+		{
+			return NULL;
+		}
+
 		return statement;
 	}
 
