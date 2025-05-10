@@ -648,6 +648,8 @@ TEST(EvaluatorTest, CollectionMemberFunctions)
 		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; myCollection;)", {1, 2, 3}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(4); myCollection;)", {1, 2, 3, 4}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(1); myCollection;)", {1, 2, 3, 1}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.pop(); myCollection;)", {1, 2}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1]; myCollection.pop(); myCollection;)", {}, object::INTEGER},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -725,6 +727,7 @@ TEST(EvaluatorTest, Error)
 		{R"("this is a string".length();)", R"('("this is a string" . length)' is not a function.)"},
 		{"collection<integer> myCollection = [2, 3, 4]; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
 		{"collection<integer> myCollection = []; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
+		{"collection<integer> myCollection = []; myCollection.pop();", "Cannot pop from an empty collection."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

@@ -179,6 +179,9 @@ namespace object
 			{"append", [&]() {
 				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
 			}},
+			{"pop", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
+			}},
 		};
 	}
 
@@ -191,6 +194,9 @@ namespace object
 			}},
 			{"append", [&]() {
 				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
+			}},
+			{"pop", [&]() {
+				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
 			}},
 		};
 	}

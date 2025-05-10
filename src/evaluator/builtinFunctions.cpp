@@ -75,7 +75,36 @@ namespace evaluator
 		collection->m_values.push_back(item);
 
 		return object::NULL_OBJECT;
+	}
 
-		// TODO: Create tests.
+	std::shared_ptr<object::Object> collectionPop(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	{
+		if (p_object == 0)
+		{
+			return createError("Expected to see a parent object for collection `pop`.");
+		}
+
+		if (p_object->Type() != object::COLLECTION)
+		{
+			return createError("Expected a collection to pop from.");
+		}
+
+		if (p_params->size() != 0)
+		{
+			std::ostringstream error;
+			error << "Expected 0 parameters, got " << p_params->size() << ".";
+			return createError(error.str());
+		}
+
+		object::Collection* collection = (object::Collection*)(p_object);
+
+		if (collection->m_values.size() == 0)
+		{
+			return createError("Cannot pop from an empty collection.");
+		}
+
+		collection->m_values.pop_back();
+
+		return object::NULL_OBJECT;
 	}
 }
