@@ -483,6 +483,7 @@ namespace evaluator
 		if (*p_infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value - p_rightObject->m_value));
 		if (*p_infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value * p_rightObject->m_value));
 		if (*p_infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
+		if (*p_infixOperator == "%") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value % p_rightObject->m_value));
 
 		if (*p_infixOperator == "<")  return object::getBoolean(p_leftObject->m_value < p_rightObject->m_value);
 		if (*p_infixOperator == "<=") return object::getBoolean(p_leftObject->m_value <= p_rightObject->m_value);

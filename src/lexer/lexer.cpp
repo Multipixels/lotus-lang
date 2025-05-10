@@ -66,6 +66,9 @@ namespace lexer
 		case '/':
 			token = token::Token(token::SLASH, std::string{ m_currentChar });
 			break;
+		case '%':
+			token = token::Token(token::PERCENT, std::string{ m_currentChar });
+			break;
 		case '!':
 			if (peekChar() == '=')
 			{

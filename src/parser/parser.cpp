@@ -28,6 +28,7 @@ namespace parser
 		registerInfixFunction(token::MINUS, &Parser::parseInfixExpression);
 		registerInfixFunction(token::ASTERIK, &Parser::parseInfixExpression);
 		registerInfixFunction(token::SLASH, &Parser::parseInfixExpression);
+		registerInfixFunction(token::PERCENT, &Parser::parseInfixExpression);
 		registerInfixFunction(token::RCHEVRON, &Parser::parseInfixExpression);
 		registerInfixFunction(token::GEQ, &Parser::parseInfixExpression);
 		registerInfixFunction(token::LCHEVRON, &Parser::parseInfixExpression);

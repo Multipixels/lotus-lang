@@ -25,6 +25,9 @@ TEST(EvaluatorTest, IntegerExpression)
 		{"5 / 5;", 1},
 		{"5 / 4;", 1}, // floor division for integers
 		{"5 / 6;", 0}, // floor division for integers
+		{"5 % 5;", 0},
+		{"27 % 5;", 2},
+		{"-7 % 5;", -2},
 		{"(24+7) * -3 - (100/3);", (24 + 7) * -3 - (100 / 3)}, // -126
 	};
 

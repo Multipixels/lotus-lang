@@ -55,6 +55,7 @@ namespace parser
 			{token::OR, SUM},
 			{token::ASTERIK, PRODUCT},
 			{token::SLASH, PRODUCT},
+			{token::PERCENT, PRODUCT},
 			{token::AND, PRODUCT},
 			{token::LPARENTHESIS, CALL},
 			{token::LBRACKET, INDEX},
