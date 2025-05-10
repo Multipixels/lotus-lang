@@ -49,7 +49,7 @@ namespace object
 		{token::STRING_TYPE, STRING},
 	};
 
-	class Object
+	class Object : public std::enable_shared_from_this<Object>
 	{
 	protected:
 		std::map<std::string, std::function<std::shared_ptr<Object>()>> m_members;
@@ -211,14 +211,14 @@ namespace object
 	class Builtin : public Object
 	{
 	public:
-		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*, object::Object*);
+		typedef std::shared_ptr<Object> (*BuiltinFunctionPointer) (std::vector<std::shared_ptr<Object>>*, std::shared_ptr<object::Object>);
 
-		Builtin(BuiltinFunctionPointer p_fn, Object* p_object = 0);
+		Builtin(BuiltinFunctionPointer p_fn, std::shared_ptr<Object> p_object = 0);
 		ObjectType Type();
 		std::string Inspect();
 
 		BuiltinFunctionPointer m_function;
-		Object* m_object; // Refers to "parent" object. myCollection.append() for example.
+		std::shared_ptr<Object> m_object; // Refers to "parent" object. myCollection.append() for example.
 	};
 
 	extern std::shared_ptr<Null> NULL_OBJECT;

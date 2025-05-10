@@ -177,13 +177,13 @@ namespace object
 				return std::make_shared<object::Integer>(m_values.size());
 			}},
 			{"append", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, shared_from_this());
 			}},
 			{"pop", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionPop, shared_from_this());
 			}},
 			{"insert", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, shared_from_this());
 			}},
 		};
 	}
@@ -196,13 +196,13 @@ namespace object
 				return std::make_shared<object::Integer>(m_values.size());
 			}},
 			{"append", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionAppend, shared_from_this());
 			}},
 			{"pop", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionPop, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionPop, shared_from_this());
 			}},
 			{"insert", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, this);
+				return std::make_shared<object::Builtin>(&evaluator::collectionInsert, shared_from_this());
 			}},
 		};
 	}
@@ -277,10 +277,10 @@ namespace object
 				return std::make_shared<object::Integer>(m_map.size());
 			}},
 			{"keys", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, this);
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, shared_from_this());
 			}},
 			{"values", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, this);
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, shared_from_this());
 			}},
 		};
 	}
@@ -293,10 +293,10 @@ namespace object
 				return std::make_shared<object::Integer>(m_map.size());
 			}},
 			{"keys", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, this);
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryKeys, shared_from_this());
 			}},
 			{"values", [&]() {
-				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, this);
+				return std::make_shared<object::Builtin>(&evaluator::dictionaryValues, shared_from_this());
 			}},
 		};
 
@@ -434,7 +434,7 @@ namespace object
 		return output.str();
 	}
 
-	Builtin::Builtin(Builtin::BuiltinFunctionPointer p_fn, Object* p_object)
+	Builtin::Builtin(Builtin::BuiltinFunctionPointer p_fn, std::shared_ptr<Object> p_object)
 		: m_function(p_fn)
 		, m_object(p_object)
 	{

@@ -644,7 +644,9 @@ TEST(EvaluatorTest, CollectionMemberFunctions)
 
 	TestCase tests[] =
 	{
-		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; returnValue;)", {3}, object::INTEGER},
+		{R"([].append(1); collection<integer> myCollection = [1, 2, 3]; myCollection;)", {1, 2, 3}, object::INTEGER},
+		{R"([1].append(1); collection<integer> myCollection = [1, 2, 3]; myCollection;)", {1, 2, 3}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; myCollection;)", {1, 2, 3}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; myCollection;)", {1, 2, 3}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(4); myCollection;)", {1, 2, 3, 4}, object::INTEGER},
 		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(1); myCollection;)", {1, 2, 3, 1}, object::INTEGER},

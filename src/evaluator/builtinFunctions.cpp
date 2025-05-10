@@ -9,7 +9,7 @@
 
 namespace evaluator
 {
-	std::shared_ptr<object::Object> logBuiltin(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> logBuiltin(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object != 0)
 		{
@@ -40,7 +40,7 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> collectionAppend(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> collectionAppend(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object == 0)
 		{
@@ -60,10 +60,10 @@ namespace evaluator
 
 		}
 
-		object::Collection* collection = (object::Collection*)(p_object);
+		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(p_object);
 		std::shared_ptr<object::Object> item = (*p_params)[0];
 
-		if (item->Type() != collection->m_collectionType)
+		if (item->Type() != collection->m_collectionType && collection->m_collectionType != object::NULL_TYPE)
 		{
 			std::ostringstream error;
 			error << "Collection is of type `" << object::c_objectTypeToString.at(collection->m_collectionType)
@@ -73,11 +73,12 @@ namespace evaluator
 		}
 
 		collection->m_values.push_back(item);
+		collection->m_collectionType = item->Type();
 
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> collectionPop(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> collectionPop(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object == 0)
 		{
@@ -103,7 +104,7 @@ namespace evaluator
 			return createError(error.str());
 		}
 
-		object::Collection* collection = (object::Collection*)(p_object);
+		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(p_object);
 
 		if (collection->m_values.size() == 0)
 		{
@@ -127,7 +128,7 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> collectionInsert(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> collectionInsert(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object == 0)
 		{
@@ -147,7 +148,7 @@ namespace evaluator
 
 		}
 
-		object::Collection* collection = (object::Collection*)(p_object);
+		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(p_object);
 		std::shared_ptr<object::Object> index = (*p_params)[0];
 		std::shared_ptr<object::Object> item = (*p_params)[1];
 
@@ -179,7 +180,7 @@ namespace evaluator
 		return object::NULL_OBJECT;
 	}
 
-	std::shared_ptr<object::Object> dictionaryKeys(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> dictionaryKeys(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object == 0)
 		{
@@ -199,7 +200,7 @@ namespace evaluator
 
 		}
 
-		object::Dictionary* dictionary = (object::Dictionary*)(p_object);
+		std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(p_object);
 
 		std::vector<std::shared_ptr<object::Object>> keys;
 		for (auto const& a : dictionary->m_map)
@@ -210,7 +211,7 @@ namespace evaluator
 		return std::make_shared<object::Collection>(dictionary->m_keyType, keys);
 	}
 
-	std::shared_ptr<object::Object> dictionaryValues(std::vector<std::shared_ptr<object::Object>>* p_params, object::Object* p_object)
+	std::shared_ptr<object::Object> dictionaryValues(std::vector<std::shared_ptr<object::Object>>* p_params, std::shared_ptr<object::Object> p_object)
 	{
 		if (p_object == 0)
 		{
@@ -230,7 +231,7 @@ namespace evaluator
 
 		}
 
-		object::Dictionary* dictionary = (object::Dictionary*)(p_object);
+		std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(p_object);
 
 		std::vector<std::shared_ptr<object::Object>> keys;
 		for (auto const& a : dictionary->m_map)

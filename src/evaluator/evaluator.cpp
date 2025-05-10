@@ -575,6 +575,7 @@ namespace evaluator
 
 	std::shared_ptr<object::Object> evaluateCallExpression(std::shared_ptr<ast::CallExpression> p_callExpression, std::shared_ptr<object::Environment> p_environment)
 	{
+		// Issue with returning raw pointer rather than shared pointer
 		std::shared_ptr<object::Object> expression = evaluate(p_callExpression->m_function, p_environment);
 		if (expression->Type() == object::ERROR)
 		{
