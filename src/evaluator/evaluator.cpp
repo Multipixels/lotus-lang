@@ -788,6 +788,11 @@ namespace evaluator
 			return createError(error.str());
 		}
 
+		if (collection->m_collectionType == object::NULL_TYPE)
+		{
+			collection->m_collectionType = object::c_nodeTypeToObjectType.at(p_declareCollection->m_typeToken.m_type);
+		}
+
 		p_environment->setIdentifier(&p_declareCollection->m_name.m_name, object);
 
 		return object::NULL_OBJECT;

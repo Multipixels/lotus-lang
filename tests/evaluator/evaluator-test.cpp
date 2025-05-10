@@ -195,6 +195,9 @@ TEST(EvaluatorTest, DictionaryExpression)
 	TestCase tests[] =
 	{
 		{R"({};)", {}, object::NULL_TYPE, object::NULL_TYPE},
+		{R"({'a': 3, 'b': 4};)", {{"a", 3}, {"b", 4}}, object::CHARACTER, object::INTEGER},
+		{R"({7: 3, 8: 4};)", {{"7", 3}, {"8", 4}}, object::INTEGER, object::INTEGER},
+		{R"({7: "hello", 8: "bye"};)", {{"7", "hello"}, {"8", "bye"}}, object::INTEGER, object::STRING},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -587,7 +590,7 @@ TEST(EvaluatorTest, IterateLoop)
 	}
 }
 
-TEST(EvaluatorTest, BuiltInFunctions)
+TEST(EvaluatorTest, BuiltinFunctions)
 {
 	typedef struct TestCase
 	{
@@ -600,10 +603,6 @@ TEST(EvaluatorTest, BuiltInFunctions)
 		{R"(log("Hello, World!");)", "Hello, World!"},
 		{R"(string myString = "Hello, World!"; log(myString);)", "Hello, World!"},
 		{R"(integer x = 7 - 5; log(x);)", "2"},
-		{R"(size("Hello, World!");)", 13},
-		{R"(string myString = "Hello, World!"; size(myString);)", 13},
-		{R"(string myString = ""; size(myString);)", 0},
-		{R"(collection<integer> myCollection = [1, 2, 3, 4]; size(myCollection);)", 4},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
@@ -612,6 +611,77 @@ TEST(EvaluatorTest, BuiltInFunctions)
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
 }
+
+TEST(EvaluatorTest, StringMemberFunctions)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"("Hello, World!".length;)", 13},
+		{R"(string myString = "Hello, World!"; myString.length;)", 13},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+TEST(EvaluatorTest, CollectionMemberFunctions)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::vector<std::any> expectedValue;
+		object::ObjectType objectType;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; returnValue;)", {3}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; collection<integer> returnValue = [myCollection.size]; myCollection;)", {1, 2, 3}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(4); myCollection;)", {1, 2, 3, 4}, object::INTEGER},
+		{R"(collection<integer> myCollection = [1, 2, 3]; myCollection.append(1); myCollection;)", {1, 2, 3, 1}, object::INTEGER},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);
+		EXPECT_NO_FATAL_FAILURE(testCollectionObject(evaluated, &tests[i].expectedValue, tests[i].objectType));
+	}
+}
+
+
+TEST(EvaluatorTest, DictionaryMemberFunctions)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::map<std::string, std::any> expectedValue;
+		object::ObjectType expectedKeyType;
+		object::ObjectType expectedValueType;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{R"(dictionary<integer, integer> myDictionary = {}; dictionary<integer, integer> returnValue = {0: myDictionary.size}; returnValue;)", {{"0", 0}}, object::INTEGER, object::INTEGER},
+		{R"(dictionary<character, integer> myDictionary = {'a': 3, 'b': 4}; dictionary<integer, integer> returnValue = {0: myDictionary.size}; returnValue;)", {{"0", 2}}, object::INTEGER, object::INTEGER},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
+
+		EXPECT_NO_FATAL_FAILURE(testDictionaryObject(evaluated, &tests[i].expectedValue, tests[i].expectedKeyType, tests[i].expectedValueType));
+	}
+}
+
 
 TEST(EvaluatorTest, Error)
 {
@@ -645,13 +715,16 @@ TEST(EvaluatorTest, Error)
 		{"collection<integer> myCollection = ['a'];", "'myCollection' is a collection of 'integer's, but got a collection of type 'character's."},
 		{"integer myInt = 0; iterate(value : [1, 'a', 3]) { myInt = myInt + value; } myInt;", "The collection [1, 'a', 3] must have uniform typing of elements."},
 		{"integer myInt = 0; iterate(value : ['a', 'b', 'c']) { myInt = myInt + value; } myInt;", "'integer + character' is not supported."},
-		{"integer myInt = 26; size(myInt);", "Argument to `size` not supported, got integer."},
 		{R"({1: 2, 2: 3, 'a': 4};)", "Dictionary has mismatching key types."},
 		{R"({1: 2, 2: 3, 3: 'a'};)", "Dictionary has mismatching value types."},
 		{R"({1: 2, 2: 3, 1: 1};)", "Dictionary initialized with duplicate key."},
 		{R"({"hello": 2};)", "Invalid dictionary key type. string is not a hashable type."},
 		{"{1: 2, 2: 3, 3: 4}[4];", "Index not in dictionary."},
 		{"{1: 2, 2: 3, 3: 4}['a'];", "Dictionary has keys of type: 'integer'. Got type: 'character'"},
+		{R"("this is a string".size;)", "size is not a member variable or function for an object of type string."},
+		{R"("this is a string".length();)", R"('("this is a string" . length)' is not a function.)"},
+		{"collection<integer> myCollection = [2, 3, 4]; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
+		{"collection<integer> myCollection = []; myCollection.append('a');", "Collection is of type `integer', but tried to append a value of type `character`."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
