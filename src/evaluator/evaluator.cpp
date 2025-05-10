@@ -1027,27 +1027,42 @@ namespace evaluator
 	{
 		std::shared_ptr<object::Environment> iterateEnvironment(new object::Environment(p_environment));
 
-		std::shared_ptr<object::Object> evaluatedCollection = evaluate(p_iterateStatement->m_collection, p_environment);
-		if (evaluatedCollection->Type() == object::ERROR)
+		std::shared_ptr<object::Object> evaluatedIterator = evaluate(p_iterateStatement->m_collection, p_environment);
+		if (evaluatedIterator->Type() == object::ERROR)
 		{
-			return evaluatedCollection;
+			return evaluatedIterator;
 		}
 
-		if (evaluatedCollection->Type() != object::COLLECTION)
+		if (evaluatedIterator->Type() == object::COLLECTION)
+		{
+			std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(evaluatedIterator);
+
+			for (std::shared_ptr<object::Object> value : collection->m_values)
+			{
+				iterateEnvironment->setIdentifier(&p_iterateStatement->m_var->m_name, value);
+
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+			}
+		}
+		else if (evaluatedIterator->Type() == object::DICTIONARY)
+		{
+			std::shared_ptr<object::Dictionary> dictionary = std::static_pointer_cast<object::Dictionary>(evaluatedIterator);
+
+			for (auto const& keyValuePair : dictionary->m_map)
+			{
+				iterateEnvironment->setIdentifier(&p_iterateStatement->m_var->m_name, keyValuePair.first);
+
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+			}
+		}
+		else
 		{
 			std::ostringstream error;
-			error << "Expected to see a collection to iterate over. Instead got a(n) '"
-				<< object::c_objectTypeToString.at(evaluatedCollection->Type()) << "'.";
+			error << "Expected to see a collection or dictionary to iterate over. Instead got a(n) '"
+				<< object::c_objectTypeToString.at(evaluatedIterator->Type()) << "'.";
 			return createError(error.str());
-		}
-		std::shared_ptr<object::Collection> collection = std::static_pointer_cast<object::Collection>(evaluatedCollection);
-
-		for (std::shared_ptr<object::Object> value : collection->m_values)
-		{
-			iterateEnvironment->setIdentifier(&p_iterateStatement->m_var->m_name, value);
-
-			std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
-			if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
 		}
 
 		return object::NULL_OBJECT;
