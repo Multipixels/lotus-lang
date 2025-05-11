@@ -404,7 +404,10 @@ namespace evaluator
 		}
 
 		// variables[index] = newValue;
-		else if (p_infixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE && p_infixExpression->m_operator == "=")
+		else if (p_infixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE && 
+					(p_infixExpression->m_operator ==  "=" || p_infixExpression->m_operator == "+=" || p_infixExpression->m_operator == "-=" ||
+					 p_infixExpression->m_operator == "*=" || p_infixExpression->m_operator == "/=" || p_infixExpression->m_operator == "%=")
+			    )
 		{
 			std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_infixExpression->m_leftExpression);
 
@@ -415,6 +418,36 @@ namespace evaluator
 			if (indexObject->Type() == object::ERROR) return indexObject;
 
 			std::shared_ptr<object::Object> valueObject = evaluate(p_infixExpression->m_rightExpression, p_environment);
+			if (valueObject->Type() == object::ERROR) return valueObject;
+
+
+			// Dealing with operator + assignment operators
+			std::shared_ptr<ast::InfixExpression> intermediateValue = std::make_shared<ast::InfixExpression>(*p_infixExpression);
+			if (p_infixExpression->m_operator == "+=")
+			{
+				intermediateValue->m_operator = "+";
+				valueObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "-=")
+			{
+				intermediateValue->m_operator = "-";
+				valueObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "*=")
+			{
+				intermediateValue->m_operator = "*";
+				valueObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "/=")
+			{
+				intermediateValue->m_operator = "/";
+				valueObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "%=")
+			{
+				intermediateValue->m_operator = "%";
+				valueObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
 			if (valueObject->Type() == object::ERROR) return valueObject;
 
 			switch (object->Type()) {

@@ -782,7 +782,7 @@ TEST(EvaluatorTest, OperatorAssignments)
 		{"integer myInteger = 12; myInteger /= 4; myInteger;", 3},
 		{"integer myInteger = 12; myInteger %= 5; myInteger;", 2},
 		{"float myFloat = 12.5f; myFloat += 5; myFloat;", 17.5f},
-
+		{"collection<integer> myCollection = [1, 2, 3, 4]; myCollection[3] += 5; myCollection[3];", 9},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
