@@ -850,6 +850,9 @@ TEST(EvaluatorTest, Error)
 		{"integer myInteger = 12; myInteger += 'a';", "'integer + character' is not supported."},
 		{"character myInteger = 'a'; myInteger %= 3;", "'character % integer' is not supported."},
 		{"5 += 3;", "'integer += integer' is not supported."},
+		{"5 / 0;", "Attempted division by zero."},
+		{"5.5f / 0.0f;", "Attempted division by zero."},
+		{"5 % 0;", "Attempted modulo by zero."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

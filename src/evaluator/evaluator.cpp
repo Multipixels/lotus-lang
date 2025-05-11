@@ -513,8 +513,16 @@ namespace evaluator
 		if (*p_infixOperator == "+") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value + p_rightObject->m_value));
 		if (*p_infixOperator == "-") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value - p_rightObject->m_value));
 		if (*p_infixOperator == "*") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value * p_rightObject->m_value));
-		if (*p_infixOperator == "/") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
-		if (*p_infixOperator == "%") return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value % p_rightObject->m_value));
+		if (*p_infixOperator == "%") 
+		{
+			if (p_rightObject->m_value == 0) return createError("Attempted modulo by zero.");
+			return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value % p_rightObject->m_value));
+		}
+		if (*p_infixOperator == "/")
+		{
+			if (p_rightObject->m_value == 0) return createError("Attempted division by zero.");
+			return std::shared_ptr<object::Integer>(new object::Integer(p_leftObject->m_value / p_rightObject->m_value));
+		}
 
 		if (*p_infixOperator == "<")  return object::getBoolean(p_leftObject->m_value < p_rightObject->m_value);
 		if (*p_infixOperator == "<=") return object::getBoolean(p_leftObject->m_value <= p_rightObject->m_value);
@@ -536,7 +544,12 @@ namespace evaluator
 		if (*p_infixOperator == "+")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value + p_rightObject->m_value));
 		if (*p_infixOperator == "-")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value - p_rightObject->m_value));
 		if (*p_infixOperator == "*")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value * p_rightObject->m_value));
-		if (*p_infixOperator == "/")  return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value / p_rightObject->m_value));
+		if (*p_infixOperator == "/")
+		{
+			if (p_rightObject->m_value == 0) return createError("Attempted division by zero.");
+			return std::shared_ptr<object::Float>(new object::Float(p_leftObject->m_value / p_rightObject->m_value));
+		}
+
 		if (*p_infixOperator == "<")  return object::getBoolean(p_leftObject->m_value < p_rightObject->m_value);
 		if (*p_infixOperator == "<=") return object::getBoolean(p_leftObject->m_value <= p_rightObject->m_value);
 		if (*p_infixOperator == ">")  return object::getBoolean(p_leftObject->m_value > p_rightObject->m_value);
