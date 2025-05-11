@@ -52,6 +52,9 @@ namespace evaluator
 
 	// Applies negative operator (prefix)
 	std::shared_ptr<object::Object> evaluateMinusPrefixOperatorExpression(std::shared_ptr<object::Object> p_expression);
+
+	// Evaluates a postfix expression
+	std::shared_ptr<object::Object> evaluatePostfixExpression(std::shared_ptr<ast::PostfixExpression> p_postfixOperator, std::shared_ptr<object::Environment> p_environment);
 	
 	// Evaluates an infix expression
 	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment);

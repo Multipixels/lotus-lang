@@ -438,6 +438,45 @@ TEST(ParserTest, PrefixExpression)
 	}
 }
 
+TEST(ParserTest, PostfixExpression)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedExpression;
+		std::string expectedOperator;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"5++;", 5, "++"},
+		{"7--;", 7, "--"},
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		lexer::Lexer lexer(&tests[i].input);
+		parser::Parser parser(lexer);
+		std::shared_ptr<ast::Program> program = parser.ParseProgram();
+		ASSERT_NO_FATAL_FAILURE(checkParserErrors(&parser));
+
+		std::shared_ptr<ast::Statement> statement = program->m_statements[0];
+		ASSERT_EQ(program->m_statements.size(), 1)
+			<< "Test #" << i << std::endl;
+
+		// Test to see if this is an expression statement
+		ASSERT_EQ(statement->Type(), ast::EXPRESSION_STATEMENT_NODE);
+		std::shared_ptr<ast::ExpressionStatement> expressionStatement = std::static_pointer_cast<ast::ExpressionStatement>(statement);
+
+		ASSERT_EQ(expressionStatement->m_expression->Type(), ast::POSTFIX_EXPRESSION_NODE);
+		std::shared_ptr<ast::PostfixExpression> postfixExpression = std::static_pointer_cast<ast::PostfixExpression>((expressionStatement->m_expression));
+
+		EXPECT_EQ(postfixExpression->m_operator, tests[i].expectedOperator);
+		ASSERT_NO_FATAL_FAILURE(testLiteralExpression(postfixExpression->m_leftExpression, tests[i].expectedExpression, i));
+
+	}
+}
+
 
 TEST(ParserTest, InfixExpression)
 {
@@ -1327,8 +1366,8 @@ TEST(ParserTest, ExampleLotus)
 {
 	std::string input =
 		R"(
--- These are comments
--- Double dashes create a single-line comment
+-> These are comments
+-> Dash followed by right chevron create a single-line comment
 
 -* These 
                     are
@@ -1337,7 +1376,7 @@ TEST(ParserTest, ExampleLotus)
     comments
 *-
 
--- Atomic data types
+-> Atomic data types
 boolean someTruthValue -* this is an inner comment *- = false;
 boolean another_truth_value = true;
 integer _someInteger = 1;
@@ -1345,21 +1384,21 @@ float someFloat = 1f;
 float anotherFloat = 2.5f;
 character theLetterA = 'a';
 
--- Collections and dictionaries
+-> Collections and dictionaries
 collection<integer> myCollection = [2, 1, 6, 3, 8];
--- dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2}; -- TODO
+dictionary<integer, integer> myDictionary = {};
 myCollection[2];
 string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
--- Functions
+-> Functions
 integer(integer a, boolean b) myFunction
 {
     integer c = 23;
     return c;
 }
 
--- Control structures
+-> Control structures
 if (someTruthValue)
 {
 
@@ -1390,17 +1429,18 @@ iterate(var : myCollection) {
 
 }
 
--- Built in functions
+-> Built in functions
 log("Hello World!");
 size(myCollection);
 
--- Operators
+-> Operators
 a == b;
 a != b;
 a < b; a > b; a <= b; a >= b;
 !a;
 a && b;
 a || b;
+myCollection[2]++;
 )";
 
 std::string expectedString = R"(boolean someTruthValue = false;
@@ -1410,6 +1450,7 @@ float someFloat = 1;
 float anotherFloat = 2.5;
 character theLetterA = 'a';
 collection<integer> myCollection = [2, 1, 6, 3, 8];
+dictionary<integer, integer> myDictionary = {};
 (myCollection[2]);
 string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
@@ -1450,7 +1491,8 @@ size(myCollection);
 (a >= b);
 (!a);
 (a && b);
-(a || b);)";
+(a || b);
+((myCollection[2])++);)";
 
 	lexer::Lexer lexer(&input);
 	parser::Parser parser(lexer);

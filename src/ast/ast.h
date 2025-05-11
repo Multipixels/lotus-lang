@@ -26,6 +26,7 @@ namespace ast
 		STRING_LITERAL_NODE,
 		FUNCTION_LITERAL_NODE,
 		PREFIX_EXPRESSION_NODE,
+		POSTFIX_EXPRESSION_NODE,
 		INFIX_EXPRESSION_NODE,
 		CALL_EXPRESSION_NODE,
 		INDEX_EXPRESSION_NODE,
@@ -233,6 +234,20 @@ namespace ast
 		NodeType Type() { return m_nodeType; }
 	private:
 		NodeType m_nodeType = PREFIX_EXPRESSION_NODE;
+	};
+
+	class PostfixExpression : public Expression
+	{
+	public:
+		token::Token m_token;
+		std::shared_ptr<ast::Expression> m_leftExpression;
+		std::string m_operator;
+
+		std::string TokenLiteral();
+		std::string String();
+		NodeType Type() { return m_nodeType; }
+	private:
+		NodeType m_nodeType = POSTFIX_EXPRESSION_NODE;
 	};
 
 	class InfixExpression : public Expression

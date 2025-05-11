@@ -24,7 +24,7 @@ namespace lexer
 		eatWhiteSpace();
 		while (true)
 		{
-			if (m_currentChar == '-' && peekChar() == '-')
+			if (m_currentChar == '-' && peekChar() == '>')
 			{
 				eatSingleComment();
 			}
@@ -61,6 +61,12 @@ namespace lexer
 				readChar();
 				token = token::Token(token::PLUS_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
 			}
+			else if (peekChar() == '+')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::INCREMENT, std::string{ prevChar } + std::string{ m_currentChar });
+			}
 			else
 			{
 				token = token::Token(token::PLUS, std::string{ m_currentChar });
@@ -72,6 +78,12 @@ namespace lexer
 				char prevChar = m_currentChar;
 				readChar();
 				token = token::Token(token::MINUS_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else if (peekChar() == '-')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::DECREMENT, std::string{ prevChar } + std::string{ m_currentChar });
 			}
 			else
 			{

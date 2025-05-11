@@ -24,6 +24,9 @@ namespace parser
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::LPARENTHESIS, &Parser::parseGroupedExpression);
 
+		registerPostfixFunction(token::INCREMENT, &Parser::parsePostfixExpression);
+		registerPostfixFunction(token::DECREMENT, &Parser::parsePostfixExpression);
+
 		registerInfixFunction(token::PLUS, &Parser::parseInfixExpression);
 		registerInfixFunction(token::MINUS, &Parser::parseInfixExpression);
 		registerInfixFunction(token::ASTERIK, &Parser::parseInfixExpression);
@@ -722,16 +725,26 @@ namespace parser
 
 		while (!peekTokenIs(token::SEMICOLON) && p_precedence < peekPrecedence())
 		{
-			InfixParseFunction infix = m_infixParseFunctions.at(m_peekToken.m_type);
+			InfixParseFunction infix = m_infixParseFunctions[m_peekToken.m_type];
 			
-			if (infix == NULL)
+			if (infix != NULL)
 			{
-				return leftExpression;
+				nextToken();
+
+				leftExpression = (this->*infix)(leftExpression);
+				continue;
 			}
 
-			nextToken();
+			PostfixParseFunction postfix = m_postfixParseFunctions[m_peekToken.m_type];
+			if (postfix != NULL)
+			{
+				nextToken();
 
-			leftExpression = (this->*infix)(leftExpression);
+				leftExpression = (this->*postfix)(leftExpression);
+				continue;
+			}
+
+			return leftExpression;
 		}
 
 		return leftExpression;
@@ -747,6 +760,19 @@ namespace parser
 		nextToken();
 
 		expression->m_rightExpression = parseExpression(PREFIX);
+
+		return expression;
+	}
+
+	std::shared_ptr<ast::Expression> Parser::parsePostfixExpression(std::shared_ptr<ast::Expression> p_leftExpression)
+	{
+		std::shared_ptr<ast::PostfixExpression> expression(new ast::PostfixExpression);
+
+		expression->m_token = m_currentToken;
+		expression->m_operator = m_currentToken.m_literal;
+		expression->m_leftExpression = p_leftExpression;
+
+		Precedence precedence = currentPrecedence();
 
 		return expression;
 	}
@@ -896,6 +922,11 @@ namespace parser
 	void Parser::registerPrefixFunction(token::TokenType p_tokenType, PrefixParseFunction p_prefixParseFunction)
 	{
 		m_prefixParseFunctions[p_tokenType] = p_prefixParseFunction;
+	}
+
+	void Parser::registerPostfixFunction(token::TokenType p_tokenType, PostfixParseFunction p_postfixParseFunction)
+	{
+		m_postfixParseFunctions[p_tokenType] = p_postfixParseFunction;
 	}
 
 	void Parser::registerInfixFunction(token::TokenType p_tokenType, InfixParseFunction p_infixParseFunction)

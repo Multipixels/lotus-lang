@@ -188,6 +188,19 @@ namespace ast
 		return output.str();
 	}
 
+	std::string PostfixExpression::TokenLiteral()
+	{
+		return m_token.m_literal;
+	}
+	std::string PostfixExpression::String()
+	{
+		std::ostringstream output;
+		output << "(" << m_leftExpression->String() 
+			<< m_operator << ")";
+
+		return output.str();
+	}
+
 	std::string InfixExpression::TokenLiteral()
 	{
 		return m_token.m_literal;

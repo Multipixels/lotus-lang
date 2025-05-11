@@ -12,8 +12,8 @@ TEST(LexerTest, LexNextToken)
 {
     std::string inputCode = 
     R"(
--- These are comments
--- Double dashes create a single-line comment
+-> These are comments
+-> Double dashes create a single-line comment
 
 -* These 
                     are
@@ -22,7 +22,7 @@ TEST(LexerTest, LexNextToken)
     comments
 *-
 
--- Atomic data types
+-> Atomic data types
 boolean someTruthValue -* this is an inner comment *- = false;
 boolean another_truth_value = true;
 integer _someInteger = 1;
@@ -30,21 +30,21 @@ float someFloat = 1f;
 float anotherFloat = 2.5f;
 character theLetterA = 'a';
 
--- Collections and dictionaries
+-> Collections and dictionaries
 collection<integer> myCollection = [2, 1, 6, 3, 8];
 dictionary<integer, integer> myDictionary = {0: 1, 5: 3, 6: 2};
 myCollection[2];
 string myString = "hello";
 collection<character> sameString = ['h', 'e', 'l', 'l', 'o'];
 
--- Functions
+-> Functions
 integer(integer a, boolean b) myFunction
 {
     integer c = 23;
     return c;
 }
 
--- Control structures
+-> Control structures
 if(someTruthValue) 
 {
 
@@ -75,11 +75,11 @@ iterate(var : myCollection) {
 
 }
 
--- Built in functions
+-> Built in functions
 log("Hello World!"); 
 length(myCollection);
 
--- Operators
+-> Operators
 a == b;
 a != b;
 a < b; a > b; a <= b; a >= b;
@@ -331,14 +331,14 @@ TEST(LexerTest, NumericalValues)
 {
     std::string inputCode =
         R"(
--- Valid
+-> Valid
 1
 12345
 2.0f
 3.232321f
 123.456789f
 
--- Invalid
+-> Invalid
 1.0
 1.f
 1.0.0.0

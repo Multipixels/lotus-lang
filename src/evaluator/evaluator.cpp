@@ -30,6 +30,7 @@ namespace evaluator
 			case ast::DICTIONARY_LITERAL_NODE:           return evaluateDictionaryLiteral(std::static_pointer_cast<ast::DictionaryLiteral>(p_node), p_environment);
 			case ast::STRING_LITERAL_NODE:               return evaluateStringLiteral(std::static_pointer_cast<ast::StringLiteral>(p_node), p_environment);
 			case ast::PREFIX_EXPRESSION_NODE:            return evaluatePrefixExpression(std::static_pointer_cast<ast::PrefixExpression>(p_node), p_environment);
+			case ast::POSTFIX_EXPRESSION_NODE:           return evaluatePostfixExpression(std::static_pointer_cast<ast::PostfixExpression>(p_node), p_environment);
 			case ast::INFIX_EXPRESSION_NODE:             return evaluateInfixExpression(std::static_pointer_cast<ast::InfixExpression>(p_node), p_environment);
 			case ast::CALL_EXPRESSION_NODE:              return evaluateCallExpression(std::static_pointer_cast<ast::CallExpression>(p_node), p_environment);
 			case ast::INDEX_EXPRESSION_NODE:             return evaluateIndexExpression(std::static_pointer_cast<ast::IndexExpression>(p_node), p_environment);
@@ -338,6 +339,53 @@ namespace evaluator
 		std::ostringstream error;
 		error << "'-" << object::c_objectTypeToString.at(p_expression->Type()) << "\' is not supported.";
 		return createError(error.str());
+	}
+
+	std::shared_ptr<object::Object> evaluatePostfixExpression(std::shared_ptr<ast::PostfixExpression> p_postfixExpression, std::shared_ptr<object::Environment> p_environment)
+	{
+		std::shared_ptr<object::Object> leftObject = evaluate(p_postfixExpression->m_leftExpression, p_environment);
+		if (leftObject->Type() == object::ERROR) return leftObject;
+
+		std::shared_ptr<object::Integer> savedValue;
+		switch (leftObject->Type())
+		{
+		case object::INTEGER:
+			if (p_postfixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE)
+			{
+				std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(p_postfixExpression->m_leftExpression);
+				savedValue = std::static_pointer_cast<object::Integer>(p_environment->getIdentifier(&identifier->m_name));
+				break;
+			}
+			else if (p_postfixExpression->m_leftExpression->Type() == ast::INDEX_EXPRESSION_NODE)
+			{
+				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_postfixExpression->m_leftExpression);
+				savedValue = std::static_pointer_cast<object::Integer>(leftObject);
+				break;
+			}
+			else
+			{
+				std::ostringstream error;
+				error << object::c_objectTypeToString.at(leftObject->Type()) << " does not support postfix operator "
+					<< p_postfixExpression->m_operator << ".";
+				return createError(error.str());
+			}
+		default:
+			std::ostringstream error;
+			error << object::c_objectTypeToString.at(leftObject->Type()) << p_postfixExpression->m_operator << "\' is not supported.";
+			return createError(error.str());
+		}
+
+		if (p_postfixExpression->m_operator == "++")
+		{
+			savedValue->m_value++;
+		}
+		else if (p_postfixExpression->m_operator == "--")
+		{
+			savedValue->m_value--;
+		}
+
+		return savedValue;
+
 	}
 
 	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment)

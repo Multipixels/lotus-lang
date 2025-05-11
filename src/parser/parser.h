@@ -10,6 +10,7 @@ namespace parser
 	{
 	public:
 		typedef std::shared_ptr<ast::Expression> (Parser::*PrefixParseFunction)();
+		typedef std::shared_ptr<ast::Expression> (Parser::*PostfixParseFunction)(std::shared_ptr<ast::Expression>);
 		typedef std::shared_ptr<ast::Expression> (Parser::*InfixParseFunction) (std::shared_ptr<ast::Expression>);
 
 		lexer::Lexer m_lexer;
@@ -18,6 +19,7 @@ namespace parser
 		token::Token m_peekToken;
 
 		std::map<token::TokenType, PrefixParseFunction> m_prefixParseFunctions;
+		std::map<token::TokenType, PostfixParseFunction> m_postfixParseFunctions;
 		std::map<token::TokenType, InfixParseFunction> m_infixParseFunctions;
 
 		std::vector<std::string> m_errors;
@@ -36,7 +38,7 @@ namespace parser
 			SUM,			// a + b
 			PRODUCT,		// a * b
 			PREFIX,			// -X or !x
-			CALL,			// function call
+			CALL,			// function call, increment/decrements
 			INDEX,			// collection indexing
 			MEMBER_ACCESS,  // dot operator
 		} Precedence;
@@ -63,6 +65,8 @@ namespace parser
 			{token::PERCENT, PRODUCT},
 			{token::AND, PRODUCT},
 			{token::LPARENTHESIS, CALL},
+			{token::INCREMENT, CALL},
+			{token::DECREMENT, CALL},
 			{token::LBRACKET, INDEX},
 			{token::DOT, MEMBER_ACCESS},
 		};
@@ -124,6 +128,7 @@ namespace parser
 
 		std::shared_ptr<ast::Expression> parseExpression(Precedence p_precedence);
 		std::shared_ptr<ast::Expression> parsePrefixExpression();
+		std::shared_ptr<ast::Expression> parsePostfixExpression(std::shared_ptr<ast::Expression> p_leftExpression);
 		std::shared_ptr<ast::Expression> parseInfixExpression(std::shared_ptr<ast::Expression> p_leftExpression);
 		std::shared_ptr<ast::Expression> parseGroupedExpression();
 		std::shared_ptr<ast::Expression> parseIntegerLiteral();
@@ -141,6 +146,9 @@ namespace parser
 
 		// Registers a prefix function into the parser
 		void registerPrefixFunction(token::TokenType p_tokenType, PrefixParseFunction p_prefixParseFunction);
+
+		// Registers a postfix function into the parser
+		void registerPostfixFunction(token::TokenType p_tokenType, PostfixParseFunction p_postfixParseFunction);
 		
 		// Registers an infix function into the parser
 		void registerInfixFunction(token::TokenType p_tokenType, InfixParseFunction p_infixParseFunction);
