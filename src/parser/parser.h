@@ -44,6 +44,11 @@ namespace parser
 		const std::map<token::TokenType, Precedence> c_precedenceOfTokenType =
 		{
 			{token::ASSIGN, ASSIGNMENT},
+			{token::PLUS_ASSIGN, ASSIGNMENT},
+			{token::MINUS_ASSIGN, ASSIGNMENT},
+			{token::ASTERIK_ASSIGN, ASSIGNMENT},
+			{token::SLASH_ASSIGN, ASSIGNMENT},
+			{token::PERCENT_ASSIGN, ASSIGNMENT},
 			{token::EQ, EQUALS},
 			{token::NEQ, EQUALS},
 			{token::LEQ, LESSGREATER},

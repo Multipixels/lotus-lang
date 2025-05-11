@@ -55,19 +55,64 @@ namespace lexer
 			}
 			break;
 		case '+':
-			token = token::Token(token::PLUS, std::string{ m_currentChar });
+			if (peekChar() == '=')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::PLUS_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else
+			{
+				token = token::Token(token::PLUS, std::string{ m_currentChar });
+			}
 			break;
 		case '-':
-			token = token::Token(token::MINUS, std::string{ m_currentChar });
+			if (peekChar() == '=')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::MINUS_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else
+			{
+				token = token::Token(token::MINUS, std::string{ m_currentChar });
+			}
 			break;
 		case '*':
-			token = token::Token(token::ASTERIK, std::string{ m_currentChar });
+			if (peekChar() == '=')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::ASTERIK_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else
+			{
+				token = token::Token(token::ASTERIK, std::string{ m_currentChar });
+			}
 			break;
 		case '/':
-			token = token::Token(token::SLASH, std::string{ m_currentChar });
+			if (peekChar() == '=')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::SLASH_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else
+			{
+				token = token::Token(token::SLASH, std::string{ m_currentChar });
+			}
 			break;
 		case '%':
-			token = token::Token(token::PERCENT, std::string{ m_currentChar });
+			if (peekChar() == '=')
+			{
+				char prevChar = m_currentChar;
+				readChar();
+				token = token::Token(token::PERCENT_ASSIGN, std::string{ prevChar } + std::string{ m_currentChar });
+			}
+			else
+			{
+				token = token::Token(token::PERCENT, std::string{ m_currentChar });
+			}
 			break;
 		case '!':
 			if (peekChar() == '=')

@@ -38,6 +38,11 @@ namespace parser
 		registerInfixFunction(token::AND, &Parser::parseInfixExpression);
 		registerInfixFunction(token::OR, &Parser::parseInfixExpression);
 		registerInfixFunction(token::ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::PLUS_ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::MINUS_ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::ASTERIK_ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::SLASH_ASSIGN, &Parser::parseInfixExpression);
+		registerInfixFunction(token::PERCENT_ASSIGN, &Parser::parseInfixExpression);
 		registerInfixFunction(token::LPARENTHESIS, &Parser::parseCallExpression);
 		registerInfixFunction(token::LBRACKET, &Parser::parseIndexExpression);
 		registerInfixFunction(token::DOT, &Parser::parseInfixExpression);

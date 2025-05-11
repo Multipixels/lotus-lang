@@ -464,6 +464,11 @@ TEST(ParserTest, InfixExpression)
 		{"5 != 6;", 5, "!=", 6},
 		{"true && false;", true, "&&", false},
 		{"true || false;", true, "||", false},
+		{"5 += 1;", 5, "+=", 1},
+		{"5 -= 1;", 5, "-=", 1},
+		{"5 *= 1;", 5, "*=", 1},
+		{"5 /= 1;", 5, "/=", 1},
+		{"5 %= 1;", 5, "%=", 1},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

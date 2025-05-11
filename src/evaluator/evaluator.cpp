@@ -343,7 +343,10 @@ namespace evaluator
 	std::shared_ptr<object::Object> evaluateInfixExpression(std::shared_ptr<ast::InfixExpression> p_infixExpression, std::shared_ptr<object::Environment> p_environment)
 	{
 		// identifier = newValue;
-		if (p_infixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE && p_infixExpression->m_operator == "=")
+		if (p_infixExpression->m_leftExpression->Type() == ast::IDENTIFIER_NODE && 
+				(p_infixExpression->m_operator ==  "=" || p_infixExpression->m_operator == "+=" || p_infixExpression->m_operator == "-=" || 
+				 p_infixExpression->m_operator == "*=" || p_infixExpression->m_operator == "/=" || p_infixExpression->m_operator == "%=")
+		   )
 		{
 			std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(p_infixExpression->m_leftExpression);
 			std::shared_ptr<object::Object> savedValue = p_environment->getIdentifier(&identifier->m_name);
@@ -355,7 +358,35 @@ namespace evaluator
 			}
 
 			std::shared_ptr<object::Object> rightObject = evaluate(p_infixExpression->m_rightExpression, p_environment);
+			if (rightObject->Type() == object::ERROR) return rightObject;
 
+			// Dealing with operator + assignment operators
+			std::shared_ptr<ast::InfixExpression> intermediateValue = std::make_shared<ast::InfixExpression>(*p_infixExpression);
+			if (p_infixExpression->m_operator == "+=")
+			{
+				intermediateValue->m_operator = "+";
+				rightObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "-=")
+			{
+				intermediateValue->m_operator = "-";
+				rightObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "*=")
+			{
+				intermediateValue->m_operator = "*";
+				rightObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "/=")
+			{
+				intermediateValue->m_operator = "/";
+				rightObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
+			else if (p_infixExpression->m_operator == "%=")
+			{
+				intermediateValue->m_operator = "%";
+				rightObject = evaluateInfixExpression(intermediateValue, p_environment);
+			}
 			if (rightObject->Type() == object::ERROR) return rightObject;
 
 			if (savedValue->Type() != rightObject->Type())

@@ -766,6 +766,33 @@ TEST(EvaluatorTest, ContinueStatement)
 }
 
 
+TEST(EvaluatorTest, OperatorAssignments)
+{
+	typedef struct TestCase
+	{
+		std::string input;
+		std::any expectedValue;
+	} TestCase;
+
+	TestCase tests[] =
+	{
+		{"integer myInteger = 12; myInteger += 1; myInteger;", 13},
+		{"integer myInteger = 12; myInteger -= 2; myInteger;", 10},
+		{"integer myInteger = 12; myInteger *= 3; myInteger;", 36},
+		{"integer myInteger = 12; myInteger /= 4; myInteger;", 3},
+		{"integer myInteger = 12; myInteger %= 5; myInteger;", 2},
+		{"float myFloat = 12.5f; myFloat += 5; myFloat;", 17.5f},
+
+	};
+
+	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
+	{
+		std::shared_ptr<object::Object> evaluated = testEvaluation(&tests[i].input);;
+		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
+	}
+}
+
+
 TEST(EvaluatorTest, Error)
 {
 	typedef struct TestCase
@@ -819,6 +846,10 @@ TEST(EvaluatorTest, Error)
 		{"break;", "Attempted to break outside a loop."},
 		{"integer() myFunc { continue; } while(true) { myFunc(); }", "Attempted to continue outside a loop."},
 		{"continue;", "Attempted to continue outside a loop."},
+		{"integer myInteger = 12; myInteger += 5.5f;", "Cannot assign 'myInteger' of type 'integer' a value of type 'float'."},
+		{"integer myInteger = 12; myInteger += 'a';", "'integer + character' is not supported."},
+		{"character myInteger = 'a'; myInteger %= 3;", "'character % integer' is not supported."},
+		{"5 += 3;", "'integer += integer' is not supported."},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
