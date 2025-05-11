@@ -13,7 +13,7 @@ namespace repl
 	int Start() 
 	{
 		bool isRunning = true;
-		std::shared_ptr<object::Environment> environment(new object::Environment);
+		std::shared_ptr<object::Environment> environment = std::make_shared<object::Environment>();
 
 		while (isRunning) 
 		{
@@ -67,7 +67,11 @@ namespace repl
 			{
 				std::cout << "Parser error: " << parser.m_errors[i] << std::endl;
 			}
-			if (parser.m_errors.size() > 0);
+			if (parser.m_errors.size() > 0)
+			{
+				file.close();
+				return -1;
+			}
 
 			std::shared_ptr<object::Object> output = evaluator::evaluate(program, std::shared_ptr<object::Environment>(&environment));
 			if (output->Type() != object::NULL_TYPE)
