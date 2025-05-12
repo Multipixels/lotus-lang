@@ -15,6 +15,12 @@
   <h3 align="center">Lotus</h3>
   <p align="center">
     A statically-typed procedural programming language with an interpreter built in C++.
+    <br />
+    <a href="https://multipixels.dev/projects/lotus-lang/">Try it out on the web!</a>
+    ·
+    <a href="https://github.com/Multipixels/Keep-Talking-and-Nobody-Explodes-Bot/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/Multipixels/Keep-Talking-and-Nobody-Explodes-Bot/issues">Request Feature</a>
   </p>
 </div>
 
@@ -45,10 +51,13 @@
 
 Lotus is a programming language I developed to explore the principles of statically-typed procedural languages, test-driven development, and software testing. With Lotus, you can write programs using familiar constructs like collections, dictionaries, and control structures, all parsed and interpreted through an interpreter written in C++.
 
+A web version of the Lotus interpreter can be found here: <https://multipixels.dev/projects/lotus-lang/>.
+
 ### Built With
 
 * C++
-* CMake
+* [CMake](https://cmake.org/)
+* [Emscripten](https://emscripten.org/)
 * [Google Test](https://google.github.io/googletest/)
 * [Visual Studio](https://visualstudio.microsoft.com/)
 
@@ -63,7 +72,7 @@ Ensure you have the following installed:
 * A C++ compiler
 * CMake
 
-### Installation
+### Setup/Installation
 
 1. Clone the repository:
    ```sh
@@ -88,26 +97,66 @@ Ensure you have the following installed:
    ```sh
    cmake .. CMAKE_BUILD_TYPE=Debug
    ```
+   
+5. Compile the project.
+   
+   i. (Windows) Open solution `out\LotusLang.sln` in Visual Studio and build.
+   
+   ii. (Mac/Linux) Run `make`.
+
+6. (Optional, Windows only) Compile the project for the web w/ Emscripten. Requires Emscripten installed and setup.
+   ```sh
+   mkdir out
+   cd out
+   mkdir build-wasm
+   cd build-wasm
+   
+   call emcmake cmake ../..  -D DCMAKE_SYSTEM_NAME=Emscripten
+   
+   cmake --build . --target LotusLangWeb
+   ```
 
 ## Usage
+
+### CLI Interpreter
+
+To open up the interpreter in your CLI, simply run the binary.
+
+- (Windows):
+```sh
+.\LotusLang.exe
+```
+
+- (Mac/Linux):
+```sh
+./LotusLang
+```
+
+### Interpret Lotus Code from Files
 
 Write Lotus programs in `.lotus` files and run them through the interpreter. Here's an example program:
 
 ```lotus
--- Find the sum of the values in a collection
+-> Find the sum of the values in a collection
 integer sum = 0;
 collection<integer> myCollection = [2, 4, 6];
 
 iterate(value : myCollection) {
-  sum = sum + myCollection;
+  sum += value;
 }
 
 log(sum);
 ```
 
-Run the program:
+Run the program
+
+- Windows:
 ```sh
-./lotus-interpreter example.lotus
+.\LotusLang.exe example.lotus
+```
+- Mac/Linux:
+```sh
+./LotusLang example.lotus
 ```
 
 ## Features
@@ -115,18 +164,8 @@ Run the program:
 - **Statically-Typed Variables**: Includes primitive types like `boolean`, `integer`, `float`, `character`, and `string`.
 - **Collections and Dictionaries**: Flexible and easy-to-use data structures.
 - **Functions**: Define reusable blocks of code with return types and parameters.
-- **Control Structures**: Use `if-else`, `while`, `for`, and more.
-- **Built-in Functions**: Log messages, calculate lengths, and more.
-
-## Roadmap
-
-- [X] Basic Syntax and Grammar
-- [X] Functions
-- [X] Control Structures
-- [X] Collections
-- [ ] Dictionaries
-- [X] Strings
-- [X] Standard Library Functions
+- **Control Structures**: Use logic and loop structures, like `if-else`, `while`, `for`, and more.
+- **Built-in Functions**: Log messages to the console, modify collection contents, and more.
 
 ## Contact
 
