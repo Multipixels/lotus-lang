@@ -1,8 +1,8 @@
 # Made w/ help from Low Level Game Dev: https://www.youtube.com/watch?v=IBgfeZME2Vw
 
 cmake_minimum_required(VERSION 3.15)
-
 set(CMAKE_CXX_STANDARD 11)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     set(RELEASE_BUILD OFF)
@@ -32,15 +32,24 @@ project(
 add_executable("LotusLang" 
     "src/main.cpp"
     "src/ast/ast.cpp"
+    "src/ast/ast.h"
     "src/evaluator/builtinFunctions.cpp"
+    "src/evaluator/builtinFunctions.h"
     "src/evaluator/evaluator.cpp"
+    "src/evaluator/evaluator.h"
     "src/lexer/lexer.cpp"
+    "src/lexer/lexer.h"
     "src/object/object.cpp"
+    "src/object/object.h"
     "src/parser/parser.cpp"
+    "src/parser/parser.h"
     "src/repl/repl.cpp"
+    "src/repl/repl.h"
     "src/token/token.cpp"
+    "src/token/token.h"
 )
 set_property(TARGET "LotusLang" PROPERTY CXX_STANDARD 11)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "LotusLang")
 
 if(RELEASE_BUILD)
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RELEASE_BUILD=1) 
@@ -74,6 +83,7 @@ message("CMake Build Type: ${CMAKE_BUILD_TYPE}")
 
 # TESTING
 
+message(${RELEASE_BUILD})
 if(NOT ${RELEASE_BUILD})
     project(LotusTests)
     set(CMAKE_CXX_STANDARD 17)
@@ -90,20 +100,31 @@ if(NOT ${RELEASE_BUILD})
 
     enable_testing()
 
-    add_executable(
-        LotusTests
+    add_executable(LotusTests
         "tests/ast/ast-test.cpp"
+        "tests/ast/ast-test.h"
         "tests/evaluator/evaluator-test.cpp"
+        "tests/evaluator/evaluator-test.h"
         "tests/lexer/lexer-test.cpp"
+        "tests/lexer/lexer-test.h"
         "tests/parser/parser-test.cpp"
+        "tests/parser/parser-test.h"
         "src/ast/ast.cpp"
+        "src/ast/ast.h"
         "src/evaluator/builtinFunctions.cpp"
+        "src/evaluator/builtinFunctions.h"
         "src/evaluator/evaluator.cpp"
+        "src/evaluator/evaluator.h"
         "src/lexer/lexer.cpp"
+        "src/lexer/lexer.h"
         "src/object/object.cpp"
+        "src/object/object.h"
         "src/parser/parser.cpp"
+        "src/parser/parser.h"
         "src/repl/repl.cpp"
+        "src/repl/repl.h"
         "src/token/token.cpp"
+        "src/token/token.h"
     )
 
     target_link_libraries(
@@ -141,13 +162,21 @@ if(${RELEASE_BUILD} AND CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     add_executable("LotusLangWeb" 
         "src/bindings.cpp"
         "src/ast/ast.cpp"
+        "src/ast/ast.h"
         "src/evaluator/builtinFunctions.cpp"
+        "src/evaluator/builtinFunctions.h"
         "src/evaluator/evaluator.cpp"
+        "src/evaluator/evaluator.h"
         "src/lexer/lexer.cpp"
+        "src/lexer/lexer.h"
         "src/object/object.cpp"
+        "src/object/object.h"
         "src/parser/parser.cpp"
+        "src/parser/parser.h"
         "src/repl/repl.cpp"
+        "src/repl/repl.h"
         "src/token/token.cpp"
+        "src/token/token.h"
     )
 
     target_include_directories(LotusLangWeb PUBLIC 
