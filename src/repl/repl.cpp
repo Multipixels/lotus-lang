@@ -73,11 +73,7 @@ namespace repl
 				return -1;
 			}
 
-			std::shared_ptr<object::Object> output = evaluator::evaluate(program, std::shared_ptr<object::Environment>(&environment));
-			if (output->Type() != object::NULL_TYPE)
-			{
-				std::cout << output->Inspect() << std::endl;
-			}
+			std::shared_ptr<object::Object> output = evaluator::evaluate(program, std::make_shared<object::Environment>(environment));
 			file.close();
 		}
 		else
