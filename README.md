@@ -48,6 +48,7 @@ Lotus is a programming language I developed to explore the principles of statica
 ### Built With
 
 * C++
+* CMake
 * [Google Test](https://google.github.io/googletest/)
 * [Visual Studio](https://visualstudio.microsoft.com/)
 
@@ -60,7 +61,7 @@ Follow these steps to set up and run the Lotus interpreter on your local machine
 Ensure you have the following installed:
 
 * A C++ compiler
-* [Visual Studio](https://visualstudio.microsoft.com/)
+* CMake
 
 ### Installation
 
@@ -72,9 +73,21 @@ Ensure you have the following installed:
    ```sh
    cd lotus-lang/src
    ```
-3. Open the `lotus-lang.sln` file in Visual Studio.
-4. Build and run the `lotus-interpreter-tests` tests.
-5. Build the `lotus-interpreter` project.
+3. Generate a new directory `out` and navigate to it:
+   ```sh
+   mkdir out
+   cd out
+   ```
+4. Run CMake:
+   
+   For just the Lotus interpreter, run
+   ```sh
+   cmake ..
+   ```
+   For the Lotus interpreter and test suites, run
+   ```sh
+   cmake .. CMAKE_BUILD_TYPE=Debug
+   ```
 
 ## Usage
 
