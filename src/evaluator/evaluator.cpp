@@ -283,6 +283,32 @@ namespace evaluator
 		// TODO: Change operator to an enum for performance gain
 		if (p_prefixExpression->m_operator == "!") return evaluateBangOperatorExpression(rightObject);
 		if (p_prefixExpression->m_operator == "-") return evaluateMinusPrefixOperatorExpression(rightObject);
+		if ( (p_prefixExpression->m_operator == "++" || p_prefixExpression->m_operator == "--") && rightObject->Type() == object::INTEGER)
+		{
+			std::shared_ptr<object::Integer> savedValue;
+			if (p_prefixExpression->m_rightExpression->Type() == ast::IDENTIFIER_NODE)
+			{
+				std::shared_ptr<ast::Identifier> identifier = std::static_pointer_cast<ast::Identifier>(p_prefixExpression->m_rightExpression);
+				savedValue = std::static_pointer_cast<object::Integer>(p_environment->getIdentifier(&identifier->m_name));
+			}
+			else if (p_prefixExpression->m_rightExpression->Type() == ast::INDEX_EXPRESSION_NODE)
+			{
+				std::shared_ptr<ast::IndexExpression> indexExpression = std::static_pointer_cast<ast::IndexExpression>(p_prefixExpression->m_rightExpression);
+				savedValue = std::static_pointer_cast<object::Integer>(rightObject);
+			}
+			else
+			{
+				std::ostringstream error;
+				error << object::c_objectTypeToString.at(rightObject->Type()) << " does not support prefix operator "
+					<< p_prefixExpression->m_operator << ".";
+				return createError(error.str());
+			}
+
+			std::shared_ptr<object::Integer> returnValue(savedValue);
+			if (p_prefixExpression->m_operator == "++") savedValue->m_value++;
+			else if (p_prefixExpression->m_operator == "--") savedValue->m_value--;
+			return returnValue;
+		}
 
 		std::ostringstream error;
 		error << p_prefixExpression->m_operator << object::c_objectTypeToString.at(rightObject->Type()) << "\' is not supported.";
@@ -375,6 +401,7 @@ namespace evaluator
 			return createError(error.str());
 		}
 
+		std::shared_ptr<object::Integer> returnValue = std::make_shared<object::Integer>(savedValue->m_value);
 		if (p_postfixExpression->m_operator == "++")
 		{
 			savedValue->m_value++;
@@ -384,7 +411,7 @@ namespace evaluator
 			savedValue->m_value--;
 		}
 
-		return savedValue;
+		return returnValue;
 
 	}
 

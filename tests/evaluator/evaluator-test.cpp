@@ -803,17 +803,31 @@ TEST(EvaluatorTest, IncrementDecrement)
 
 	TestCase tests[] =
 	{
-		{"integer a = 5; a++;", 6},
+		{"integer a = 5; a++;", 5},
 		{"integer a = 5; a++; a;", 6},
-		{"integer a = 5; a++ + 5;", 11},
+		{"integer a = 5; a++ + 5;", 10},
 		{"integer a = 5; a++ + 5; a;", 6},
-		{"integer a = 5; a--;", 4},
+		{"integer a = 5; a--;", 5},
 		{"integer a = 5; a--; a;", 4},
-		{"integer a = 5; a-- + 5;", 9},
+		{"integer a = 5; a-- + 5;", 10},
 		{"integer a = 5; a-- + 5; a;", 4},
+		{"collection<integer> b = [1, 2, 3]; b[1]++;", 2},
 		{"collection<integer> b = [1, 2, 3]; b[1]++; b[1];", 3},
-		{"integer a = 5; 5 + a++ + 5;", 16},
-		{"integer a = 23; (a++ +7) * -3 - (100/3.0f);", (24 + 7) * -3 - (100 / 3.0f)}, // -126.333 
+		{"integer a = 5; 5 + a++ + 5;", 15},
+		{"integer a = 23; (a++ +7) * -3 - (100/3.0f);", (23 + 7) * -3 - (100 / 3.0f)}, // -126.333 
+
+		{"integer a = 5; ++a;", 6},
+		{"integer a = 5; ++a; a;", 6},
+		{"integer a = 5; ++a + 5;", 11},
+		{"integer a = 5; ++a + 5; a;", 6},
+		{"integer a = 5; --a;", 4},
+		{"integer a = 5; --a; a;", 4},
+		{"integer a = 5; --a + 5;", 9},
+		{"integer a = 5; --a + 5; a;", 4},
+		{"collection<integer> b = [1, 2, 3]; ++b[1];", 3},
+		{"collection<integer> b = [1, 2, 3]; ++b[1]; b[1];", 3},
+		{"integer a = 5; 5 + ++a + 5;", 16},
+		{"integer a = 23; (++a +7) * -3 - (100/3.0f);", (24 + 7) * -3 - (100 / 3.0f)}, // -126.333 
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

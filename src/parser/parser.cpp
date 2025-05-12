@@ -23,6 +23,8 @@ namespace parser
 		registerPrefixFunction(token::BANG, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::MINUS, &Parser::parsePrefixExpression);
 		registerPrefixFunction(token::LPARENTHESIS, &Parser::parseGroupedExpression);
+		registerPrefixFunction(token::INCREMENT, &Parser::parsePrefixExpression);
+		registerPrefixFunction(token::DECREMENT, &Parser::parsePrefixExpression);
 
 		registerPostfixFunction(token::INCREMENT, &Parser::parsePostfixExpression);
 		registerPostfixFunction(token::DECREMENT, &Parser::parsePostfixExpression);
