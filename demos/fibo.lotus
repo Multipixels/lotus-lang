@@ -1,0 +1,14 @@
+-> Returns the n'th fibonacci number (0th is 0, 1st is 1, 2nd is 1, ...)
+integer(integer num) fibo {
+    integer first = 0;
+    integer second = 1;
+
+    for(integer i = 0; i < num; i++) {
+        second += first;
+        first = second - first;
+    }
+
+    return first;
+} 
+
+log(fibo(10));

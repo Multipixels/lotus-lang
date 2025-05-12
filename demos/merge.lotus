@@ -1,0 +1,25 @@
+collection<integer> left = [1, 3, 6];
+collection<integer> right = [2, 4, 5];
+
+    collection<integer> output = [];
+log(right.size > 0);
+
+while(left.size > 0 && right.size > 0) {
+    if(left[0] > right[0]) {
+        output.append(right[0]);
+        right.pop(0);
+    } else {
+        output.append(left[0]);
+        left.pop(0);
+    }
+}
+
+iterate(value : left) {
+    output.append(value);
+}
+
+iterate(value : right) {
+    output.append(value);
+}
+
+log(output);
