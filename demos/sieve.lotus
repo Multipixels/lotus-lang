@@ -1,0 +1,19 @@
+-> Returns whether a number is prime using the sieve of eratosthenes
+boolean(integer n) sieve {
+	collection<boolean> primes = [];
+	for(integer i = 0; i <= n; i++) {
+		primes.append(true);
+	}
+
+	for(integer p = 2; p * p < n; p++) {
+		if(primes[p]) {
+			for(integer j = p + p; j <= n; j += p) {
+				primes[j] = false;
+			}
+		}
+	}
+
+	return primes[n];
+}
+
+log(sieve(23));
