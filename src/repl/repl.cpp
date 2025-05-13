@@ -74,6 +74,12 @@ namespace repl
 			}
 
 			std::shared_ptr<object::Object> output = evaluator::evaluate(program, std::make_shared<object::Environment>(environment));
+
+			if (output->Type() == object::ERROR)
+			{
+				std::cout << output->Inspect() << std::endl;
+			}
+
 			file.close();
 		}
 		else
