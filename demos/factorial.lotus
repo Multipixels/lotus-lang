@@ -1,0 +1,10 @@
+-> Returns the factorial of n
+integer(integer n) factorial {
+    if(n <= 0) {
+        return 1;
+    }
+
+    return factorial(n-1) * n;
+} 
+
+log(factorial(10));

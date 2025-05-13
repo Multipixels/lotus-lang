@@ -20,6 +20,7 @@ TEST(DemosTest, Demos)
 		{"..\\..\\..\\demos\\fibo.lotus", "55"},
 		{"..\\..\\..\\demos\\merge.lotus", "[1, 2, 3, 4, 5, 6]"},
 		{"..\\..\\..\\demos\\hello_world.lotus", "Hello, world!"},
+		{"..\\..\\..\\demos\\factorial.lotus", "3628800"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
