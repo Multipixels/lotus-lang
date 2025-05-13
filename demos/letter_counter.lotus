@@ -1,0 +1,15 @@
+-> Creating a letter frequency dictionary
+
+dictionary<character, integer> letterFrequencies = {};
+string s = "Hello, world!";
+
+for(integer i = 0; i < s.length; i++) {
+	letterFrequencies[s[i]] = 0;
+}
+
+iterate(letter : s) {
+	letterFrequencies[s[i]]++;
+}
+
+-> Returns the number of 'l's in the string s.
+log(letterFrequencies['l']);

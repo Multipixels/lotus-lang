@@ -23,6 +23,7 @@ TEST(DemosTest, Demos)
 		{"..\\..\\..\\demos\\factorial.lotus", "3628800"},
 		{"..\\..\\..\\demos\\palindrome.lotus", "true"},
 		{"..\\..\\..\\demos\\sieve.lotus", "true"},
+		{"..\\..\\..\\demos\\letter_counter.lotus", "3"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)

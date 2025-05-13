@@ -1,3 +1,5 @@
+-> Merges two lists to create one sorted list
+
 collection<integer> left = [1, 3, 6];
 collection<integer> right = [2, 4, 5];
 collection<integer> output = [];
