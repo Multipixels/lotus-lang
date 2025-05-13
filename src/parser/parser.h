@@ -33,6 +33,8 @@ namespace parser
 		{
 			LOWEST,			// default
 			ASSIGNMENT,		// =
+			LOGICAL_OR,		// ||
+			LOGICAL_AND,	// &&
 			EQUALS,			// ==
 			LESSGREATER,	// < or >
 			SUM,			// a + b
@@ -51,6 +53,8 @@ namespace parser
 			{token::ASTERIK_ASSIGN, ASSIGNMENT},
 			{token::SLASH_ASSIGN, ASSIGNMENT},
 			{token::PERCENT_ASSIGN, ASSIGNMENT},
+			{token::OR, LOGICAL_OR},
+			{token::AND, LOGICAL_AND},
 			{token::EQ, EQUALS},
 			{token::NEQ, EQUALS},
 			{token::LEQ, LESSGREATER},
@@ -59,11 +63,9 @@ namespace parser
 			{token::RCHEVRON, LESSGREATER},
 			{token::PLUS, SUM},
 			{token::MINUS, SUM},
-			{token::OR, SUM},
 			{token::ASTERIK, PRODUCT},
 			{token::SLASH, PRODUCT},
 			{token::PERCENT, PRODUCT},
-			{token::AND, PRODUCT},
 			{token::LPARENTHESIS, CALL},
 			{token::INCREMENT, CALL},
 			{token::DECREMENT, CALL},

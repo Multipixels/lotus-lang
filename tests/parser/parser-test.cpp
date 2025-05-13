@@ -569,6 +569,7 @@ TEST(ParserTest, OperatorPrecedence)
 		{"(24+7) * -3 + (100/3);", "(((24 + 7) * (-3)) + (100 / 3));"},
 		{"24 * [1,2,3,4][2];", "(24 * ([1, 2, 3, 4][2]));"},
 		{"left.middle.right;", "((left . middle) . right);"},
+		{"5 > 3 && 2 < 7;", "((5 > 3) && (2 < 7));"},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
