@@ -23,9 +23,7 @@ TEST(DemosTest, Demos)
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
 	{
-		std::cout.setstate(std::ios_base::failbit);
 		std::shared_ptr<object::Object> evaluated = testEvaluationFile(&tests[i].fileName);
-		std::cout.clear();
 
 		EXPECT_NO_FATAL_FAILURE(testLiteralObject(evaluated, tests[i].expectedValue));
 	}
@@ -58,13 +56,16 @@ std::shared_ptr<object::Object> testEvaluationFile(std::string* p_input)
 			return evaluator::createError("Parser errors found.");
 		}
 
+		std::cout.setstate(std::ios_base::failbit);
 		std::shared_ptr<object::Object> output = evaluator::evaluate(program, environment);
+		std::cout.clear();
+
 		file.close();
 		return output;
 	}
 	else
 	{
-		return evaluator::createError("Could not open the file. Demos are searched for in ..\..\..\demos.");
+		return evaluator::createError("Could not open the file. Demos are searched for in ..\\..\\..\\demos.");
 	}
 
 	return evaluator::createError("Unreachable code");

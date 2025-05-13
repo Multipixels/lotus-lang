@@ -916,7 +916,9 @@ std::shared_ptr<object::Object> testEvaluation(std::string* p_input)
 	std::shared_ptr<ast::Program> program = parser.ParseProgram();
 	std::shared_ptr<object::Environment> environment(new object::Environment());
 
+	std::cout.setstate(std::ios_base::failbit);
 	return evaluator::evaluate(program, environment);
+	std::cout.clear();
 }
 
 void testLiteralObject(std::shared_ptr<object::Object> p_object, std::any p_expectedValue)
