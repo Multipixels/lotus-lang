@@ -103,6 +103,8 @@ if(NOT ${RELEASE_BUILD})
     add_executable(LotusTests
         "tests/ast/ast-test.cpp"
         "tests/ast/ast-test.h"
+        "tests/demos/demos-test.cpp"
+        "tests/demos/demos-test.h"
         "tests/evaluator/evaluator-test.cpp"
         "tests/evaluator/evaluator-test.h"
         "tests/lexer/lexer-test.cpp"
@@ -124,8 +126,7 @@ if(NOT ${RELEASE_BUILD})
         "src/repl/repl.cpp"
         "src/repl/repl.h"
         "src/token/token.cpp"
-        "src/token/token.h"
-    )
+        "src/token/token.h")
 
     target_link_libraries(
       LotusTests
@@ -144,6 +145,7 @@ if(NOT ${RELEASE_BUILD})
         "src/repl"
         "src/token"
         "tests/ast"
+        "tests/demos"
         "tests/evaluator"
         "tests/lexer"
         "tests/parser"

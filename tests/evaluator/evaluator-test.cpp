@@ -952,6 +952,18 @@ void testLiteralObject(std::shared_ptr<object::Object> p_object, std::any p_expe
 		EXPECT_NO_FATAL_FAILURE(testStringObject(p_object, &expectedString));
 		return;
 	}
+	case object::ERROR:
+	{
+		std::cout << std::static_pointer_cast<object::Error>(p_object)->m_errorMessage << std::endl;
+		FAIL();
+		return;
+	}
+	default:
+	{
+		std::cout << "Unexpected object type received. Got object of type " << object::c_objectTypeToString.at(p_object->Type()) << "." << std::endl;
+		FAIL();
+		return;
+	}
 	}
 
 	FAIL();
