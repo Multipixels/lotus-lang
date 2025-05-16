@@ -1288,6 +1288,22 @@ namespace evaluator
 				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
 			}
 		}
+		else if (evaluatedIterator->Type() == object::STRING)
+		{
+			std::shared_ptr<object::String> string = std::static_pointer_cast<object::String>(evaluatedIterator);
+
+			for (char chr : string->m_value)
+			{
+				std::shared_ptr<object::Character> character = std::make_shared<object::Character>(chr);
+				iterateEnvironment->setIdentifier(&p_iterateStatement->m_var->m_name, character);
+
+				std::shared_ptr<object::Object> evaluatedConsequence = evaluate(p_iterateStatement->m_consequence, iterateEnvironment);
+				if (evaluatedConsequence->Type() == object::ERROR) return evaluatedConsequence;
+				else if (evaluatedConsequence->Type() == object::BREAK) break;
+				else if (evaluatedConsequence->Type() == object::CONTINUE) continue;
+				else if (evaluatedConsequence->Type() == object::RETURN) return evaluatedConsequence;
+			}
+		}
 		else
 		{
 			std::ostringstream error;

@@ -8,7 +8,7 @@ for(integer i = 0; i < s.length; i++) {
 }
 
 iterate(letter : s) {
-	letterFrequencies[s[i]]++;
+	letterFrequencies[letter]++;
 }
 
 -> Returns the number of 'l's in the string s.

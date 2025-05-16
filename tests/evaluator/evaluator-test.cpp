@@ -590,6 +590,7 @@ TEST(EvaluatorTest, IterateLoop)
 		{"integer myInt = 0; iterate(value : [1, 2, 3, 4]) { myInt = myInt + 1; } myInt;", 4},
 		{"integer myInt = 0; iterate(value : [1, 2, 3, 4]) { myInt = myInt + value; } myInt;", 10},
 		{"integer myInt = 0; dictionary<character, integer> myDictionary = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4}; iterate(key : myDictionary) { myInt = myInt + myDictionary[key]; } myInt;", 10},
+		{"integer myInt = 0; iterate(letter : \"Hello, world.\") { myInt++; } myInt;", 13},
 	};
 
 	for (int i = 0; i < sizeof(tests) / sizeof(TestCase); i++)
