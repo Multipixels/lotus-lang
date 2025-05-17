@@ -78,9 +78,9 @@ Ensure you have the following installed:
    ```sh
    git clone https://github.com/Multipixels/lotus-lang.git
    ```
-2. Navigate to the project's src directory:
+2. Navigate to the project's root directory:
    ```sh
-   cd lotus-lang/src
+   cd lotus-lang
    ```
 3. Generate a new directory `out` and navigate to it:
    ```sh
@@ -102,7 +102,7 @@ Ensure you have the following installed:
    
    i. (Windows) Open solution `out\LotusLang.sln` in Visual Studio and build.
    
-   ii. (Mac/Linux) Run `make`.
+   ii. (Mac/Linux) Run `make`
 
 6. (Optional, Windows only) Compile the project for the web w/ Emscripten. Requires Emscripten installed and setup.
    ```sh

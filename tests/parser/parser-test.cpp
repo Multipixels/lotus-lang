@@ -1525,20 +1525,23 @@ void testLiteralExpression(std::shared_ptr<ast::Expression> p_expression, std::a
 	// Cannot use a switch on type as std::string is not integral
 	// Minor efficiency tradeoff, but this is just a test suite, not the actual interpreter
 
-	std::string expectedValueType = p_expectedValue.type().name();
-	if(expectedValueType == "int")
+	// GCC and Clang produce different outputs compared to MSVC: https://en.cppreference.com/w/cpp/types/type_info/name
+	// std::string expectedValueType = p_expectedValue.type().name();
+
+	std::type_info const& type = p_expectedValue.type();
+	if(type == typeid(int))
 	{
 		ASSERT_NO_FATAL_FAILURE(testIntegerLiteral(p_expression, std::any_cast<int>(p_expectedValue), p_testNumber));
 	}
-	else if (expectedValueType == "float")
+	else if (type == typeid(float))
 	{
 		ASSERT_NO_FATAL_FAILURE(testFloatLiteral(p_expression, std::any_cast<float>(p_expectedValue), p_testNumber));
 	}
-	else if (expectedValueType == "bool")
+	else if (type == typeid(bool))
 	{
 		ASSERT_NO_FATAL_FAILURE(testBooleanLiteral(p_expression, std::any_cast<bool>(p_expectedValue), p_testNumber));
 	}
-	else if (expectedValueType == "char")
+	else if (type == typeid(char))
 	{
 		ASSERT_NO_FATAL_FAILURE(testCharacterLiteral(p_expression, std::any_cast<char>(p_expectedValue), p_testNumber));
 	}
