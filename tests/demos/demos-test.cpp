@@ -70,7 +70,7 @@ std::shared_ptr<object::Object> testEvaluationFile(std::string* p_input)
 	}
 	else
 	{
-		return evaluator::createError("Could not open the file. Demos are searched for in ..\\..\\..\\demos.");
+		return evaluator::createError("Could not open the file. Demos are searched for in ..\\..\\..\\demos. This test will fail on non-Windows devices.");
 	}
 
 	return evaluator::createError("Unreachable code");
